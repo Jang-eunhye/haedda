@@ -1,19 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Mission } from '../types';
 
 const CONTENT_MAX = 50;
 
 interface Props {
   onClose: () => void;
-  onAdd: (mission: Omit<Mission, 'id' | 'completed'>) => void;
+  onAdd: (mission: Omit<Mission, 'id' | 'completed' | 'earnedStickers'>) => void;
 }
 
 export default function AddMissionModal({ onClose, onAdd }: Props) {
   const [content, setContent] = useState('');
   const [deadline, setDeadline] = useState('');
   const [stickerCount, setStickerCount] = useState(1);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,13 +35,15 @@ export default function AddMissionModal({ onClose, onAdd }: Props) {
     setStickerCount(prev => Math.max(1, Math.min(10, prev + delta)));
   };
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <div
       className="fixed inset-0 bg-black/40 flex items-end justify-center z-50"
       onClick={onClose}
     >
       <div
-        className="bg-white w-full max-w-md rounded-t-3xl p-6 pb-10"
+        className="bg-white w-full max-w-md rounded-t-3xl p-6 pb-12"
         onClick={e => e.stopPropagation()}
       >
         <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-6" />
@@ -112,6 +124,7 @@ export default function AddMissionModal({ onClose, onAdd }: Props) {
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

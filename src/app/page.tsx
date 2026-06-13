@@ -8,7 +8,7 @@ import RewardTab from './components/RewardTab';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>('mission');
-  const { missions, addMission } = useMissions();
+  const { missions, totalStickers, addMission, completeMission } = useMissions();
 
   return (
     <div className="min-h-screen bg-amber-50">
@@ -27,16 +27,20 @@ export default function Home() {
                 : 'text-gray-400 hover:text-gray-600'
             }`}
           >
-            {tab === 'mission' ? '미션' : '보상'}
+            {tab === 'mission' ? '미션' : `보상 · ⭐${totalStickers}`}
           </button>
         ))}
       </div>
 
       <main className="max-w-md mx-auto px-4 py-6">
         {activeTab === 'mission' ? (
-          <MissionTab missions={missions} onAddMission={addMission} />
+          <MissionTab
+            missions={missions}
+            onAddMission={addMission}
+            onCompleteMission={completeMission}
+          />
         ) : (
-          <RewardTab />
+          <RewardTab totalStickers={totalStickers} />
         )}
       </main>
     </div>

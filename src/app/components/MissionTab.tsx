@@ -7,17 +7,21 @@ import AddMissionModal from './AddMissionModal';
 
 interface Props {
   missions: Mission[];
-  onAddMission: (mission: Omit<Mission, 'id' | 'completed'>) => void;
+  onAddMission: (mission: Omit<Mission, 'id' | 'completed' | 'earnedStickers'>) => void;
+  onCompleteMission: (id: string) => void;
 }
 
-export default function MissionTab({ missions, onAddMission }: Props) {
+export default function MissionTab({ missions, onAddMission, onCompleteMission }: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const active = missions.filter(m => !m.completed);
+  const done = missions.filter(m => m.completed);
 
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-base font-semibold text-gray-700">
-          미션 <span className="text-amber-500">{missions.length}</span>
+          미션 <span className="text-amber-500">{active.length}</span>
         </h2>
         <button
           onClick={() => setIsModalOpen(true)}
@@ -27,7 +31,7 @@ export default function MissionTab({ missions, onAddMission }: Props) {
         </button>
       </div>
 
-      {missions.length === 0 ? (
+      {active.length === 0 && done.length === 0 ? (
         <div className="text-center py-20 text-gray-400">
           <div className="text-5xl mb-3">🎯</div>
           <p className="text-sm font-medium">아직 미션이 없어요</p>
@@ -35,9 +39,18 @@ export default function MissionTab({ missions, onAddMission }: Props) {
         </div>
       ) : (
         <div className="space-y-3">
-          {missions.map(mission => (
-            <MissionCard key={mission.id} mission={mission} />
+          {active.map(mission => (
+            <MissionCard key={mission.id} mission={mission} onComplete={onCompleteMission} />
           ))}
+
+          {done.length > 0 && (
+            <>
+              <p className="text-xs text-gray-400 font-medium pt-2">완료된 미션</p>
+              {done.map(mission => (
+                <MissionCard key={mission.id} mission={mission} onComplete={onCompleteMission} />
+              ))}
+            </>
+          )}
         </div>
       )}
 

@@ -3,29 +3,53 @@
 import { useState, useEffect } from 'react';
 import { Mission } from '../types';
 
-const STORAGE_KEY = 'haedda_missions';
+const MISSIONS_KEY = 'haedda_missions';
+const STICKERS_KEY = 'haedda_stickers';
 
 export function useMissions() {
-  const [missions, setMissions] = useState<Mission[]>(() => {
-    if (typeof window === 'undefined') return [];
+  const [missions, setMissions] = useState<Mission[]>([]);
+  const [totalStickers, setTotalStickers] = useState<number>(0);
+  const [ready, setReady] = useState(false);
+
+  // SSR과 클라이언트 불일치 방지: 마운트 후 localStorage에서 로드
+  useEffect(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  });
+      const m = localStorage.getItem(MISSIONS_KEY);
+      const s = localStorage.getItem(STICKERS_KEY);
+      if (m) setMissions(JSON.parse(m));
+      if (s) setTotalStickers(JSON.parse(s));
+    } catch {}
+    setReady(true);
+  }, []);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(missions));
-  }, [missions]);
+    if (!ready) return;
+    localStorage.setItem(MISSIONS_KEY, JSON.stringify(missions));
+  }, [missions, ready]);
 
-  const addMission = (data: Omit<Mission, 'id' | 'completed'>) => {
+  useEffect(() => {
+    if (!ready) return;
+    localStorage.setItem(STICKERS_KEY, JSON.stringify(totalStickers));
+  }, [totalStickers, ready]);
+
+  const addMission = (data: Omit<Mission, 'id' | 'completed' | 'earnedStickers'>) => {
     setMissions(prev => [
       ...prev,
       { ...data, id: crypto.randomUUID(), completed: false },
     ]);
   };
 
-  return { missions, addMission };
+  const completeMission = (id: string) => {
+    setMissions(prev =>
+      prev.map(m => {
+        if (m.id !== id || m.completed) return m;
+        const isExpired = new Date(m.deadline) < new Date();
+        const earned = isExpired ? 0 : m.stickerCount;
+        if (earned > 0) setTotalStickers(s => s + earned);
+        return { ...m, completed: true, earnedStickers: earned };
+      })
+    );
+  };
+
+  return { missions, totalStickers, addMission, completeMission };
 }
