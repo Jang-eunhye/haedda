@@ -14,7 +14,7 @@ const TABS: { key: TabType; label: string }[] = [
 
 export default function MainApp() {
   const [activeTab, setActiveTab] = useState<TabType>('mission');
-  const { missions, totalStickers, addMission, completeMission } = useMissions();
+  const { missions, rewards, totalStickers, addMission, completeMission, addReward, claimReward } = useMissions();
 
   return (
     <div className="min-h-screen bg-background">
@@ -57,7 +57,12 @@ export default function MainApp() {
                 onCompleteMission={completeMission}
               />
             ) : (
-              <RewardTab />
+              <RewardTab
+                rewards={rewards}
+                totalStickers={totalStickers}
+                onAddReward={addReward}
+                onClaimReward={claimReward}
+              />
             )}
           </main>
         </div>

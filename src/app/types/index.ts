@@ -7,4 +7,10 @@ export interface Mission {
   earnedStickers?: number; // 완료 시 실제 획득한 스티커 수
 }
 
+export interface Reward {
+  id: string;
+  content: string;
+  stickerCost: number;
+}
+
 export type TabType = 'mission' | 'reward';

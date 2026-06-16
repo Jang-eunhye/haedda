@@ -1,23 +1,26 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Mission } from '../types';
+import { Mission, Reward } from '../types';
 import { isDeadlineExpired } from '../utils/date';
 
 const MISSIONS_KEY = 'haedda_missions';
+const REWARDS_KEY = 'haedda_rewards';
 const STICKERS_KEY = 'haedda_stickers';
 
 export function useMissions() {
   const [missions, setMissions] = useState<Mission[]>([]);
+  const [rewards, setRewards] = useState<Reward[]>([]);
   const [totalStickers, setTotalStickers] = useState<number>(0);
   const [ready, setReady] = useState(false);
 
-  // SSR과 클라이언트 불일치 방지: 마운트 후 localStorage에서 로드
   useEffect(() => {
     try {
       const m = localStorage.getItem(MISSIONS_KEY);
+      const r = localStorage.getItem(REWARDS_KEY);
       const s = localStorage.getItem(STICKERS_KEY);
       if (m) setMissions(JSON.parse(m));
+      if (r) setRewards(JSON.parse(r));
       if (s) setTotalStickers(JSON.parse(s));
     } catch {}
     setReady(true);
@@ -27,6 +30,11 @@ export function useMissions() {
     if (!ready) return;
     localStorage.setItem(MISSIONS_KEY, JSON.stringify(missions));
   }, [missions, ready]);
+
+  useEffect(() => {
+    if (!ready) return;
+    localStorage.setItem(REWARDS_KEY, JSON.stringify(rewards));
+  }, [rewards, ready]);
 
   useEffect(() => {
     if (!ready) return;
@@ -52,5 +60,30 @@ export function useMissions() {
     );
   };
 
-  return { missions, totalStickers, addMission, completeMission };
+  const addReward = (data: Omit<Reward, 'id'>) => {
+    setRewards(prev => [...prev, { ...data, id: crypto.randomUUID() }]);
+  };
+
+  const claimReward = (id: string): boolean => {
+    const reward = rewards.find(r => r.id === id);
+    if (!reward) return false;
+
+    let claimed = false;
+    setTotalStickers(s => {
+      if (s < reward.stickerCost) return s;
+      claimed = true;
+      return s - reward.stickerCost;
+    });
+    return claimed;
+  };
+
+  return {
+    missions,
+    rewards,
+    totalStickers,
+    addMission,
+    completeMission,
+    addReward,
+    claimReward,
+  };
 }
