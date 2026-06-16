@@ -1,23 +1,13 @@
 import { Mission } from '../types';
+import { formatDeadlineLabel, isDeadlineExpired } from '../utils/date';
 
 interface Props {
   mission: Mission;
   onComplete: (id: string) => void;
 }
 
-function formatDeadline(deadline: string) {
-  const date = new Date(deadline);
-  return date.toLocaleString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
 export default function MissionCard({ mission, onComplete }: Props) {
-  const isExpired = new Date(mission.deadline) < new Date();
+  const isExpired = isDeadlineExpired(mission.deadline);
   const { completed, earnedStickers } = mission;
 
   return (
@@ -50,7 +40,7 @@ export default function MissionCard({ mission, onComplete }: Props) {
         <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
-        <span>{formatDeadline(mission.deadline)}</span>
+        <span>{formatDeadlineLabel(mission.deadline)}</span>
         {isExpired && !completed && (
           <span className="font-semibold text-danger/80">· 기한 초과</span>
         )}

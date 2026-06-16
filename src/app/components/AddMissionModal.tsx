@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Mission } from '../types';
+import { getTodayISO } from '../utils/date';
+import DatePicker from './DatePicker';
 
 const CONTENT_MAX = 50;
 
@@ -13,7 +15,7 @@ interface Props {
 
 export default function AddMissionModal({ onClose, onAdd }: Props) {
   const [content, setContent] = useState('');
-  const [deadline, setDeadline] = useState('');
+  const [deadline, setDeadline] = useState(getTodayISO);
   const [stickerCount, setStickerCount] = useState(1);
   const [mounted, setMounted] = useState(false);
 
@@ -75,12 +77,7 @@ export default function AddMissionModal({ onClose, onAdd }: Props) {
 
           <div>
             <label className="block text-sm font-semibold text-foreground mb-2">기한</label>
-            <input
-              type="datetime-local"
-              value={deadline}
-              onChange={e => setDeadline(e.target.value)}
-              className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-colors"
-            />
+            <DatePicker value={deadline} onChange={setDeadline} />
           </div>
 
           <div>

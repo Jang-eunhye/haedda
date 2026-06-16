@@ -5,6 +5,7 @@ import { TabType } from '../types';
 import { useMissions } from '../hooks/useMissions';
 import MissionTab from './MissionTab';
 import RewardTab from './RewardTab';
+import StickerBanner from './StickerBanner';
 
 const TABS: { key: TabType; label: string }[] = [
   { key: 'mission', label: '미션' },
@@ -28,7 +29,9 @@ export default function MainApp() {
             </p>
           </header>
 
-          <div className="px-4 pb-3 sm:px-6">
+          <StickerBanner count={totalStickers} />
+
+          <div className="px-4 pb-3 sm:px-6 mt-4">
             <div className="flex p-1 bg-background rounded-2xl">
               {TABS.map(({ key, label }) => (
                 <button
@@ -40,7 +43,7 @@ export default function MainApp() {
                       : 'text-muted hover:text-foreground'
                   }`}
                 >
-                  {key === 'reward' ? `${label} · ⭐${totalStickers}` : label}
+                  {label}
                 </button>
               ))}
             </div>
@@ -54,7 +57,7 @@ export default function MainApp() {
                 onCompleteMission={completeMission}
               />
             ) : (
-              <RewardTab totalStickers={totalStickers} />
+              <RewardTab />
             )}
           </main>
         </div>

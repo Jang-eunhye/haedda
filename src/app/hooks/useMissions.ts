@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Mission } from '../types';
+import { isDeadlineExpired } from '../utils/date';
 
 const MISSIONS_KEY = 'haedda_missions';
 const STICKERS_KEY = 'haedda_stickers';
@@ -43,7 +44,7 @@ export function useMissions() {
     setMissions(prev =>
       prev.map(m => {
         if (m.id !== id || m.completed) return m;
-        const isExpired = new Date(m.deadline) < new Date();
+        const isExpired = isDeadlineExpired(m.deadline);
         const earned = isExpired ? 0 : m.stickerCount;
         if (earned > 0) setTotalStickers(s => s + earned);
         return { ...m, completed: true, earnedStickers: earned };
