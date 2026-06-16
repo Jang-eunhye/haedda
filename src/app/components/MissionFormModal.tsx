@@ -2,18 +2,25 @@
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Reward } from '../types';
+import { Mission } from '../types';
+import { getTodayISO, normalizeDeadline } from '../utils/date';
+import DatePicker from './DatePicker';
 
 const CONTENT_MAX = 50;
 
 interface Props {
   onClose: () => void;
-  onAdd: (reward: Omit<Reward, 'id'>) => void;
+  onSave: (data: Omit<Mission, 'id' | 'completed' | 'earnedStickers'>) => void;
+  mission?: Mission;
 }
 
-export default function AddRewardModal({ onClose, onAdd }: Props) {
-  const [content, setContent] = useState('');
-  const [stickerCost, setStickerCost] = useState(1);
+export default function MissionFormModal({ onClose, onSave, mission }: Props) {
+  const isEdit = !!mission;
+  const [content, setContent] = useState(mission?.content ?? '');
+  const [deadline, setDeadline] = useState(
+    mission ? normalizeDeadline(mission.deadline) : getTodayISO()
+  );
+  const [stickerCount, setStickerCount] = useState(mission?.stickerCount ?? 1);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -26,12 +33,12 @@ export default function AddRewardModal({ onClose, onAdd }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content.trim()) return;
-    onAdd({ content: content.trim(), stickerCost });
+    if (!content.trim() || !deadline) return;
+    onSave({ content: content.trim(), deadline, stickerCount });
   };
 
-  const adjustCost = (delta: number) => {
-    setStickerCost(prev => Math.max(1, Math.min(99, prev + delta)));
+  const adjustSticker = (delta: number) => {
+    setStickerCount(prev => Math.max(1, Math.min(10, prev + delta)));
   };
 
   if (!mounted) return null;
@@ -46,24 +53,28 @@ export default function AddRewardModal({ onClose, onAdd }: Props) {
         onClick={e => e.stopPropagation()}
       >
         <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5 sm:hidden" />
-        <h3 className="text-lg font-bold text-foreground mb-1">새 보상</h3>
-        <p className="text-xs text-muted mb-5">스티커를 모아 받을 보상을 만들어 보세요</p>
+        <h3 className="text-lg font-bold text-foreground mb-1">
+          {isEdit ? '미션 수정' : '새 미션'}
+        </h3>
+        <p className="text-xs text-muted mb-5">
+          {isEdit ? '미션 내용을 수정해 보세요' : '완료하면 스티커를 받을 수 있어요'}
+        </p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block text-sm font-semibold text-foreground mb-2">
-              보상 내용
+              미션 내용
             </label>
             <div className="relative">
-              <input
-                type="text"
+              <textarea
                 value={content}
                 onChange={e => setContent(e.target.value.slice(0, CONTENT_MAX))}
-                placeholder="예) 아이스크림, 게임 30분"
-                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-colors placeholder:text-muted/60"
+                placeholder="무엇을 할까요?"
+                rows={3}
+                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-colors placeholder:text-muted/60"
               />
               <span
-                className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs tabular-nums ${
+                className={`absolute bottom-3 right-3 text-xs tabular-nums ${
                   content.length >= CONTENT_MAX ? 'text-danger' : 'text-muted/60'
                 }`}
               >
@@ -73,26 +84,31 @@ export default function AddRewardModal({ onClose, onAdd }: Props) {
           </div>
 
           <div>
+            <label className="block text-sm font-semibold text-foreground mb-2">기한</label>
+            <DatePicker value={deadline} onChange={setDeadline} />
+          </div>
+
+          <div>
             <label className="block text-sm font-semibold text-foreground mb-2">
-              필요 스티커
+              스티커 개수
             </label>
             <div className="flex items-center justify-center gap-6 py-2 bg-background rounded-xl border border-border">
               <button
                 type="button"
-                onClick={() => adjustCost(-1)}
-                disabled={stickerCost <= 1}
+                onClick={() => adjustSticker(-1)}
+                disabled={stickerCount <= 1}
                 className="w-10 h-10 rounded-xl bg-surface border border-border text-foreground font-bold text-lg hover:bg-background transition-colors disabled:opacity-30 active:scale-95"
               >
                 −
               </button>
               <div className="flex items-center gap-2 min-w-[80px] justify-center">
                 <span className="text-2xl">⭐</span>
-                <span className="text-2xl font-bold text-accent tabular-nums">{stickerCost}</span>
+                <span className="text-2xl font-bold text-accent tabular-nums">{stickerCount}</span>
               </div>
               <button
                 type="button"
-                onClick={() => adjustCost(1)}
-                disabled={stickerCost >= 99}
+                onClick={() => adjustSticker(1)}
+                disabled={stickerCount >= 10}
                 className="w-10 h-10 rounded-xl bg-surface border border-border text-foreground font-bold text-lg hover:bg-background transition-colors disabled:opacity-30 active:scale-95"
               >
                 +
@@ -110,10 +126,10 @@ export default function AddRewardModal({ onClose, onAdd }: Props) {
             </button>
             <button
               type="submit"
-              disabled={!content.trim()}
+              disabled={!content.trim() || !deadline}
               className="flex-1 py-3 rounded-xl bg-foreground text-white text-sm font-semibold disabled:opacity-40 hover:bg-foreground/90 transition-all active:scale-[0.98]"
             >
-              추가하기
+              {isEdit ? '저장하기' : '추가하기'}
             </button>
           </div>
         </form>

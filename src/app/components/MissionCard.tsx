@@ -1,12 +1,15 @@
 import { Mission } from '../types';
 import { formatDeadlineLabel, isDeadlineExpired } from '../utils/date';
+import ItemMenu from './ItemMenu';
 
 interface Props {
   mission: Mission;
   onComplete: (id: string) => void;
+  onEdit: (mission: Mission) => void;
+  onDelete: (id: string) => void;
 }
 
-export default function MissionCard({ mission, onComplete }: Props) {
+export default function MissionCard({ mission, onComplete, onEdit, onDelete }: Props) {
   const isExpired = isDeadlineExpired(mission.deadline);
   const { completed, earnedStickers } = mission;
 
@@ -18,17 +21,20 @@ export default function MissionCard({ mission, onComplete }: Props) {
           : 'border-border hover:border-border hover:shadow-[0_2px_12px_rgba(0,0,0,0.04)]'
       }`}
     >
-      <div className="flex justify-between items-start gap-3">
+      <div className="flex justify-between items-start gap-2">
         <p
-          className={`font-medium text-[15px] leading-snug flex-1 break-words ${
+          className={`font-medium text-[15px] leading-snug flex-1 break-words min-w-0 ${
             completed ? 'text-muted line-through' : 'text-foreground'
           }`}
         >
           {mission.content}
         </p>
-        <div className="flex items-center gap-1 shrink-0 bg-accent-soft px-2.5 py-1 rounded-full border border-accent-muted/50">
-          <span className="text-sm leading-none">⭐</span>
-          <span className="text-xs font-bold text-accent">×{mission.stickerCount}</span>
+        <div className="flex items-center gap-1 shrink-0">
+          <div className="flex items-center gap-1 bg-accent-soft px-2.5 py-1 rounded-full border border-accent-muted/50">
+            <span className="text-sm leading-none">⭐</span>
+            <span className="text-xs font-bold text-accent">×{mission.stickerCount}</span>
+          </div>
+          <ItemMenu onEdit={() => onEdit(mission)} onDelete={() => onDelete(mission.id)} />
         </div>
       </div>
 

@@ -3,17 +3,29 @@
 import { useState } from 'react';
 import { Mission } from '../types';
 import MissionCard from './MissionCard';
-import AddMissionModal from './AddMissionModal';
+import MissionFormModal from './MissionFormModal';
 import Fab from './Fab';
 
 interface Props {
   missions: Mission[];
   onAddMission: (mission: Omit<Mission, 'id' | 'completed' | 'earnedStickers'>) => void;
+  onUpdateMission: (
+    id: string,
+    data: Omit<Mission, 'id' | 'completed' | 'earnedStickers'>
+  ) => void;
+  onDeleteMission: (id: string) => void;
   onCompleteMission: (id: string) => void;
 }
 
-export default function MissionTab({ missions, onAddMission, onCompleteMission }: Props) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+export default function MissionTab({
+  missions,
+  onAddMission,
+  onUpdateMission,
+  onDeleteMission,
+  onCompleteMission,
+}: Props) {
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [editTarget, setEditTarget] = useState<Mission | null>(null);
 
   const active = missions.filter(m => !m.completed);
   const done = missions.filter(m => m.completed);
@@ -40,7 +52,13 @@ export default function MissionTab({ missions, onAddMission, onCompleteMission }
       ) : (
         <div className="space-y-3">
           {active.map(mission => (
-            <MissionCard key={mission.id} mission={mission} onComplete={onCompleteMission} />
+            <MissionCard
+              key={mission.id}
+              mission={mission}
+              onComplete={onCompleteMission}
+              onEdit={setEditTarget}
+              onDelete={onDeleteMission}
+            />
           ))}
 
           {done.length > 0 && (
@@ -50,7 +68,13 @@ export default function MissionTab({ missions, onAddMission, onCompleteMission }
               </p>
               <div className="space-y-3">
                 {done.map(mission => (
-                  <MissionCard key={mission.id} mission={mission} onComplete={onCompleteMission} />
+                  <MissionCard
+                    key={mission.id}
+                    mission={mission}
+                    onComplete={onCompleteMission}
+                    onEdit={setEditTarget}
+                    onDelete={onDeleteMission}
+                  />
                 ))}
               </div>
             </div>
@@ -58,17 +82,28 @@ export default function MissionTab({ missions, onAddMission, onCompleteMission }
         </div>
       )}
 
-      {isModalOpen && (
-        <AddMissionModal
-          onClose={() => setIsModalOpen(false)}
-          onAdd={data => {
+      {isAddOpen && (
+        <MissionFormModal
+          onClose={() => setIsAddOpen(false)}
+          onSave={data => {
             onAddMission(data);
-            setIsModalOpen(false);
+            setIsAddOpen(false);
           }}
         />
       )}
 
-      <Fab onClick={() => setIsModalOpen(true)} label="미션 추가" />
+      {editTarget && (
+        <MissionFormModal
+          mission={editTarget}
+          onClose={() => setEditTarget(null)}
+          onSave={data => {
+            onUpdateMission(editTarget.id, data);
+            setEditTarget(null);
+          }}
+        />
+      )}
+
+      <Fab onClick={() => setIsAddOpen(true)} label="미션 추가" />
     </div>
   );
 }

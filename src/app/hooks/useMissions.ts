@@ -77,13 +77,40 @@ export function useMissions() {
     return claimed;
   };
 
+  const updateMission = (
+    id: string,
+    data: Omit<Mission, 'id' | 'completed' | 'earnedStickers'>
+  ) => {
+    setMissions(prev =>
+      prev.map(m => (m.id === id ? { ...m, ...data } : m))
+    );
+  };
+
+  const deleteMission = (id: string) => {
+    setMissions(prev => prev.filter(m => m.id !== id));
+  };
+
+  const updateReward = (id: string, data: Omit<Reward, 'id'>) => {
+    setRewards(prev =>
+      prev.map(r => (r.id === id ? { ...r, ...data } : r))
+    );
+  };
+
+  const deleteReward = (id: string) => {
+    setRewards(prev => prev.filter(r => r.id !== id));
+  };
+
   return {
     missions,
     rewards,
     totalStickers,
     addMission,
     completeMission,
+    updateMission,
+    deleteMission,
     addReward,
     claimReward,
+    updateReward,
+    deleteReward,
   };
 }

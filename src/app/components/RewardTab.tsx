@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Reward } from '../types';
 import RewardCard from './RewardCard';
-import AddRewardModal from './AddRewardModal';
+import RewardFormModal from './RewardFormModal';
 import ClaimRewardModal from './ClaimRewardModal';
 import Fab from './Fab';
 
@@ -11,6 +11,8 @@ interface Props {
   rewards: Reward[];
   totalStickers: number;
   onAddReward: (reward: Omit<Reward, 'id'>) => void;
+  onUpdateReward: (id: string, data: Omit<Reward, 'id'>) => void;
+  onDeleteReward: (id: string) => void;
   onClaimReward: (id: string) => boolean;
 }
 
@@ -18,9 +20,12 @@ export default function RewardTab({
   rewards,
   totalStickers,
   onAddReward,
+  onUpdateReward,
+  onDeleteReward,
   onClaimReward,
 }: Props) {
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [editTarget, setEditTarget] = useState<Reward | null>(null);
   const [claimTarget, setClaimTarget] = useState<Reward | null>(null);
 
   const handleClaimConfirm = () => {
@@ -59,17 +64,30 @@ export default function RewardTab({
                 const target = rewards.find(r => r.id === id);
                 if (target) setClaimTarget(target);
               }}
+              onEdit={setEditTarget}
+              onDelete={onDeleteReward}
             />
           ))}
         </div>
       )}
 
       {isAddOpen && (
-        <AddRewardModal
+        <RewardFormModal
           onClose={() => setIsAddOpen(false)}
-          onAdd={data => {
+          onSave={data => {
             onAddReward(data);
             setIsAddOpen(false);
+          }}
+        />
+      )}
+
+      {editTarget && (
+        <RewardFormModal
+          reward={editTarget}
+          onClose={() => setEditTarget(null)}
+          onSave={data => {
+            onUpdateReward(editTarget.id, data);
+            setEditTarget(null);
           }}
         />
       )}
