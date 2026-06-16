@@ -1,12 +1,26 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Mission, Reward } from '../types';
-import { isDeadlineExpired } from '../utils/date';
+import { Mission, Reward, MissionInput } from '../types';
+import { isDeadlineExpired, normalizeDeadline } from '../utils/date';
 
 const MISSIONS_KEY = 'haedda_missions';
 const REWARDS_KEY = 'haedda_rewards';
 const STICKERS_KEY = 'haedda_stickers';
+
+function normalizeMission(raw: unknown): Mission | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const m = raw as Record<string, unknown>;
+  if (typeof m.id !== 'string' || typeof m.content !== 'string') return null;
+  if (typeof m.deadline !== 'string' || typeof m.stickerCount !== 'number') return null;
+  if (m.completed === true) return null;
+  return {
+    id: m.id,
+    content: m.content,
+    deadline: normalizeDeadline(m.deadline),
+    stickerCount: m.stickerCount,
+  };
+}
 
 export function useMissions() {
   const [missions, setMissions] = useState<Mission[]>([]);
@@ -19,7 +33,12 @@ export function useMissions() {
       const m = localStorage.getItem(MISSIONS_KEY);
       const r = localStorage.getItem(REWARDS_KEY);
       const s = localStorage.getItem(STICKERS_KEY);
-      if (m) setMissions(JSON.parse(m));
+      if (m) {
+        const parsed: unknown[] = JSON.parse(m);
+        setMissions(
+          parsed.map(normalizeMission).filter((x): x is Mission => x !== null)
+        );
+      }
       if (r) setRewards(JSON.parse(r));
       if (s) setTotalStickers(JSON.parse(s));
     } catch {}
@@ -41,23 +60,21 @@ export function useMissions() {
     localStorage.setItem(STICKERS_KEY, JSON.stringify(totalStickers));
   }, [totalStickers, ready]);
 
-  const addMission = (data: Omit<Mission, 'id' | 'completed' | 'earnedStickers'>) => {
-    setMissions(prev => [
-      ...prev,
-      { ...data, id: crypto.randomUUID(), completed: false },
-    ]);
+  const addMission = (data: MissionInput) => {
+    setMissions(prev => [...prev, { ...data, id: crypto.randomUUID() }]);
   };
 
-  const completeMission = (id: string) => {
-    setMissions(prev =>
-      prev.map(m => {
-        if (m.id !== id || m.completed) return m;
-        const isExpired = isDeadlineExpired(m.deadline);
-        const earned = isExpired ? 0 : m.stickerCount;
-        if (earned > 0) setTotalStickers(s => s + earned);
-        return { ...m, completed: true, earnedStickers: earned };
-      })
-    );
+  const completeMission = (id: string): { earned: number; content: string } | null => {
+    let result: { earned: number; content: string } | null = null;
+    setMissions(prev => {
+      const mission = prev.find(m => m.id === id);
+      if (!mission) return prev;
+      const earned = isDeadlineExpired(mission.deadline) ? 0 : mission.stickerCount;
+      if (earned > 0) setTotalStickers(s => s + earned);
+      result = { earned, content: mission.content };
+      return prev.filter(m => m.id !== id);
+    });
+    return result;
   };
 
   const addReward = (data: Omit<Reward, 'id'>) => {
@@ -77,13 +94,8 @@ export function useMissions() {
     return claimed;
   };
 
-  const updateMission = (
-    id: string,
-    data: Omit<Mission, 'id' | 'completed' | 'earnedStickers'>
-  ) => {
-    setMissions(prev =>
-      prev.map(m => (m.id === id ? { ...m, ...data } : m))
-    );
+  const updateMission = (id: string, data: MissionInput) => {
+    setMissions(prev => prev.map(m => (m.id === id ? { ...m, ...data } : m)));
   };
 
   const deleteMission = (id: string) => {
@@ -91,9 +103,7 @@ export function useMissions() {
   };
 
   const updateReward = (id: string, data: Omit<Reward, 'id'>) => {
-    setRewards(prev =>
-      prev.map(r => (r.id === id ? { ...r, ...data } : r))
-    );
+    setRewards(prev => prev.map(r => (r.id === id ? { ...r, ...data } : r)));
   };
 
   const deleteReward = (id: string) => {

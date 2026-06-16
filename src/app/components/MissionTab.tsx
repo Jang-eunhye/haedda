@@ -1,20 +1,19 @@
 'use client';
 
 import { useState } from 'react';
-import { Mission } from '../types';
+import { Mission, MissionInput } from '../types';
 import MissionCard from './MissionCard';
 import MissionFormModal from './MissionFormModal';
+import ConfirmMissionModal from './ConfirmMissionModal';
+import MissionCompleteResultModal from './MissionCompleteResultModal';
 import Fab from './Fab';
 
 interface Props {
   missions: Mission[];
-  onAddMission: (mission: Omit<Mission, 'id' | 'completed' | 'earnedStickers'>) => void;
-  onUpdateMission: (
-    id: string,
-    data: Omit<Mission, 'id' | 'completed' | 'earnedStickers'>
-  ) => void;
+  onAddMission: (mission: MissionInput) => void;
+  onUpdateMission: (id: string, data: MissionInput) => void;
   onDeleteMission: (id: string) => void;
-  onCompleteMission: (id: string) => void;
+  onCompleteMission: (id: string) => { earned: number; content: string } | null;
 }
 
 export default function MissionTab({
@@ -26,20 +25,34 @@ export default function MissionTab({
 }: Props) {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<Mission | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<Mission | null>(null);
+  const [completeResult, setCompleteResult] = useState<{
+    earned: number;
+    content: string;
+  } | null>(null);
 
-  const active = missions.filter(m => !m.completed);
-  const done = missions.filter(m => m.completed);
+  const handleCompleteClick = (id: string) => {
+    const mission = missions.find(m => m.id === id);
+    if (mission) setConfirmTarget(mission);
+  };
+
+  const handleConfirmComplete = () => {
+    if (!confirmTarget) return;
+    const result = onCompleteMission(confirmTarget.id);
+    setConfirmTarget(null);
+    if (result) setCompleteResult(result);
+  };
 
   return (
     <div className="pb-20">
       <div className="mb-5">
         <h2 className="text-base font-bold text-foreground">미션</h2>
         <p className="text-xs text-muted mt-0.5">
-          진행 중 <span className="text-foreground font-semibold">{active.length}</span>개
+          진행 중 <span className="text-foreground font-semibold">{missions.length}</span>개
         </p>
       </div>
 
-      {active.length === 0 && done.length === 0 ? (
+      {missions.length === 0 ? (
         <div className="text-center py-16 sm:py-20">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-background flex items-center justify-center text-3xl">
             🎯
@@ -51,34 +64,15 @@ export default function MissionTab({
         </div>
       ) : (
         <div className="space-y-3">
-          {active.map(mission => (
+          {missions.map(mission => (
             <MissionCard
               key={mission.id}
               mission={mission}
-              onComplete={onCompleteMission}
+              onComplete={handleCompleteClick}
               onEdit={setEditTarget}
               onDelete={onDeleteMission}
             />
           ))}
-
-          {done.length > 0 && (
-            <div className="pt-2">
-              <p className="text-xs text-muted font-semibold uppercase tracking-wide mb-3 px-1">
-                완료된 미션
-              </p>
-              <div className="space-y-3">
-                {done.map(mission => (
-                  <MissionCard
-                    key={mission.id}
-                    mission={mission}
-                    onComplete={onCompleteMission}
-                    onEdit={setEditTarget}
-                    onDelete={onDeleteMission}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       )}
 
@@ -100,6 +94,22 @@ export default function MissionTab({
             onUpdateMission(editTarget.id, data);
             setEditTarget(null);
           }}
+        />
+      )}
+
+      {confirmTarget && (
+        <ConfirmMissionModal
+          mission={confirmTarget}
+          onCancel={() => setConfirmTarget(null)}
+          onConfirm={handleConfirmComplete}
+        />
+      )}
+
+      {completeResult && (
+        <MissionCompleteResultModal
+          content={completeResult.content}
+          earned={completeResult.earned}
+          onConfirm={() => setCompleteResult(null)}
         />
       )}
 

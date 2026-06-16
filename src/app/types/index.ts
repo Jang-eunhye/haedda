@@ -3,8 +3,6 @@ export interface Mission {
   content: string;
   deadline: string; // "YYYY-MM-DD"
   stickerCount: number;
-  completed: boolean;
-  earnedStickers?: number; // 완료 시 실제 획득한 스티커 수
 }
 
 export interface Reward {
@@ -14,3 +12,5 @@ export interface Reward {
 }
 
 export type TabType = 'mission' | 'reward';
+
+export type MissionInput = Omit<Mission, 'id'>;

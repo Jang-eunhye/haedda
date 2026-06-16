@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Mission } from '../types';
+import { Mission, MissionInput } from '../types';
 import { getTodayISO, normalizeDeadline } from '../utils/date';
 import DatePicker from './DatePicker';
 
@@ -10,7 +10,7 @@ const CONTENT_MAX = 50;
 
 interface Props {
   onClose: () => void;
-  onSave: (data: Omit<Mission, 'id' | 'completed' | 'earnedStickers'>) => void;
+  onSave: (data: MissionInput) => void;
   mission?: Mission;
 }
 
