@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Mission } from '../types';
 import MissionCard from './MissionCard';
 import AddMissionModal from './AddMissionModal';
+import Fab from './Fab';
 
 interface Props {
   missions: Mission[];
@@ -18,23 +19,12 @@ export default function MissionTab({ missions, onAddMission, onCompleteMission }
   const done = missions.filter(m => m.completed);
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-5">
-        <div>
-          <h2 className="text-base font-bold text-foreground">미션</h2>
-          <p className="text-xs text-muted mt-0.5">
-            진행 중 <span className="text-foreground font-semibold">{active.length}</span>개
-          </p>
-        </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center gap-1.5 bg-foreground text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-foreground/90 active:scale-[0.98] transition-all duration-150"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-          미션 추가
-        </button>
+    <div className="pb-20">
+      <div className="mb-5">
+        <h2 className="text-base font-bold text-foreground">미션</h2>
+        <p className="text-xs text-muted mt-0.5">
+          진행 중 <span className="text-foreground font-semibold">{active.length}</span>개
+        </p>
       </div>
 
       {active.length === 0 && done.length === 0 ? (
@@ -77,6 +67,8 @@ export default function MissionTab({ missions, onAddMission, onCompleteMission }
           }}
         />
       )}
+
+      <Fab onClick={() => setIsModalOpen(true)} label="미션 추가" />
     </div>
   );
 }
