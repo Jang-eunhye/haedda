@@ -6,7 +6,10 @@ import MissionCard from './MissionCard';
 import MissionFormModal from './MissionFormModal';
 import ConfirmMissionModal from './ConfirmMissionModal';
 import MissionCompleteResultModal from './MissionCompleteResultModal';
+import EmptyState from './EmptyState';
 import Fab from './Fab';
+
+const APP_TAGLINE = '미션을 완료하고 스티커를 모아보세요';
 
 interface Props {
   missions: Mission[];
@@ -45,35 +48,33 @@ export default function MissionTab({
 
   return (
     <div className="pb-20">
-      <div className="mb-5">
-        <h2 className="text-base font-bold text-foreground">미션</h2>
-        <p className="text-xs text-muted mt-0.5">
-          진행 중 <span className="text-foreground font-semibold">{missions.length}</span>개
-        </p>
-      </div>
-
       {missions.length === 0 ? (
-        <div className="text-center py-16 sm:py-20">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-background flex items-center justify-center text-3xl">
-            🎯
-          </div>
-          <p className="text-sm font-semibold text-foreground">아직 미션이 없어요</p>
-          <p className="text-xs mt-1.5 text-muted max-w-[220px] mx-auto leading-relaxed">
-            미션을 추가하고 완료하면 스티커를 받을 수 있어요
-          </p>
-        </div>
+        <EmptyState
+          icon="🎯"
+          tagline={APP_TAGLINE}
+          title="아직 미션이 없어요"
+          description="오른쪽 아래 + 버튼으로 첫 미션을 추가해 보세요"
+        />
       ) : (
-        <div className="space-y-3">
-          {missions.map(mission => (
-            <MissionCard
-              key={mission.id}
-              mission={mission}
-              onComplete={handleCompleteClick}
-              onEdit={setEditTarget}
-              onDelete={onDeleteMission}
-            />
-          ))}
-        </div>
+        <>
+          <div className="mb-5">
+            <h2 className="text-base font-bold text-foreground">미션</h2>
+            <p className="text-xs text-muted mt-0.5">
+              진행 중 <span className="text-foreground font-semibold">{missions.length}</span>개
+            </p>
+          </div>
+          <div className="space-y-3">
+            {missions.map(mission => (
+              <MissionCard
+                key={mission.id}
+                mission={mission}
+                onComplete={handleCompleteClick}
+                onEdit={setEditTarget}
+                onDelete={onDeleteMission}
+              />
+            ))}
+          </div>
+        </>
       )}
 
       {isAddOpen && (
