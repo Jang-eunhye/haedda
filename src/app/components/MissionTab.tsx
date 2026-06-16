@@ -19,23 +19,33 @@ export default function MissionTab({ missions, onAddMission, onCompleteMission }
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-base font-semibold text-gray-700">
-          미션 <span className="text-amber-500">{active.length}</span>
-        </h2>
+      <div className="flex justify-between items-center mb-5">
+        <div>
+          <h2 className="text-base font-bold text-foreground">미션</h2>
+          <p className="text-xs text-muted mt-0.5">
+            진행 중 <span className="text-foreground font-semibold">{active.length}</span>개
+          </p>
+        </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="bg-amber-500 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-amber-600 transition-colors shadow-sm"
+          className="inline-flex items-center gap-1.5 bg-foreground text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-foreground/90 active:scale-[0.98] transition-all duration-150"
         >
-          + 미션 추가
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          미션 추가
         </button>
       </div>
 
       {active.length === 0 && done.length === 0 ? (
-        <div className="text-center py-20 text-gray-400">
-          <div className="text-5xl mb-3">🎯</div>
-          <p className="text-sm font-medium">아직 미션이 없어요</p>
-          <p className="text-xs mt-1 text-gray-300">미션을 추가해 스티커를 모아보세요!</p>
+        <div className="text-center py-16 sm:py-20">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-background flex items-center justify-center text-3xl">
+            🎯
+          </div>
+          <p className="text-sm font-semibold text-foreground">아직 미션이 없어요</p>
+          <p className="text-xs mt-1.5 text-muted max-w-[220px] mx-auto leading-relaxed">
+            미션을 추가하고 완료하면 스티커를 받을 수 있어요
+          </p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -44,12 +54,16 @@ export default function MissionTab({ missions, onAddMission, onCompleteMission }
           ))}
 
           {done.length > 0 && (
-            <>
-              <p className="text-xs text-gray-400 font-medium pt-2">완료된 미션</p>
-              {done.map(mission => (
-                <MissionCard key={mission.id} mission={mission} onComplete={onCompleteMission} />
-              ))}
-            </>
+            <div className="pt-2">
+              <p className="text-xs text-muted font-semibold uppercase tracking-wide mb-3 px-1">
+                완료된 미션
+              </p>
+              <div className="space-y-3">
+                {done.map(mission => (
+                  <MissionCard key={mission.id} mission={mission} onComplete={onCompleteMission} />
+                ))}
+              </div>
+            </div>
           )}
         </div>
       )}

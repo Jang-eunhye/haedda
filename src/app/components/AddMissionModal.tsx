@@ -39,30 +39,33 @@ export default function AddMissionModal({ onClose, onAdd }: Props) {
 
   return createPortal(
     <div
-      className="fixed inset-0 bg-black/40 flex items-end justify-center z-50"
+      className="fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-end sm:items-center justify-center z-50 p-0 sm:p-4"
       onClick={onClose}
     >
       <div
-        className="bg-white w-full max-w-md rounded-t-3xl p-6 pb-12"
+        className="bg-surface w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-8 sm:pb-6 shadow-[0_-8px_40px_-12px_rgba(0,0,0,0.15)] sm:shadow-xl max-h-[90vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
       >
-        <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-6" />
-        <h3 className="text-lg font-bold text-gray-800 mb-5">새 미션</h3>
+        <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5 sm:hidden" />
+        <h3 className="text-lg font-bold text-foreground mb-1">새 미션</h3>
+        <p className="text-xs text-muted mb-5">완료하면 스티커를 받을 수 있어요</p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1.5">미션 내용</label>
+            <label className="block text-sm font-semibold text-foreground mb-2">
+              미션 내용
+            </label>
             <div className="relative">
               <textarea
                 value={content}
                 onChange={e => setContent(e.target.value.slice(0, CONTENT_MAX))}
-                placeholder="미션 내용을 입력해주세요"
+                placeholder="무엇을 할까요?"
                 rows={3}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-amber-300"
+                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-colors placeholder:text-muted/60"
               />
               <span
-                className={`absolute bottom-2.5 right-3 text-xs ${
-                  content.length >= CONTENT_MAX ? 'text-red-400' : 'text-gray-300'
+                className={`absolute bottom-3 right-3 text-xs tabular-nums ${
+                  content.length >= CONTENT_MAX ? 'text-danger' : 'text-muted/60'
                 }`}
               >
                 {content.length}/{CONTENT_MAX}
@@ -71,53 +74,55 @@ export default function AddMissionModal({ onClose, onAdd }: Props) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1.5">기한</label>
+            <label className="block text-sm font-semibold text-foreground mb-2">기한</label>
             <input
               type="datetime-local"
               value={deadline}
               onChange={e => setDeadline(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300"
+              className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-colors"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1.5">스티커 개수</label>
-            <div className="flex items-center gap-4">
+            <label className="block text-sm font-semibold text-foreground mb-2">
+              스티커 개수
+            </label>
+            <div className="flex items-center justify-center gap-6 py-2 bg-background rounded-xl border border-border">
               <button
                 type="button"
                 onClick={() => adjustSticker(-1)}
                 disabled={stickerCount <= 1}
-                className="w-9 h-9 rounded-full bg-gray-100 text-gray-600 font-bold text-lg hover:bg-gray-200 transition-colors disabled:opacity-30"
+                className="w-10 h-10 rounded-xl bg-surface border border-border text-foreground font-bold text-lg hover:bg-background transition-colors disabled:opacity-30 active:scale-95"
               >
                 −
               </button>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2 min-w-[80px] justify-center">
                 <span className="text-2xl">⭐</span>
-                <span className="text-xl font-bold text-amber-500 w-6 text-center">{stickerCount}</span>
+                <span className="text-2xl font-bold text-accent tabular-nums">{stickerCount}</span>
               </div>
               <button
                 type="button"
                 onClick={() => adjustSticker(1)}
                 disabled={stickerCount >= 10}
-                className="w-9 h-9 rounded-full bg-gray-100 text-gray-600 font-bold text-lg hover:bg-gray-200 transition-colors disabled:opacity-30"
+                className="w-10 h-10 rounded-xl bg-surface border border-border text-foreground font-bold text-lg hover:bg-background transition-colors disabled:opacity-30 active:scale-95"
               >
                 +
               </button>
             </div>
           </div>
 
-          <div className="flex gap-2 pt-1">
+          <div className="flex gap-2.5 pt-1">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3 rounded-xl border border-gray-200 text-sm text-gray-500 font-medium hover:bg-gray-50 transition-colors"
+              className="flex-1 py-3 rounded-xl border border-border text-sm text-muted font-semibold hover:bg-background transition-colors active:scale-[0.98]"
             >
               취소
             </button>
             <button
               type="submit"
               disabled={!content.trim() || !deadline}
-              className="flex-1 py-3 rounded-xl bg-amber-500 text-white text-sm font-semibold disabled:opacity-40 hover:bg-amber-600 transition-colors"
+              className="flex-1 py-3 rounded-xl bg-foreground text-white text-sm font-semibold disabled:opacity-40 hover:bg-foreground/90 transition-all active:scale-[0.98]"
             >
               추가하기
             </button>
