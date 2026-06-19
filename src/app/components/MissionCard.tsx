@@ -21,11 +21,6 @@ export default function MissionCard({ mission, onComplete, onEdit, onDelete }: P
           <p className="font-medium text-[15px] leading-snug break-words text-foreground">
             {mission.content}
           </p>
-          {isRecurring && mission.recurrence && (
-            <span className="inline-block mt-2 text-[11px] font-semibold text-accent bg-accent-soft px-2 py-0.5 rounded-full border border-accent-muted/50">
-              {formatRecurrenceLabel(mission.recurrence)}
-            </span>
-          )}
         </div>
         <div className="flex items-center gap-1 shrink-0">
           <div className="flex items-center gap-1 bg-accent-soft px-2.5 py-1 rounded-full border border-accent-muted/50">
@@ -37,16 +32,44 @@ export default function MissionCard({ mission, onComplete, onEdit, onDelete }: P
       </div>
 
       <div
-        className={`mt-2.5 text-xs flex items-center gap-1.5 ${
+        className={`mt-2.5 text-xs flex items-center gap-1.5 flex-wrap ${
           isExpired ? 'text-danger' : 'text-muted'
         }`}
       >
-        <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        <svg
+          className="w-3.5 h-3.5 shrink-0"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+          aria-hidden
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+          />
         </svg>
-        <span>
-          {isRecurring ? '이번 마감' : '마감'} · {formatDeadlineLabel(mission.deadline)}
-        </span>
+        <span>{formatDeadlineLabel(mission.deadline)}</span>
+        {isRecurring && mission.recurrence && (
+          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-accent bg-accent-soft px-2 py-0.5 rounded-full border border-accent-muted/50">
+            <svg
+              className="w-3 h-3 shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+              aria-hidden
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            {formatRecurrenceLabel(mission.recurrence)}
+          </span>
+        )}
         {isExpired && <span className="font-semibold text-danger/80">· 기한 초과</span>}
       </div>
 
