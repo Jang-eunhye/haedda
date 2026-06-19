@@ -2,6 +2,7 @@ import { Mission } from '../types';
 import { formatDeadlineLabel, isDeadlineExpired } from '../utils/date';
 import { formatRecurrenceLabel } from '../utils/recurrence';
 import ItemMenu from './ItemMenu';
+import StickerStar from './StickerStar';
 
 interface Props {
   mission: Mission;
@@ -16,23 +17,25 @@ export default function MissionCard({ mission, onComplete, onEdit, onDelete }: P
 
   return (
     <article className="group bg-surface rounded-2xl p-4 border border-border transition-all duration-200 hover:shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-      <div className="flex justify-between items-start gap-2">
+      <div className="flex gap-2">
         <div className="min-w-0 flex-1">
-          <p className="font-medium text-[15px] leading-snug break-words text-foreground">
+          <div
+            className={`inline-flex flex-wrap items-center gap-0.5 ${isExpired ? 'opacity-40' : ''}`}
+            aria-label={`스티커 ${mission.stickerCount}개`}
+          >
+            {Array.from({ length: mission.stickerCount }, (_, i) => (
+              <StickerStar key={i} size="md" />
+            ))}
+          </div>
+          <p className="mt-2 font-medium text-[15px] leading-snug break-words text-foreground">
             {mission.content}
           </p>
         </div>
-        <div className="flex items-center gap-1 shrink-0">
-          <div className="flex items-center gap-1 bg-accent-soft px-2.5 py-1 rounded-full border border-accent-muted/50">
-            <span className="text-sm leading-none">⭐</span>
-            <span className="text-xs font-bold text-accent">×{mission.stickerCount}</span>
-          </div>
-          <ItemMenu onEdit={() => onEdit(mission)} onDelete={() => onDelete(mission.id)} />
-        </div>
+        <ItemMenu onEdit={() => onEdit(mission)} onDelete={() => onDelete(mission.id)} />
       </div>
 
       <div
-        className={`mt-2.5 text-xs flex items-center gap-1.5 flex-wrap ${
+        className={`mt-2 text-xs flex items-center gap-1.5 flex-wrap ${
           isExpired ? 'text-danger' : 'text-muted'
         }`}
       >

@@ -11,6 +11,7 @@ import RecurrencePicker, {
   getFrequencyFromMission,
   RecurrenceFrequency,
 } from './RecurrencePicker';
+import StickerStar from './StickerStar';
 
 const CONTENT_MAX = 50;
 
@@ -188,7 +189,7 @@ export default function MissionFormModal({ onClose, onSave, mission }: Props) {
                 −
               </button>
               <div className="flex items-center gap-2 min-w-[80px] justify-center">
-                <span className="text-2xl">⭐</span>
+                <StickerStar size="lg" />
                 <span className="text-2xl font-bold text-accent tabular-nums">{stickerCount}</span>
               </div>
               <button

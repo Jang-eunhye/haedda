@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { Mission } from '../types';
 import { isDeadlineExpired } from '../utils/date';
 import { formatRecurrenceLabel } from '../utils/recurrence';
+import StickerStar from './StickerStar';
 
 interface Props {
   mission: Mission;
@@ -46,7 +47,9 @@ export default function ConfirmMissionModal({ mission, onCancel, onConfirm }: Pr
           {expectedStickers > 0 ? (
             <>
               <p className="text-xs font-medium text-muted mb-1">획득 예정 스티커</p>
-              <p className="text-2xl font-bold text-accent tabular-nums">+{expectedStickers} ⭐</p>
+              <p className="text-2xl font-bold text-accent tabular-nums inline-flex items-center justify-center gap-1">
+                +{expectedStickers} <StickerStar size="lg" />
+              </p>
             </>
           ) : (
             <>

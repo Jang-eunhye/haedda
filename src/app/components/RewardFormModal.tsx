@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Reward } from '../types';
+import StickerStar from './StickerStar';
 
 const CONTENT_MAX = 50;
 
@@ -92,7 +93,7 @@ export default function RewardFormModal({ onClose, onSave, reward }: Props) {
                 −
               </button>
               <div className="flex items-center gap-2 min-w-[80px] justify-center">
-                <span className="text-2xl">⭐</span>
+                <StickerStar size="lg" />
                 <span className="text-2xl font-bold text-accent tabular-nums">{stickerCost}</span>
               </div>
               <button

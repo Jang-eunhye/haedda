@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Reward } from '../types';
+import StickerStar from './StickerStar';
 
 interface Props {
   reward: Reward;
@@ -47,16 +48,20 @@ export default function ClaimRewardModal({ reward, totalStickers, onClose, onCon
         <div className="bg-background rounded-2xl p-4 space-y-3 mb-5">
           <div className="flex justify-between text-sm">
             <span className="text-muted">차감 스티커</span>
-            <span className="font-semibold text-foreground">⭐ {reward.stickerCost}</span>
+            <span className="font-semibold text-foreground inline-flex items-center gap-1">
+              <StickerStar size="sm" /> {reward.stickerCost}
+            </span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-muted">현재 보유</span>
-            <span className="font-semibold text-foreground">⭐ {totalStickers}</span>
+            <span className="font-semibold text-foreground inline-flex items-center gap-1">
+              <StickerStar size="sm" /> {totalStickers}
+            </span>
           </div>
           <div className="border-t border-border pt-3 flex justify-between text-sm">
             <span className="text-muted">받은 후</span>
-            <span className={`font-bold tabular-nums ${canClaim ? 'text-foreground' : 'text-danger'}`}>
-              ⭐ {canClaim ? remaining : totalStickers}
+            <span className={`font-bold tabular-nums inline-flex items-center gap-1 ${canClaim ? 'text-foreground' : 'text-danger'}`}>
+              <StickerStar size="sm" /> {canClaim ? remaining : totalStickers}
             </span>
           </div>
         </div>

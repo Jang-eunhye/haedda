@@ -1,5 +1,6 @@
 import { Reward } from '../types';
 import ItemMenu from './ItemMenu';
+import StickerStar from './StickerStar';
 
 interface Props {
   reward: Reward;
@@ -30,7 +31,7 @@ export default function RewardCard({
         </p>
         <div className="flex items-center gap-1 shrink-0">
           <div className="flex items-center gap-1 bg-accent-soft px-2.5 py-1 rounded-full border border-accent-muted/50">
-            <span className="text-sm leading-none">⭐</span>
+            <StickerStar size="sm" />
             <span className="text-xs font-bold text-accent">×{reward.stickerCost}</span>
           </div>
           <ItemMenu onEdit={() => onEdit(reward)} onDelete={() => onDelete(reward.id)} />

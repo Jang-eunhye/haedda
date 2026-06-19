@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { formatDeadlineLabel } from '../utils/date';
+import StickerStar from './StickerStar';
 
 interface Props {
   content: string;
@@ -47,7 +48,9 @@ export default function MissionCompleteResultModal({
           {earned > 0 ? (
             <>
               <p className="text-xs font-medium text-muted mb-1">획득 스티커</p>
-              <p className="text-3xl font-bold text-accent tabular-nums">+{earned} ⭐</p>
+              <p className="text-3xl font-bold text-accent tabular-nums inline-flex items-center justify-center gap-1">
+                +{earned} <StickerStar size="xl" />
+              </p>
             </>
           ) : (
             <>

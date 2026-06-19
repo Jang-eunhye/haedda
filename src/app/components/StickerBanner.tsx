@@ -1,3 +1,5 @@
+import StickerStar from './StickerStar';
+
 interface Props {
   count: number;
 }
@@ -10,7 +12,7 @@ export default function StickerBanner({ count }: Props) {
       </span>
       <span className="w-px h-6 bg-accent-muted/50 shrink-0" aria-hidden />
       <div className="flex items-center gap-1.5">
-        <span className="text-xl leading-none">⭐</span>
+        <StickerStar size="md" />
         <span className="text-2xl font-bold text-foreground tabular-nums leading-none">
           {count}
         </span>
