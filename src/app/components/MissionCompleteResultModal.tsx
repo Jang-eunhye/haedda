@@ -2,14 +2,23 @@
 
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { formatDeadlineLabel } from '../utils/date';
 
 interface Props {
   content: string;
   earned: number;
+  isRecurring: boolean;
+  nextDeadline?: string;
   onConfirm: () => void;
 }
 
-export default function MissionCompleteResultModal({ content, earned, onConfirm }: Props) {
+export default function MissionCompleteResultModal({
+  content,
+  earned,
+  isRecurring,
+  nextDeadline,
+  onConfirm,
+}: Props) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -48,9 +57,15 @@ export default function MissionCompleteResultModal({ content, earned, onConfirm 
           )}
         </div>
 
-        <p className="text-xs text-muted text-center mb-5">
-          해당 미션은 목록에서 삭제됩니다
-        </p>
+        {isRecurring && nextDeadline ? (
+          <p className="text-xs text-muted text-center mb-5">
+            다음 마감: {formatDeadlineLabel(nextDeadline)}
+          </p>
+        ) : (
+          <p className="text-xs text-muted text-center mb-5">
+            해당 미션은 목록에서 삭제됩니다
+          </p>
+        )}
 
         <button
           type="button"

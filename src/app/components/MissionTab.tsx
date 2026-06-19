@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Mission, MissionInput } from '../types';
+import { Mission, MissionInput, MissionCompleteResult } from '../types';
 import MissionCard from './MissionCard';
 import MissionFormModal from './MissionFormModal';
 import ConfirmMissionModal from './ConfirmMissionModal';
@@ -16,7 +16,7 @@ interface Props {
   onAddMission: (mission: MissionInput) => void;
   onUpdateMission: (id: string, data: MissionInput) => void;
   onDeleteMission: (id: string) => void;
-  onCompleteMission: (id: string) => { earned: number; content: string } | null;
+  onCompleteMission: (id: string) => MissionCompleteResult | null;
 }
 
 export default function MissionTab({
@@ -29,10 +29,7 @@ export default function MissionTab({
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<Mission | null>(null);
   const [confirmTarget, setConfirmTarget] = useState<Mission | null>(null);
-  const [completeResult, setCompleteResult] = useState<{
-    earned: number;
-    content: string;
-  } | null>(null);
+  const [completeResult, setCompleteResult] = useState<MissionCompleteResult | null>(null);
 
   const handleCompleteClick = (id: string) => {
     const mission = missions.find(m => m.id === id);
@@ -110,6 +107,8 @@ export default function MissionTab({
         <MissionCompleteResultModal
           content={completeResult.content}
           earned={completeResult.earned}
+          isRecurring={completeResult.isRecurring}
+          nextDeadline={completeResult.nextDeadline}
           onConfirm={() => setCompleteResult(null)}
         />
       )}

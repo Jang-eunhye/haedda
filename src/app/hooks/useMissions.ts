@@ -1,12 +1,30 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Mission, Reward, MissionInput } from '../types';
+import { Mission, Reward, MissionInput, MissionCompleteResult, MissionRecurrence } from '../types';
 import { isDeadlineExpired, normalizeDeadline } from '../utils/date';
+import { computeNextDeadline } from '../utils/recurrence';
 
 const MISSIONS_KEY = 'haedda_missions';
 const REWARDS_KEY = 'haedda_rewards';
 const STICKERS_KEY = 'haedda_stickers';
+
+function normalizeRecurrence(raw: unknown): MissionRecurrence | undefined {
+  if (!raw || typeof raw !== 'object') return undefined;
+  const r = raw as Record<string, unknown>;
+  if (r.type === 'daily') return { type: 'daily' };
+  if (r.type === 'weekly' && Array.isArray(r.weekdays)) {
+    const weekdays = r.weekdays.filter((d): d is number => typeof d === 'number');
+    return weekdays.length > 0 ? { type: 'weekly', weekdays } : undefined;
+  }
+  if (r.type === 'monthly') {
+    if (r.dayOfMonth === 'last') return { type: 'monthly', dayOfMonth: 'last' };
+    if (typeof r.dayOfMonth === 'number') {
+      return { type: 'monthly', dayOfMonth: r.dayOfMonth };
+    }
+  }
+  return undefined;
+}
 
 function normalizeMission(raw: unknown): Mission | null {
   if (!raw || typeof raw !== 'object') return null;
@@ -14,12 +32,21 @@ function normalizeMission(raw: unknown): Mission | null {
   if (typeof m.id !== 'string' || typeof m.content !== 'string') return null;
   if (typeof m.deadline !== 'string' || typeof m.stickerCount !== 'number') return null;
   if (m.completed === true) return null;
-  return {
+
+  const recurrence = normalizeRecurrence(m.recurrence);
+  const mission: Mission = {
     id: m.id,
     content: m.content,
     deadline: normalizeDeadline(m.deadline),
     stickerCount: m.stickerCount,
+    recurrence,
   };
+
+  if (recurrence) {
+    mission.deadline = computeNextDeadline(recurrence, new Date(), true);
+  }
+
+  return mission;
 }
 
 export function useMissions() {
@@ -64,14 +91,29 @@ export function useMissions() {
     setMissions(prev => [...prev, { ...data, id: crypto.randomUUID() }]);
   };
 
-  const completeMission = (id: string): { earned: number; content: string } | null => {
-    let result: { earned: number; content: string } | null = null;
+  const completeMission = (id: string): MissionCompleteResult | null => {
+    let result: MissionCompleteResult | null = null;
     setMissions(prev => {
       const mission = prev.find(m => m.id === id);
       if (!mission) return prev;
+
       const earned = isDeadlineExpired(mission.deadline) ? 0 : mission.stickerCount;
       if (earned > 0) setTotalStickers(s => s + earned);
-      result = { earned, content: mission.content };
+
+      if (mission.recurrence) {
+        const nextDeadline = computeNextDeadline(mission.recurrence, new Date(), false);
+        result = {
+          earned,
+          content: mission.content,
+          isRecurring: true,
+          nextDeadline,
+        };
+        return prev.map(m =>
+          m.id === id ? { ...m, deadline: nextDeadline } : m
+        );
+      }
+
+      result = { earned, content: mission.content, isRecurring: false };
       return prev.filter(m => m.id !== id);
     });
     return result;

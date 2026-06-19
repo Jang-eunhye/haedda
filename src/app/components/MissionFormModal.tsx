@@ -4,7 +4,13 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Mission, MissionInput } from '../types';
 import { getTodayISO, normalizeDeadline } from '../utils/date';
+import { computeNextDeadline } from '../utils/recurrence';
 import DatePicker from './DatePicker';
+import RecurrencePicker, {
+  buildRecurrenceFromForm,
+  getFrequencyFromMission,
+  RecurrenceFrequency,
+} from './RecurrencePicker';
 
 const CONTENT_MAX = 50;
 
@@ -21,6 +27,22 @@ export default function MissionFormModal({ onClose, onSave, mission }: Props) {
     mission ? normalizeDeadline(mission.deadline) : getTodayISO()
   );
   const [stickerCount, setStickerCount] = useState(mission?.stickerCount ?? 1);
+  const [isRecurring, setIsRecurring] = useState(!!mission?.recurrence);
+  const [frequency, setFrequency] = useState<RecurrenceFrequency>(
+    getFrequencyFromMission(mission?.recurrence)
+  );
+  const [weekdays, setWeekdays] = useState<number[]>(mission?.recurrence?.weekdays ?? []);
+  const [monthlyMode, setMonthlyMode] = useState<'day' | 'last'>(() => {
+    if (mission?.recurrence?.type === 'monthly') {
+      return mission.recurrence.dayOfMonth === 'last' ? 'last' : 'day';
+    }
+    return 'last';
+  });
+  const [dayOfMonth, setDayOfMonth] = useState<number>(
+    typeof mission?.recurrence?.dayOfMonth === 'number'
+      ? mission.recurrence.dayOfMonth
+      : 1
+  );
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -33,13 +55,39 @@ export default function MissionFormModal({ onClose, onSave, mission }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content.trim() || !deadline) return;
-    onSave({ content: content.trim(), deadline, stickerCount });
+    if (!content.trim()) return;
+    if (isRecurring && frequency === 'weekly' && weekdays.length === 0) return;
+
+    const recurrence = buildRecurrenceFromForm(
+      isRecurring,
+      frequency,
+      weekdays,
+      monthlyMode,
+      dayOfMonth
+    );
+
+    let finalDeadline = deadline;
+    if (recurrence) {
+      finalDeadline = computeNextDeadline(recurrence, new Date(), true);
+    } else if (!deadline) {
+      return;
+    }
+
+    onSave({
+      content: content.trim(),
+      deadline: finalDeadline,
+      stickerCount,
+      recurrence,
+    });
   };
 
   const adjustSticker = (delta: number) => {
     setStickerCount(prev => Math.max(1, Math.min(10, prev + delta)));
   };
+
+  const canSubmit =
+    content.trim() &&
+    (isRecurring ? (frequency !== 'weekly' || weekdays.length > 0) : !!deadline);
 
   if (!mounted) return null;
 
@@ -60,7 +108,7 @@ export default function MissionFormModal({ onClose, onSave, mission }: Props) {
           {isEdit ? '미션 내용을 수정해 보세요' : '완료하면 스티커를 받을 수 있어요'}
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-0">
           <div>
             <label className="block text-sm font-semibold text-foreground mb-2">
               미션 내용
@@ -83,12 +131,50 @@ export default function MissionFormModal({ onClose, onSave, mission }: Props) {
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-foreground mb-2">기한</label>
-            <DatePicker value={deadline} onChange={setDeadline} />
+          <div className="border-t border-border/50 pt-5 mt-5">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold text-foreground">반복 미션</p>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={isRecurring}
+                onClick={() => setIsRecurring(v => !v)}
+                className={`relative w-12 h-7 rounded-full transition-colors duration-200 shrink-0 ${
+                  isRecurring ? 'bg-foreground' : 'bg-border'
+                }`}
+              >
+                <span
+                  className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                    isRecurring ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {isRecurring && (
+              <div className="mt-4">
+                <RecurrencePicker
+                  frequency={frequency}
+                  onFrequencyChange={setFrequency}
+                  weekdays={weekdays}
+                  onWeekdaysChange={setWeekdays}
+                  monthlyMode={monthlyMode}
+                  onMonthlyModeChange={setMonthlyMode}
+                  dayOfMonth={dayOfMonth}
+                  onDayOfMonthChange={setDayOfMonth}
+                />
+              </div>
+            )}
           </div>
 
-          <div>
+          {!isRecurring && (
+            <div className="border-t border-border/50 pt-5 mt-5">
+              <label className="block text-sm font-semibold text-foreground mb-2">기한</label>
+              <DatePicker value={deadline} onChange={setDeadline} />
+            </div>
+          )}
+
+          <div className="border-t border-border/50 pt-5 mt-5">
             <label className="block text-sm font-semibold text-foreground mb-2">
               스티커 개수
             </label>
@@ -116,7 +202,7 @@ export default function MissionFormModal({ onClose, onSave, mission }: Props) {
             </div>
           </div>
 
-          <div className="flex gap-2.5 pt-1">
+          <div className="flex gap-2.5 pt-5 mt-5">
             <button
               type="button"
               onClick={onClose}
@@ -126,7 +212,7 @@ export default function MissionFormModal({ onClose, onSave, mission }: Props) {
             </button>
             <button
               type="submit"
-              disabled={!content.trim() || !deadline}
+              disabled={!canSubmit}
               className="flex-1 py-3 rounded-xl bg-foreground text-white text-sm font-semibold disabled:opacity-40 hover:bg-foreground/90 transition-all active:scale-[0.98]"
             >
               {isEdit ? '저장하기' : '추가하기'}

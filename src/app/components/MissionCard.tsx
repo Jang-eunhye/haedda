@@ -1,5 +1,6 @@
 import { Mission } from '../types';
 import { formatDeadlineLabel, isDeadlineExpired } from '../utils/date';
+import { formatRecurrenceLabel } from '../utils/recurrence';
 import ItemMenu from './ItemMenu';
 
 interface Props {
@@ -11,13 +12,21 @@ interface Props {
 
 export default function MissionCard({ mission, onComplete, onEdit, onDelete }: Props) {
   const isExpired = isDeadlineExpired(mission.deadline);
+  const isRecurring = !!mission.recurrence;
 
   return (
     <article className="group bg-surface rounded-2xl p-4 border border-border transition-all duration-200 hover:shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
       <div className="flex justify-between items-start gap-2">
-        <p className="font-medium text-[15px] leading-snug flex-1 break-words min-w-0 text-foreground">
-          {mission.content}
-        </p>
+        <div className="min-w-0 flex-1">
+          <p className="font-medium text-[15px] leading-snug break-words text-foreground">
+            {mission.content}
+          </p>
+          {isRecurring && mission.recurrence && (
+            <span className="inline-block mt-2 text-[11px] font-semibold text-accent bg-accent-soft px-2 py-0.5 rounded-full border border-accent-muted/50">
+              {formatRecurrenceLabel(mission.recurrence)}
+            </span>
+          )}
+        </div>
         <div className="flex items-center gap-1 shrink-0">
           <div className="flex items-center gap-1 bg-accent-soft px-2.5 py-1 rounded-full border border-accent-muted/50">
             <span className="text-sm leading-none">⭐</span>
@@ -35,7 +44,9 @@ export default function MissionCard({ mission, onComplete, onEdit, onDelete }: P
         <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
-        <span>{formatDeadlineLabel(mission.deadline)}</span>
+        <span>
+          {isRecurring ? '이번 마감' : '마감'} · {formatDeadlineLabel(mission.deadline)}
+        </span>
         {isExpired && <span className="font-semibold text-danger/80">· 기한 초과</span>}
       </div>
 
