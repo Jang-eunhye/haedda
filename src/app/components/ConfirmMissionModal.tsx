@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Mission } from '../types';
 import { isDeadlineExpired } from '../utils/date';
-import { formatRecurrenceLabel } from '../utils/recurrence';
 import StickerStar from './StickerStar';
 
 interface Props {
@@ -61,7 +60,7 @@ export default function ConfirmMissionModal({ mission, onCancel, onConfirm }: Pr
 
         {mission.recurrence && (
           <p className="text-xs text-muted text-center mb-5">
-            {formatRecurrenceLabel(mission.recurrence)} · 완료 후 다음 주기로 넘어갑니다
+            완료 후 다음 주기로 넘어갑니다
           </p>
         )}
 

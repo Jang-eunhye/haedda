@@ -14,6 +14,10 @@ export interface Mission {
   deadline: string; // "YYYY-MM-DD"
   stickerCount: number;
   recurrence?: MissionRecurrence; // 없으면 일회성
+  /** 반복 미션: 놓친 주기 수 */
+  missedCount?: number;
+  /** 반복 미션: 기한 내 연속 완료 수 */
+  consecutiveCompletions?: number;
 }
 
 export interface Reward {

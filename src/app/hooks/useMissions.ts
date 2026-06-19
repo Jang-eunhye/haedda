@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Mission, Reward, MissionInput, MissionCompleteResult, MissionRecurrence } from '../types';
 import { isDeadlineExpired, normalizeDeadline } from '../utils/date';
-import { computeNextDeadline } from '../utils/recurrence';
+import { computeNextDeadlineAfter, refreshRecurringMission } from '../utils/recurrence';
 
 const MISSIONS_KEY = 'haedda_missions';
 const REWARDS_KEY = 'haedda_rewards';
@@ -40,10 +40,13 @@ function normalizeMission(raw: unknown): Mission | null {
     deadline: normalizeDeadline(m.deadline),
     stickerCount: m.stickerCount,
     recurrence,
+    missedCount: typeof m.missedCount === 'number' ? m.missedCount : 0,
+    consecutiveCompletions:
+      typeof m.consecutiveCompletions === 'number' ? m.consecutiveCompletions : 0,
   };
 
   if (recurrence) {
-    mission.deadline = computeNextDeadline(recurrence, new Date(), true);
+    return refreshRecurringMission(mission);
   }
 
   return mission;
@@ -101,7 +104,11 @@ export function useMissions() {
       if (earned > 0) setTotalStickers(s => s + earned);
 
       if (mission.recurrence) {
-        const nextDeadline = computeNextDeadline(mission.recurrence, new Date(), false);
+        const onTime = !isDeadlineExpired(mission.deadline);
+        const nextDeadline = computeNextDeadlineAfter(
+          mission.recurrence,
+          mission.deadline
+        );
         result = {
           earned,
           content: mission.content,
@@ -109,7 +116,16 @@ export function useMissions() {
           nextDeadline,
         };
         return prev.map(m =>
-          m.id === id ? { ...m, deadline: nextDeadline } : m
+          m.id === id
+            ? {
+                ...m,
+                deadline: nextDeadline,
+                missedCount: 0,
+                consecutiveCompletions: onTime
+                  ? (mission.consecutiveCompletions ?? 0) + 1
+                  : 0,
+              }
+            : m
         );
       }
 

@@ -1,6 +1,6 @@
 import { Mission } from '../types';
 import { formatDeadlineLabel, isDeadlineExpired } from '../utils/date';
-import { formatRecurrenceLabel } from '../utils/recurrence';
+import { formatRecurrenceLabel, getRecurrenceStatus } from '../utils/recurrence';
 import ItemMenu from './ItemMenu';
 import StickerStar from './StickerStar';
 
@@ -14,6 +14,7 @@ interface Props {
 export default function MissionCard({ mission, onComplete, onEdit, onDelete }: Props) {
   const isExpired = isDeadlineExpired(mission.deadline);
   const isRecurring = !!mission.recurrence;
+  const recurrenceStatus = getRecurrenceStatus(mission);
 
   return (
     <article className="group bg-surface rounded-2xl p-4 border border-border transition-all duration-200 hover:shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
@@ -53,7 +54,21 @@ export default function MissionCard({ mission, onComplete, onEdit, onDelete }: P
             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
           />
         </svg>
-        <span>{formatDeadlineLabel(mission.deadline)}</span>
+        <span>
+          {recurrenceStatus && (
+            <>
+              <span
+                className={`font-semibold ${
+                  recurrenceStatus.variant === 'missed' ? 'text-danger' : 'text-success'
+                }`}
+              >
+                {recurrenceStatus.label}
+              </span>
+              <span className="mx-1 opacity-40">·</span>
+            </>
+          )}
+          {formatDeadlineLabel(mission.deadline)}
+        </span>
         {isRecurring && mission.recurrence && (
           <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-accent bg-accent-soft px-2 py-0.5 rounded-full border border-accent-muted/50">
             <svg
