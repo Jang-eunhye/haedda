@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Mission, MissionInput, MissionCompleteResult } from '../types';
 import MissionCard from './MissionCard';
 import MissionFormModal from './MissionFormModal';
@@ -8,8 +8,17 @@ import ConfirmMissionModal from './ConfirmMissionModal';
 import MissionCompleteResultModal from './MissionCompleteResultModal';
 import EmptyState from './EmptyState';
 import Fab from './Fab';
+import SortSelect from './SortSelect';
 
 const APP_TAGLINE = '미션을 완료하고 스티커를 모아보세요';
+
+type MissionSort = 'registered' | 'deadline' | 'sticker-desc';
+
+const MISSION_SORT_OPTIONS = [
+  { value: 'registered' as const, label: '등록순' },
+  { value: 'deadline' as const, label: '마감일순' },
+  { value: 'sticker-desc' as const, label: '스티커 많은 순' },
+];
 
 interface Props {
   missions: Mission[];
@@ -30,6 +39,15 @@ export default function MissionTab({
   const [editTarget, setEditTarget] = useState<Mission | null>(null);
   const [confirmTarget, setConfirmTarget] = useState<Mission | null>(null);
   const [completeResult, setCompleteResult] = useState<MissionCompleteResult | null>(null);
+  const [sort, setSort] = useState<MissionSort>('registered');
+
+  const sortedMissions = useMemo(() => {
+    if (sort === 'registered') return missions;
+    if (sort === 'deadline') {
+      return [...missions].sort((a, b) => a.deadline.localeCompare(b.deadline));
+    }
+    return [...missions].sort((a, b) => b.stickerCount - a.stickerCount);
+  }, [missions, sort]);
 
   const handleCompleteClick = (id: string) => {
     const mission = missions.find(m => m.id === id);
@@ -54,11 +72,20 @@ export default function MissionTab({
         />
       ) : (
         <>
-          <div className="mb-5">
-            <h2 className="text-base font-bold text-foreground">미션 ({missions.length})</h2>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h2 className="text-base font-bold text-foreground tracking-tight">
+              미션
+              <span className="text-sm font-semibold text-muted tabular-nums">({missions.length})</span>
+            </h2>
+            <SortSelect
+              value={sort}
+              onChange={setSort}
+              options={MISSION_SORT_OPTIONS}
+              ariaLabel="미션 정렬"
+            />
           </div>
           <div className="space-y-3">
-            {missions.map(mission => (
+            {sortedMissions.map(mission => (
               <MissionCard
                 key={mission.id}
                 mission={mission}

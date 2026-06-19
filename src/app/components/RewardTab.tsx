@@ -1,14 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Reward } from '../types';
 import RewardCard from './RewardCard';
 import RewardFormModal from './RewardFormModal';
 import ClaimRewardModal from './ClaimRewardModal';
 import EmptyState from './EmptyState';
 import Fab from './Fab';
+import SortSelect from './SortSelect';
 
 const APP_TAGLINE = '미션을 완료하고 스티커를 모아보세요';
+
+type RewardSort = 'registered' | 'sticker-asc' | 'sticker-desc';
+
+const REWARD_SORT_OPTIONS = [
+  { value: 'registered' as const, label: '등록순' },
+  { value: 'sticker-asc' as const, label: '스티커 적은 순' },
+  { value: 'sticker-desc' as const, label: '스티커 많은 순' },
+];
 
 interface Props {
   rewards: Reward[];
@@ -30,6 +39,15 @@ export default function RewardTab({
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<Reward | null>(null);
   const [claimTarget, setClaimTarget] = useState<Reward | null>(null);
+  const [sort, setSort] = useState<RewardSort>('registered');
+
+  const sortedRewards = useMemo(() => {
+    if (sort === 'registered') return rewards;
+    if (sort === 'sticker-asc') {
+      return [...rewards].sort((a, b) => a.stickerCost - b.stickerCost);
+    }
+    return [...rewards].sort((a, b) => b.stickerCost - a.stickerCost);
+  }, [rewards, sort]);
 
   const handleClaimConfirm = () => {
     if (!claimTarget) return;
@@ -48,11 +66,20 @@ export default function RewardTab({
         />
       ) : (
         <>
-          <div className="mb-5">
-            <h2 className="text-base font-bold text-foreground">보상 ({rewards.length})</h2>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h2 className="text-base font-bold text-foreground tracking-tight">
+              보상
+              <span className="text-sm font-semibold text-muted tabular-nums">({rewards.length})</span>
+            </h2>
+            <SortSelect
+              value={sort}
+              onChange={setSort}
+              options={REWARD_SORT_OPTIONS}
+              ariaLabel="보상 정렬"
+            />
           </div>
           <div className="space-y-3">
-            {rewards.map(reward => (
+            {sortedRewards.map(reward => (
               <RewardCard
                 key={reward.id}
                 reward={reward}
