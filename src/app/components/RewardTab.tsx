@@ -49,10 +49,7 @@ export default function RewardTab({
       ) : (
         <>
           <div className="mb-5">
-            <h2 className="text-base font-bold text-foreground">보상</h2>
-            <p className="text-xs text-muted mt-0.5">
-              등록된 보상 <span className="text-foreground font-semibold">{rewards.length}</span>개
-            </p>
+            <h2 className="text-base font-bold text-foreground">보상 ({rewards.length})</h2>
           </div>
           <div className="space-y-3">
             {rewards.map(reward => (

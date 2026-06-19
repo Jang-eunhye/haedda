@@ -55,10 +55,7 @@ export default function MissionTab({
       ) : (
         <>
           <div className="mb-5">
-            <h2 className="text-base font-bold text-foreground">미션</h2>
-            <p className="text-xs text-muted mt-0.5">
-              진행 중 <span className="text-foreground font-semibold">{missions.length}</span>개
-            </p>
+            <h2 className="text-base font-bold text-foreground">미션 ({missions.length})</h2>
           </div>
           <div className="space-y-3">
             {missions.map(mission => (
