@@ -12,6 +12,7 @@ import EmptyState from './EmptyState';
 import Fab from './Fab';
 import SortSelect from './SortSelect';
 import FilterChips from './FilterChips';
+import FilterExcludeOption from './FilterExcludeOption';
 import MissedTodosBanner from './MissedTodosBanner';
 import { isMissedTodo, matchesTodoFilter, TodoFilter } from '../utils/todoFilter';
 
@@ -56,7 +57,14 @@ export default function TodoTab({
   const [completeResult, setCompleteResult] = useState<TodoCompleteResult | null>(null);
   const [sort, setSort] = useState<TodoSort>('registered');
   const [filter, setFilter] = useState<TodoFilter>('all');
+  const [excludeTodayFromWeek, setExcludeTodayFromWeek] = useState(true);
+  const [excludeWeekFromMonth, setExcludeWeekFromMonth] = useState(true);
   const [missedExpanded, setMissedExpanded] = useState(false);
+
+  const filterOptions = useMemo(
+    () => ({ excludeTodayFromWeek, excludeWeekFromMonth }),
+    [excludeTodayFromWeek, excludeWeekFromMonth]
+  );
 
   const missedTodos = useMemo(() => todos.filter(isMissedTodo), [todos]);
   const missedTodoCount = missedTodos.length;
@@ -66,8 +74,8 @@ export default function TodoTab({
   }, [missedTodoCount]);
 
   const filteredTodos = useMemo(
-    () => todos.filter(todo => matchesTodoFilter(todo, filter)),
-    [todos, filter]
+    () => todos.filter(todo => matchesTodoFilter(todo, filter, filterOptions)),
+    [todos, filter, filterOptions]
   );
 
   const sortedTodos = useMemo(() => {
@@ -134,6 +142,20 @@ export default function TodoTab({
                   options={TODO_FILTER_OPTIONS}
                   ariaLabel="할일 필터"
                 />
+                {filter === 'week' && (
+                  <FilterExcludeOption
+                    label="오늘 목록 제외"
+                    checked={excludeTodayFromWeek}
+                    onChange={setExcludeTodayFromWeek}
+                  />
+                )}
+                {filter === 'month' && (
+                  <FilterExcludeOption
+                    label="이번주 목록 제외"
+                    checked={excludeWeekFromMonth}
+                    onChange={setExcludeWeekFromMonth}
+                  />
+                )}
               </div>
               {sortedTodos.length === 0 ? (
                 <EmptyState
