@@ -18,7 +18,7 @@ import { isMissedTodo, matchesTodoFilter, TodoFilter } from '../utils/todoFilter
 
 const APP_TAGLINE = '할일을 완료하고 스티커를 모아보세요';
 
-type TodoSort = 'registered' | 'deadline' | 'sticker-desc';
+type TodoSort = 'recent' | 'deadline' | 'sticker-desc';
 
 const TODO_FILTER_OPTIONS = [
   { value: 'all' as const, label: '전체' },
@@ -29,7 +29,7 @@ const TODO_FILTER_OPTIONS = [
 ];
 
 const TODO_SORT_OPTIONS = [
-  { value: 'registered' as const, label: '등록순' },
+  { value: 'recent' as const, label: '최신순' },
   { value: 'deadline' as const, label: '마감일순' },
   { value: 'sticker-desc' as const, label: '스티커 많은 순' },
 ];
@@ -55,7 +55,7 @@ export default function TodoTab({
   const [confirmTarget, setConfirmTarget] = useState<Todo | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Todo | null>(null);
   const [completeResult, setCompleteResult] = useState<TodoCompleteResult | null>(null);
-  const [sort, setSort] = useState<TodoSort>('registered');
+  const [sort, setSort] = useState<TodoSort>('recent');
   const [filter, setFilter] = useState<TodoFilter>('all');
   const [excludeTodayFromWeek, setExcludeTodayFromWeek] = useState(true);
   const [excludeWeekFromMonth, setExcludeWeekFromMonth] = useState(true);
@@ -79,7 +79,7 @@ export default function TodoTab({
   );
 
   const sortedTodos = useMemo(() => {
-    if (sort === 'registered') return filteredTodos;
+    if (sort === 'recent') return [...filteredTodos].reverse();
     if (sort === 'deadline') {
       return [...filteredTodos].sort((a, b) => a.deadline.localeCompare(b.deadline));
     }
