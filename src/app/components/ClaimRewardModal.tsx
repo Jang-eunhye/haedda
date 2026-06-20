@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Reward } from '../types';
+import { MdRemove } from 'react-icons/md';
 import StickerStar from './StickerStar';
 
 interface Props {
@@ -47,15 +48,14 @@ export default function ClaimRewardModal({ reward, totalStickers, onClose, onCon
 
         <div className="bg-background rounded-2xl p-4 space-y-3 mb-5">
           <div className="flex justify-between text-sm">
-            <span className="text-muted">차감 스티커</span>
-            <span className="font-semibold text-foreground inline-flex items-center gap-1">
-              <StickerStar size="sm" /> {reward.stickerCost}
-            </span>
+            <span className="text-muted">현재 보유</span>
+            <span className="font-semibold text-foreground tabular-nums">{totalStickers}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted">현재 보유</span>
-            <span className="font-semibold text-foreground inline-flex items-center gap-1">
-              <StickerStar size="sm" /> {totalStickers}
+            <span className="text-muted">차감 스티커</span>
+            <span className="font-semibold text-foreground inline-flex items-center gap-3 tabular-nums">
+              <MdRemove size={16} className="text-muted shrink-0" aria-hidden />
+              {reward.stickerCost}
             </span>
           </div>
           <div className="border-t border-border pt-3 flex justify-between text-sm">
