@@ -13,7 +13,7 @@ interface Props {
   onConfirm: () => void;
 }
 
-export default function MissionCompleteResultModal({
+export default function TodoCompleteResultModal({
   content,
   earned,
   isRecurring,
@@ -40,7 +40,7 @@ export default function MissionCompleteResultModal({
           <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-success-soft flex items-center justify-center text-3xl">
             🎉
           </div>
-          <h3 className="text-lg font-bold text-foreground">미션 완료!</h3>
+          <h3 className="text-lg font-bold text-foreground">할일 완료!</h3>
           <p className="text-sm text-muted mt-1 break-words px-2">{content}</p>
         </div>
 
@@ -66,7 +66,7 @@ export default function MissionCompleteResultModal({
           </p>
         ) : (
           <p className="text-xs text-muted text-center mb-5">
-            해당 미션은 목록에서 삭제됩니다
+            해당 할일은 목록에서 삭제됩니다
           </p>
         )}
 

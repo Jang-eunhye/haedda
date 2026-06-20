@@ -1,15 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Mission, Reward, MissionInput, MissionCompleteResult, MissionRecurrence } from '../types';
+import { Todo, Reward, TodoInput, TodoCompleteResult, TodoRecurrence } from '../types';
 import { isDeadlineExpired, normalizeDeadline } from '../utils/date';
-import { computeNextDeadlineAfter, refreshRecurringMission } from '../utils/recurrence';
+import { computeNextDeadlineAfter, refreshRecurringTodo } from '../utils/recurrence';
 
-const MISSIONS_KEY = 'haedda_missions';
+const TODOS_KEY = 'haedda_todos';
+const LEGACY_MISSIONS_KEY = 'haedda_missions';
 const REWARDS_KEY = 'haedda_rewards';
 const STICKERS_KEY = 'haedda_stickers';
 
-function normalizeRecurrence(raw: unknown): MissionRecurrence | undefined {
+function normalizeRecurrence(raw: unknown): TodoRecurrence | undefined {
   if (!raw || typeof raw !== 'object') return undefined;
   const r = raw as Record<string, unknown>;
   if (r.type === 'daily') return { type: 'daily' };
@@ -26,7 +27,7 @@ function normalizeRecurrence(raw: unknown): MissionRecurrence | undefined {
   return undefined;
 }
 
-function normalizeMission(raw: unknown): Mission | null {
+function normalizeTodo(raw: unknown): Todo | null {
   if (!raw || typeof raw !== 'object') return null;
   const m = raw as Record<string, unknown>;
   if (typeof m.id !== 'string' || typeof m.content !== 'string') return null;
@@ -34,7 +35,7 @@ function normalizeMission(raw: unknown): Mission | null {
   if (m.completed === true) return null;
 
   const recurrence = normalizeRecurrence(m.recurrence);
-  const mission: Mission = {
+  const todo: Todo = {
     id: m.id,
     content: m.content,
     deadline: normalizeDeadline(m.deadline),
@@ -46,29 +47,43 @@ function normalizeMission(raw: unknown): Mission | null {
   };
 
   if (recurrence) {
-    return refreshRecurringMission(mission);
+    return refreshRecurringTodo(todo);
   }
 
-  return mission;
+  return todo;
 }
 
-export function useMissions() {
-  const [missions, setMissions] = useState<Mission[]>([]);
+function loadTodosFromStorage(): Todo[] {
+  try {
+    const stored = localStorage.getItem(TODOS_KEY);
+    if (stored) {
+      const parsed: unknown[] = JSON.parse(stored);
+      return parsed.map(normalizeTodo).filter((x): x is Todo => x !== null);
+    }
+
+    const legacy = localStorage.getItem(LEGACY_MISSIONS_KEY);
+    if (legacy) {
+      const parsed: unknown[] = JSON.parse(legacy);
+      const todos = parsed.map(normalizeTodo).filter((x): x is Todo => x !== null);
+      localStorage.setItem(TODOS_KEY, JSON.stringify(todos));
+      localStorage.removeItem(LEGACY_MISSIONS_KEY);
+      return todos;
+    }
+  } catch {}
+  return [];
+}
+
+export function useTodos() {
+  const [todos, setTodos] = useState<Todo[]>([]);
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [totalStickers, setTotalStickers] = useState<number>(0);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     try {
-      const m = localStorage.getItem(MISSIONS_KEY);
+      setTodos(loadTodosFromStorage());
       const r = localStorage.getItem(REWARDS_KEY);
       const s = localStorage.getItem(STICKERS_KEY);
-      if (m) {
-        const parsed: unknown[] = JSON.parse(m);
-        setMissions(
-          parsed.map(normalizeMission).filter((x): x is Mission => x !== null)
-        );
-      }
       if (r) setRewards(JSON.parse(r));
       if (s) setTotalStickers(JSON.parse(s));
     } catch {}
@@ -77,8 +92,8 @@ export function useMissions() {
 
   useEffect(() => {
     if (!ready) return;
-    localStorage.setItem(MISSIONS_KEY, JSON.stringify(missions));
-  }, [missions, ready]);
+    localStorage.setItem(TODOS_KEY, JSON.stringify(todos));
+  }, [todos, ready]);
 
   useEffect(() => {
     if (!ready) return;
@@ -90,47 +105,44 @@ export function useMissions() {
     localStorage.setItem(STICKERS_KEY, JSON.stringify(totalStickers));
   }, [totalStickers, ready]);
 
-  const addMission = (data: MissionInput) => {
-    setMissions(prev => [...prev, { ...data, id: crypto.randomUUID() }]);
+  const addTodo = (data: TodoInput) => {
+    setTodos(prev => [...prev, { ...data, id: crypto.randomUUID() }]);
   };
 
-  const completeMission = (id: string): MissionCompleteResult | null => {
-    let result: MissionCompleteResult | null = null;
-    setMissions(prev => {
-      const mission = prev.find(m => m.id === id);
-      if (!mission) return prev;
+  const completeTodo = (id: string): TodoCompleteResult | null => {
+    let result: TodoCompleteResult | null = null;
+    setTodos(prev => {
+      const todo = prev.find(t => t.id === id);
+      if (!todo) return prev;
 
-      const earned = isDeadlineExpired(mission.deadline) ? 0 : mission.stickerCount;
+      const earned = isDeadlineExpired(todo.deadline) ? 0 : todo.stickerCount;
       if (earned > 0) setTotalStickers(s => s + earned);
 
-      if (mission.recurrence) {
-        const onTime = !isDeadlineExpired(mission.deadline);
-        const nextDeadline = computeNextDeadlineAfter(
-          mission.recurrence,
-          mission.deadline
-        );
+      if (todo.recurrence) {
+        const onTime = !isDeadlineExpired(todo.deadline);
+        const nextDeadline = computeNextDeadlineAfter(todo.recurrence, todo.deadline);
         result = {
           earned,
-          content: mission.content,
+          content: todo.content,
           isRecurring: true,
           nextDeadline,
         };
-        return prev.map(m =>
-          m.id === id
+        return prev.map(t =>
+          t.id === id
             ? {
-                ...m,
+                ...t,
                 deadline: nextDeadline,
                 missedCount: 0,
                 consecutiveCompletions: onTime
-                  ? (mission.consecutiveCompletions ?? 0) + 1
+                  ? (todo.consecutiveCompletions ?? 0) + 1
                   : 0,
               }
-            : m
+            : t
         );
       }
 
-      result = { earned, content: mission.content, isRecurring: false };
-      return prev.filter(m => m.id !== id);
+      result = { earned, content: todo.content, isRecurring: false };
+      return prev.filter(t => t.id !== id);
     });
     return result;
   };
@@ -152,12 +164,12 @@ export function useMissions() {
     return claimed;
   };
 
-  const updateMission = (id: string, data: MissionInput) => {
-    setMissions(prev => prev.map(m => (m.id === id ? { ...m, ...data } : m)));
+  const updateTodo = (id: string, data: TodoInput) => {
+    setTodos(prev => prev.map(t => (t.id === id ? { ...t, ...data } : t)));
   };
 
-  const deleteMission = (id: string) => {
-    setMissions(prev => prev.filter(m => m.id !== id));
+  const deleteTodo = (id: string) => {
+    setTodos(prev => prev.filter(t => t.id !== id));
   };
 
   const updateReward = (id: string, data: Omit<Reward, 'id'>) => {
@@ -169,13 +181,13 @@ export function useMissions() {
   };
 
   return {
-    missions,
+    todos,
     rewards,
     totalStickers,
-    addMission,
-    completeMission,
-    updateMission,
-    deleteMission,
+    addTodo,
+    completeTodo,
+    updateTodo,
+    deleteTodo,
     addReward,
     claimReward,
     updateReward,

@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Mission, MissionInput } from '../types';
+import { Todo, TodoInput } from '../types';
 import { getTodayISO, normalizeDeadline } from '../utils/date';
 import { computeNextDeadline } from '../utils/recurrence';
 import DatePicker from './DatePicker';
 import RecurrencePicker, {
   buildRecurrenceFromForm,
-  getFrequencyFromMission,
+  getFrequencyFromTodo,
   RecurrenceFrequency,
 } from './RecurrencePicker';
 import StickerStar from './StickerStar';
@@ -17,32 +17,30 @@ const CONTENT_MAX = 50;
 
 interface Props {
   onClose: () => void;
-  onSave: (data: MissionInput) => void;
-  mission?: Mission;
+  onSave: (data: TodoInput) => void;
+  todo?: Todo;
 }
 
-export default function MissionFormModal({ onClose, onSave, mission }: Props) {
-  const isEdit = !!mission;
-  const [content, setContent] = useState(mission?.content ?? '');
+export default function TodoFormModal({ onClose, onSave, todo }: Props) {
+  const isEdit = !!todo;
+  const [content, setContent] = useState(todo?.content ?? '');
   const [deadline, setDeadline] = useState(
-    mission ? normalizeDeadline(mission.deadline) : getTodayISO()
+    todo ? normalizeDeadline(todo.deadline) : getTodayISO()
   );
-  const [stickerCount, setStickerCount] = useState(mission?.stickerCount ?? 1);
-  const [isRecurring, setIsRecurring] = useState(!!mission?.recurrence);
+  const [stickerCount, setStickerCount] = useState(todo?.stickerCount ?? 1);
+  const [isRecurring, setIsRecurring] = useState(!!todo?.recurrence);
   const [frequency, setFrequency] = useState<RecurrenceFrequency>(
-    getFrequencyFromMission(mission?.recurrence)
+    getFrequencyFromTodo(todo?.recurrence)
   );
-  const [weekdays, setWeekdays] = useState<number[]>(mission?.recurrence?.weekdays ?? []);
+  const [weekdays, setWeekdays] = useState<number[]>(todo?.recurrence?.weekdays ?? []);
   const [monthlyMode, setMonthlyMode] = useState<'day' | 'last'>(() => {
-    if (mission?.recurrence?.type === 'monthly') {
-      return mission.recurrence.dayOfMonth === 'last' ? 'last' : 'day';
+    if (todo?.recurrence?.type === 'monthly') {
+      return todo.recurrence.dayOfMonth === 'last' ? 'last' : 'day';
     }
     return 'last';
   });
   const [dayOfMonth, setDayOfMonth] = useState<number>(
-    typeof mission?.recurrence?.dayOfMonth === 'number'
-      ? mission.recurrence.dayOfMonth
-      : 1
+    typeof todo?.recurrence?.dayOfMonth === 'number' ? todo.recurrence.dayOfMonth : 1
   );
   const [mounted, setMounted] = useState(false);
 
@@ -88,7 +86,7 @@ export default function MissionFormModal({ onClose, onSave, mission }: Props) {
 
   const canSubmit =
     content.trim() &&
-    (isRecurring ? (frequency !== 'weekly' || weekdays.length > 0) : !!deadline);
+    (isRecurring ? frequency !== 'weekly' || weekdays.length > 0 : !!deadline);
 
   if (!mounted) return null;
 
@@ -103,16 +101,16 @@ export default function MissionFormModal({ onClose, onSave, mission }: Props) {
       >
         <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5 sm:hidden" />
         <h3 className="text-lg font-bold text-foreground mb-1">
-          {isEdit ? '미션 수정' : '새 미션'}
+          {isEdit ? '할일 수정' : '새 할일'}
         </h3>
         <p className="text-xs text-muted mb-5">
-          {isEdit ? '미션 내용을 수정해 보세요' : '완료하면 스티커를 받을 수 있어요'}
+          {isEdit ? '할일 내용을 수정해 보세요' : '완료하면 스티커를 받을 수 있어요'}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-0">
           <div>
             <label className="block text-sm font-semibold text-foreground mb-2">
-              미션 내용
+              할일 내용
             </label>
             <div className="relative">
               <textarea
@@ -134,7 +132,7 @@ export default function MissionFormModal({ onClose, onSave, mission }: Props) {
 
           <div className="border-t border-border/50 pt-5 mt-5">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-foreground">반복 미션</p>
+              <p className="text-sm font-semibold text-foreground">반복 할일</p>
               <button
                 type="button"
                 role="switch"

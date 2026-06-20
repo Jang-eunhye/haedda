@@ -1,4 +1,4 @@
-import { Mission, MissionRecurrence } from '../types';
+import { Todo, TodoRecurrence } from '../types';
 import { formatDateISO, formatDeadlineLabel, getDaysInMonth, parseDateParts } from './date';
 
 export const WEEKDAY_LABELS: { value: number; label: string }[] = [
@@ -11,7 +11,7 @@ export const WEEKDAY_LABELS: { value: number; label: string }[] = [
   { value: 0, label: '일' },
 ];
 
-export function isRecurringMission(recurrence?: MissionRecurrence): boolean {
+export function isRecurringTodo(recurrence?: TodoRecurrence): boolean {
   return !!recurrence;
 }
 
@@ -53,7 +53,7 @@ function parseISODate(iso: string): Date {
 
 /** 다음 마감일 계산. includeToday=true면 오늘도 후보 */
 export function computeNextDeadline(
-  recurrence: MissionRecurrence,
+  recurrence: TodoRecurrence,
   from: Date = new Date(),
   includeToday = false
 ): string {
@@ -87,7 +87,7 @@ export function computeNextDeadline(
 
 /** 완료 후 다음 마감일 — 현재 마감일 이후의 다음 주기 */
 export function computeNextDeadlineAfter(
-  recurrence: MissionRecurrence,
+  recurrence: TodoRecurrence,
   currentDeadline: string
 ): string {
   const after = startOfDay(parseISODate(currentDeadline));
@@ -117,7 +117,7 @@ export function computeNextDeadlineAfter(
 }
 
 function computeNextMonthlyDeadline(
-  recurrence: MissionRecurrence,
+  recurrence: TodoRecurrence,
   from: Date,
   includeToday: boolean
 ): string {
@@ -140,7 +140,7 @@ function computeNextMonthlyDeadline(
   return formatDateISO(from);
 }
 
-export function formatRecurrenceLabel(recurrence: MissionRecurrence): string {
+export function formatRecurrenceLabel(recurrence: TodoRecurrence): string {
   if (recurrence.type === 'daily') return '매일';
 
   if (recurrence.type === 'weekly') {
@@ -167,7 +167,7 @@ function getWeekStartMonday(date: Date): Date {
 
 /** 이번 주기(오늘 포함 당일·이번 주·이번 달)의 마감일 */
 export function computeCurrentPeriodDeadline(
-  recurrence: MissionRecurrence,
+  recurrence: TodoRecurrence,
   from: Date = new Date()
 ): string {
   const today = startOfDay(from);
@@ -204,7 +204,7 @@ export function computeCurrentPeriodDeadline(
 }
 
 export function countMissedPeriods(
-  recurrence: MissionRecurrence,
+  recurrence: TodoRecurrence,
   storedDeadline: string,
   currentPeriodDeadline: string
 ): number {
@@ -219,57 +219,53 @@ export function countMissedPeriods(
   return missed;
 }
 
-export function getRecurrenceStatus(mission: {
-  recurrence?: MissionRecurrence;
+export function getRecurrenceStatus(todo: {
+  recurrence?: TodoRecurrence;
   missedCount?: number;
   consecutiveCompletions?: number;
 }): { label: string; variant: 'missed' | 'streak' } | null {
-  if (!mission.recurrence) return null;
-  const missed = mission.missedCount ?? 0;
-  const streak = mission.consecutiveCompletions ?? 0;
+  if (!todo.recurrence) return null;
+  const missed = todo.missedCount ?? 0;
+  const streak = todo.consecutiveCompletions ?? 0;
   if (missed > 0) return { label: `미완료 ${missed}회`, variant: 'missed' };
   if (streak > 0) return { label: `${streak}회 연속 완료`, variant: 'streak' };
   return null;
 }
 
-export function formatRecurrenceStatus(mission: {
-  recurrence?: MissionRecurrence;
+export function formatRecurrenceStatus(todo: {
+  recurrence?: TodoRecurrence;
   missedCount?: number;
   consecutiveCompletions?: number;
 }): string | null {
-  return getRecurrenceStatus(mission)?.label ?? null;
+  return getRecurrenceStatus(todo)?.label ?? null;
 }
 
-/** 만료된 반복 미션을 이번 주기 마감일로 갱신하고 미완료 횟수 누적 */
-export function refreshRecurringMission(mission: Mission): Mission {
-  if (!mission.recurrence) return mission;
+/** 만료된 반복 할일을 이번 주기 마감일로 갱신하고 미완료 횟수 누적 */
+export function refreshRecurringTodo(todo: Todo): Todo {
+  if (!todo.recurrence) return todo;
 
-  const currentPeriod = computeCurrentPeriodDeadline(mission.recurrence);
-  const stored = mission.deadline;
+  const currentPeriod = computeCurrentPeriodDeadline(todo.recurrence);
+  const stored = todo.deadline;
 
   if (stored >= currentPeriod) {
     return {
-      ...mission,
-      missedCount: mission.missedCount ?? 0,
-      consecutiveCompletions: mission.consecutiveCompletions ?? 0,
+      ...todo,
+      missedCount: todo.missedCount ?? 0,
+      consecutiveCompletions: todo.consecutiveCompletions ?? 0,
     };
   }
 
-  const additionalMissed = countMissedPeriods(
-    mission.recurrence,
-    stored,
-    currentPeriod
-  );
+  const additionalMissed = countMissedPeriods(todo.recurrence, stored, currentPeriod);
 
   return {
-    ...mission,
+    ...todo,
     deadline: currentPeriod,
-    missedCount: (mission.missedCount ?? 0) + additionalMissed,
-    consecutiveCompletions: mission.consecutiveCompletions ?? 0,
+    missedCount: (todo.missedCount ?? 0) + additionalMissed,
+    consecutiveCompletions: todo.consecutiveCompletions ?? 0,
   };
 }
 
-export function formatRecurrenceDeadline(recurrence: MissionRecurrence, deadline: string): string {
+export function formatRecurrenceDeadline(recurrence: TodoRecurrence, deadline: string): string {
   const dateLabel = formatDeadlineLabel(deadline);
   if (recurrence.type === 'daily') return `오늘까지 · ${dateLabel}`;
   return `${formatRecurrenceLabel(recurrence)} · ${dateLabel}`;

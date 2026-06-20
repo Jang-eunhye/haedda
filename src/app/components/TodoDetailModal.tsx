@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Mission } from '../types';
+import { Todo } from '../types';
 import {
   formatDeadlineLabel,
   getTodayISO,
@@ -14,7 +14,7 @@ import { MdClose, MdDeleteOutline, MdOutlineEdit } from 'react-icons/md';
 import StickerStar from './StickerStar';
 
 interface Props {
-  mission: Mission;
+  todo: Todo;
   onClose: () => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -45,20 +45,20 @@ function InfoRow({ label, children }: { label: string; children: React.ReactNode
   );
 }
 
-export default function MissionDetailModal({
-  mission,
+export default function TodoDetailModal({
+  todo,
   onClose,
   onEdit,
   onDelete,
   onComplete,
 }: Props) {
   const [mounted, setMounted] = useState(false);
-  const isExpired = isDeadlineExpired(mission.deadline);
-  const isRecurring = !!mission.recurrence;
-  const missedCount = mission.missedCount ?? 0;
-  const streak = mission.consecutiveCompletions ?? 0;
+  const isExpired = isDeadlineExpired(todo.deadline);
+  const isRecurring = !!todo.recurrence;
+  const missedCount = todo.missedCount ?? 0;
+  const streak = todo.consecutiveCompletions ?? 0;
   const showExpired = isExpired && !isRecurring;
-  const deadlineStatus = getDeadlineStatus(mission.deadline, isRecurring);
+  const deadlineStatus = getDeadlineStatus(todo.deadline, isRecurring);
   const showStreak = isRecurring && streak > 0;
   const showMissed = isRecurring && missedCount > 0;
 
@@ -92,7 +92,7 @@ export default function MissionDetailModal({
           >
             <MdClose size={20} aria-hidden />
           </button>
-          <span className="text-sm font-semibold text-muted">미션 상세</span>
+          <span className="text-sm font-semibold text-muted">할일 상세</span>
           <div className="absolute right-5 sm:right-6 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
             <button
               type="button"
@@ -116,15 +116,15 @@ export default function MissionDetailModal({
         <div className="px-5 pb-8 sm:px-6 sm:pb-6">
           <div
             className={`flex flex-wrap items-center justify-center gap-1 py-2 ${showExpired ? 'opacity-40' : ''}`}
-            aria-label={`스티커 ${mission.stickerCount}개`}
+            aria-label={`스티커 ${todo.stickerCount}개`}
           >
-            {Array.from({ length: mission.stickerCount }, (_, i) => (
+            {Array.from({ length: todo.stickerCount }, (_, i) => (
               <StickerStar key={i} size="lg" />
             ))}
           </div>
 
           <h2 className="mt-3 text-xl font-bold leading-snug break-words text-foreground text-center">
-            {mission.content}
+            {todo.content}
           </h2>
 
           {showStreak && (
@@ -142,16 +142,16 @@ export default function MissionDetailModal({
           )}
 
           <div className="mt-4 rounded-2xl bg-background border border-border divide-y divide-border">
-            <InfoRow label="마감일">{formatDeadlineLabel(mission.deadline)}</InfoRow>
+            <InfoRow label="마감일">{formatDeadlineLabel(todo.deadline)}</InfoRow>
             <InfoRow label="남은 기한">
               <span className={showExpired ? 'text-danger' : ''}>{deadlineStatus}</span>
             </InfoRow>
-            {isRecurring && mission.recurrence && (
-              <InfoRow label="반복">{formatRecurrenceLabel(mission.recurrence)}</InfoRow>
+            {isRecurring && todo.recurrence && (
+              <InfoRow label="반복">{formatRecurrenceLabel(todo.recurrence)}</InfoRow>
             )}
             {!isRecurring && (
               <InfoRow label="유형">
-                <span className="text-muted">1회성 미션</span>
+                <span className="text-muted">1회성 할일</span>
               </InfoRow>
             )}
           </div>

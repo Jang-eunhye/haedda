@@ -1,20 +1,20 @@
 import { MdOutlineAutorenew, MdCalendarToday } from 'react-icons/md';
-import { Mission } from "../types";
-import { formatDeadlineLabel, isDeadlineExpired } from "../utils/date";
-import { formatRecurrenceLabel } from "../utils/recurrence";
-import StickerStar from "./StickerStar";
+import { Todo } from '../types';
+import { formatDeadlineLabel, isDeadlineExpired } from '../utils/date';
+import { formatRecurrenceLabel } from '../utils/recurrence';
+import StickerStar from './StickerStar';
 
 interface Props {
-  mission: Mission;
+  todo: Todo;
   onComplete: (id: string) => void;
-  onOpen: (mission: Mission) => void;
+  onOpen: (todo: Todo) => void;
 }
 
-export default function MissionCard({ mission, onComplete, onOpen }: Props) {
-  const isExpired = isDeadlineExpired(mission.deadline);
-  const isRecurring = !!mission.recurrence;
-  const missedCount = mission.missedCount ?? 0;
-  const streak = mission.consecutiveCompletions ?? 0;
+export default function TodoCard({ todo, onComplete, onOpen }: Props) {
+  const isExpired = isDeadlineExpired(todo.deadline);
+  const isRecurring = !!todo.recurrence;
+  const missedCount = todo.missedCount ?? 0;
+  const streak = todo.consecutiveCompletions ?? 0;
   const showExpiredStyle = isExpired && !isRecurring;
   const showMissedStripe = isRecurring && missedCount > 0;
 
@@ -26,20 +26,20 @@ export default function MissionCard({ mission, onComplete, onOpen }: Props) {
       <div className="min-w-0 flex-1 p-4">
         <button
           type="button"
-          onClick={() => onOpen(mission)}
+          onClick={() => onOpen(todo)}
           className="w-full text-left cursor-pointer rounded-xl -m-1 p-1 hover:bg-background/60 transition-colors active:scale-[0.995]"
         >
           <div
-            className={`inline-flex flex-wrap items-center gap-0.5 ${isExpired ? "opacity-40" : ""}`}
-            aria-label={`스티커 ${mission.stickerCount}개`}
+            className={`inline-flex flex-wrap items-center gap-0.5 ${isExpired ? 'opacity-40' : ''}`}
+            aria-label={`스티커 ${todo.stickerCount}개`}
           >
-            {Array.from({ length: mission.stickerCount }, (_, i) => (
+            {Array.from({ length: todo.stickerCount }, (_, i) => (
               <StickerStar key={i} size="md" />
             ))}
           </div>
 
           <p className="mt-2 font-medium text-[15px] leading-snug break-words text-foreground">
-            {mission.content}
+            {todo.content}
           </p>
 
           {isRecurring && missedCount > 0 && (
@@ -52,15 +52,15 @@ export default function MissionCard({ mission, onComplete, onOpen }: Props) {
 
           <div
             className={`mt-2 text-xs flex items-center gap-1.5 flex-wrap ${
-              showExpiredStyle ? "text-danger" : "text-muted"
+              showExpiredStyle ? 'text-danger' : 'text-muted'
             }`}
           >
             <MdCalendarToday size={14} className="shrink-0" aria-hidden />
-            <span>{formatDeadlineLabel(mission.deadline)}</span>
-            {isRecurring && mission.recurrence && (
+            <span>{formatDeadlineLabel(todo.deadline)}</span>
+            {isRecurring && todo.recurrence && (
               <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-accent bg-accent-soft px-2 py-0.5 rounded-full border border-accent-muted/50">
                 <MdOutlineAutorenew size={12} className="shrink-0" aria-hidden />
-                {formatRecurrenceLabel(mission.recurrence)}
+                {formatRecurrenceLabel(todo.recurrence)}
               </span>
             )}
             {showExpiredStyle && (
@@ -72,7 +72,7 @@ export default function MissionCard({ mission, onComplete, onOpen }: Props) {
         <div className="mt-3.5">
           <button
             type="button"
-            onClick={() => onComplete(mission.id)}
+            onClick={() => onComplete(todo.id)}
             className="w-full py-2.5 rounded-xl text-sm font-semibold bg-foreground text-white hover:bg-foreground/90 active:scale-[0.98] transition-all duration-150"
           >
             완료하기

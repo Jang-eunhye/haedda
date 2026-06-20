@@ -1,6 +1,6 @@
 'use client';
 
-import { MissionRecurrence } from '../types';
+import { TodoRecurrence } from '../types';
 import { WEEKDAY_LABELS } from '../utils/recurrence';
 
 export type RecurrenceFrequency = 'daily' | 'weekly' | 'monthly';
@@ -156,7 +156,7 @@ export function buildRecurrenceFromForm(
   weekdays: number[],
   monthlyMode: 'day' | 'last',
   dayOfMonth: number
-): MissionRecurrence | undefined {
+): TodoRecurrence | undefined {
   if (!isRecurring) return undefined;
   if (frequency === 'daily') return { type: 'daily' };
   if (frequency === 'weekly') return { type: 'weekly', weekdays: [...weekdays].sort() };
@@ -169,8 +169,8 @@ export function buildRecurrenceFromForm(
   return undefined;
 }
 
-export function getFrequencyFromMission(
-  recurrence?: MissionRecurrence
+export function getFrequencyFromTodo(
+  recurrence?: TodoRecurrence
 ): RecurrenceFrequency {
   if (!recurrence) return 'daily';
   return recurrence.type;

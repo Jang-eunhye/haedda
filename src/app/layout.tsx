@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "해따",
-  description: "미션을 완료하고 스티커를 모아보세요",
+  description: "할일을 완료하고 스티커를 모아보세요",
 };
 
 export const viewport: Viewport = {

@@ -2,20 +2,20 @@
 
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Mission } from '../types';
+import { Todo } from '../types';
 import { isDeadlineExpired } from '../utils/date';
 import StickerStar from './StickerStar';
 
 interface Props {
-  mission: Mission;
+  todo: Todo;
   onCancel: () => void;
   onConfirm: () => void;
 }
 
-export default function ConfirmMissionModal({ mission, onCancel, onConfirm }: Props) {
+export default function ConfirmTodoModal({ todo, onCancel, onConfirm }: Props) {
   const [mounted, setMounted] = useState(false);
-  const isExpired = isDeadlineExpired(mission.deadline);
-  const expectedStickers = isExpired ? 0 : mission.stickerCount;
+  const isExpired = isDeadlineExpired(todo.deadline);
+  const expectedStickers = isExpired ? 0 : todo.stickerCount;
 
   useEffect(() => {
     setMounted(true);
@@ -38,8 +38,8 @@ export default function ConfirmMissionModal({ mission, onCancel, onConfirm }: Pr
       >
         <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5 sm:hidden" />
         <div className="text-center mb-5">
-          <h3 className="text-lg font-bold text-foreground">미션을 완료할까요?</h3>
-          <p className="text-sm text-muted mt-2 break-words px-2">{mission.content}</p>
+          <h3 className="text-lg font-bold text-foreground">할일을 완료할까요?</h3>
+          <p className="text-sm text-muted mt-2 break-words px-2">{todo.content}</p>
         </div>
 
         <div className="bg-background rounded-2xl p-4 text-center mb-5">
@@ -58,7 +58,7 @@ export default function ConfirmMissionModal({ mission, onCancel, onConfirm }: Pr
           )}
         </div>
 
-        {mission.recurrence && (
+        {todo.recurrence && (
           <p className="text-xs text-muted text-center mb-5">
             완료 후 다음 주기로 넘어갑니다
           </p>

@@ -1,98 +1,98 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Mission, MissionInput, MissionCompleteResult } from '../types';
-import MissionCard from './MissionCard';
-import MissionFormModal from './MissionFormModal';
-import MissionDetailModal from './MissionDetailModal';
-import ConfirmMissionModal from './ConfirmMissionModal';
-import MissionCompleteResultModal from './MissionCompleteResultModal';
+import { Todo, TodoInput, TodoCompleteResult } from '../types';
+import TodoCard from './TodoCard';
+import TodoFormModal from './TodoFormModal';
+import TodoDetailModal from './TodoDetailModal';
+import ConfirmTodoModal from './ConfirmTodoModal';
+import TodoCompleteResultModal from './TodoCompleteResultModal';
 import DeleteConfirmModal from './DeleteConfirmModal';
 import EmptyState from './EmptyState';
 import Fab from './Fab';
 import SortSelect from './SortSelect';
 
-const APP_TAGLINE = '미션을 완료하고 스티커를 모아보세요';
+const APP_TAGLINE = '할일을 완료하고 스티커를 모아보세요';
 
-type MissionSort = 'registered' | 'deadline' | 'sticker-desc';
+type TodoSort = 'registered' | 'deadline' | 'sticker-desc';
 
-const MISSION_SORT_OPTIONS = [
+const TODO_SORT_OPTIONS = [
   { value: 'registered' as const, label: '등록순' },
   { value: 'deadline' as const, label: '마감일순' },
   { value: 'sticker-desc' as const, label: '스티커 많은 순' },
 ];
 
 interface Props {
-  missions: Mission[];
-  onAddMission: (mission: MissionInput) => void;
-  onUpdateMission: (id: string, data: MissionInput) => void;
-  onDeleteMission: (id: string) => void;
-  onCompleteMission: (id: string) => MissionCompleteResult | null;
+  todos: Todo[];
+  onAddTodo: (todo: TodoInput) => void;
+  onUpdateTodo: (id: string, data: TodoInput) => void;
+  onDeleteTodo: (id: string) => void;
+  onCompleteTodo: (id: string) => TodoCompleteResult | null;
 }
 
-export default function MissionTab({
-  missions,
-  onAddMission,
-  onUpdateMission,
-  onDeleteMission,
-  onCompleteMission,
+export default function TodoTab({
+  todos,
+  onAddTodo,
+  onUpdateTodo,
+  onDeleteTodo,
+  onCompleteTodo,
 }: Props) {
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [detailTarget, setDetailTarget] = useState<Mission | null>(null);
-  const [editTarget, setEditTarget] = useState<Mission | null>(null);
-  const [confirmTarget, setConfirmTarget] = useState<Mission | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<Mission | null>(null);
-  const [completeResult, setCompleteResult] = useState<MissionCompleteResult | null>(null);
-  const [sort, setSort] = useState<MissionSort>('registered');
+  const [detailTarget, setDetailTarget] = useState<Todo | null>(null);
+  const [editTarget, setEditTarget] = useState<Todo | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<Todo | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Todo | null>(null);
+  const [completeResult, setCompleteResult] = useState<TodoCompleteResult | null>(null);
+  const [sort, setSort] = useState<TodoSort>('registered');
 
-  const sortedMissions = useMemo(() => {
-    if (sort === 'registered') return missions;
+  const sortedTodos = useMemo(() => {
+    if (sort === 'registered') return todos;
     if (sort === 'deadline') {
-      return [...missions].sort((a, b) => a.deadline.localeCompare(b.deadline));
+      return [...todos].sort((a, b) => a.deadline.localeCompare(b.deadline));
     }
-    return [...missions].sort((a, b) => b.stickerCount - a.stickerCount);
-  }, [missions, sort]);
+    return [...todos].sort((a, b) => b.stickerCount - a.stickerCount);
+  }, [todos, sort]);
 
   const handleCompleteClick = (id: string) => {
-    const mission = missions.find(m => m.id === id);
-    if (mission) setConfirmTarget(mission);
+    const todo = todos.find(t => t.id === id);
+    if (todo) setConfirmTarget(todo);
   };
 
   const handleConfirmComplete = () => {
     if (!confirmTarget) return;
-    const result = onCompleteMission(confirmTarget.id);
+    const result = onCompleteTodo(confirmTarget.id);
     setConfirmTarget(null);
     if (result) setCompleteResult(result);
   };
 
   return (
     <div className="pb-20">
-      {missions.length === 0 ? (
+      {todos.length === 0 ? (
         <EmptyState
           icon="🎯"
           tagline={APP_TAGLINE}
-          title="아직 미션이 없어요"
-          description="오른쪽 아래 + 버튼으로 첫 미션을 추가해 보세요"
+          title="아직 할일이 없어요"
+          description="오른쪽 아래 + 버튼으로 첫 할일을 추가해 보세요"
         />
       ) : (
         <>
           <div className="mb-4 flex items-center justify-between gap-3">
             <h2 className="text-base font-bold text-foreground tracking-tight">
-              미션
-              <span className="text-sm font-semibold text-muted tabular-nums">({missions.length})</span>
+              할일
+              <span className="text-sm font-semibold text-muted tabular-nums">({todos.length})</span>
             </h2>
             <SortSelect
               value={sort}
               onChange={setSort}
-              options={MISSION_SORT_OPTIONS}
-              ariaLabel="미션 정렬"
+              options={TODO_SORT_OPTIONS}
+              ariaLabel="할일 정렬"
             />
           </div>
           <div className="space-y-3">
-            {sortedMissions.map(mission => (
-              <MissionCard
-                key={mission.id}
-                mission={mission}
+            {sortedTodos.map(todo => (
+              <TodoCard
+                key={todo.id}
+                todo={todo}
                 onComplete={handleCompleteClick}
                 onOpen={setDetailTarget}
               />
@@ -102,18 +102,18 @@ export default function MissionTab({
       )}
 
       {isAddOpen && (
-        <MissionFormModal
+        <TodoFormModal
           onClose={() => setIsAddOpen(false)}
           onSave={data => {
-            onAddMission(data);
+            onAddTodo(data);
             setIsAddOpen(false);
           }}
         />
       )}
 
       {detailTarget && (
-        <MissionDetailModal
-          mission={detailTarget}
+        <TodoDetailModal
+          todo={detailTarget}
           onClose={() => setDetailTarget(null)}
           onEdit={() => {
             setEditTarget(detailTarget);
@@ -128,19 +128,19 @@ export default function MissionTab({
       )}
 
       {editTarget && (
-        <MissionFormModal
-          mission={editTarget}
+        <TodoFormModal
+          todo={editTarget}
           onClose={() => setEditTarget(null)}
           onSave={data => {
-            onUpdateMission(editTarget.id, data);
+            onUpdateTodo(editTarget.id, data);
             setEditTarget(null);
           }}
         />
       )}
 
       {confirmTarget && (
-        <ConfirmMissionModal
-          mission={confirmTarget}
+        <ConfirmTodoModal
+          todo={confirmTarget}
           onCancel={() => setConfirmTarget(null)}
           onConfirm={handleConfirmComplete}
         />
@@ -148,11 +148,11 @@ export default function MissionTab({
 
       {deleteTarget && (
         <DeleteConfirmModal
-          title="미션을 삭제할까요?"
+          title="할일을 삭제할까요?"
           content={deleteTarget.content}
           onCancel={() => setDeleteTarget(null)}
           onConfirm={() => {
-            onDeleteMission(deleteTarget.id);
+            onDeleteTodo(deleteTarget.id);
             setDeleteTarget(null);
             setDetailTarget(null);
             setEditTarget(null);
@@ -161,7 +161,7 @@ export default function MissionTab({
       )}
 
       {completeResult && (
-        <MissionCompleteResultModal
+        <TodoCompleteResultModal
           content={completeResult.content}
           earned={completeResult.earned}
           isRecurring={completeResult.isRecurring}
@@ -170,7 +170,7 @@ export default function MissionTab({
         />
       )}
 
-      <Fab onClick={() => setIsAddOpen(true)} label="미션 추가" />
+      <Fab onClick={() => setIsAddOpen(true)} label="할일 추가" />
     </div>
   );
 }

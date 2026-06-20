@@ -9,7 +9,7 @@ import DeleteConfirmModal from './DeleteConfirmModal';
 import EmptyState from './EmptyState';
 import Fab from './Fab';
 
-const APP_TAGLINE = '미션을 완료하고 스티커를 모아보세요';
+const APP_TAGLINE = '할일을 완료하고 스티커를 모아보세요';
 
 interface Props {
   rewards: Reward[];

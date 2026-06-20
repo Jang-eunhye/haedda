@@ -68,7 +68,7 @@ export default function ClaimRewardModal({ reward, totalStickers, onClose, onCon
 
         {!canClaim && (
           <p className="text-xs text-danger text-center mb-4">
-            스티커가 부족해요. 미션을 완료하고 더 모아보세요!
+            스티커가 부족해요. 할일을 완료하고 더 모아보세요!
           </p>
         )}
 

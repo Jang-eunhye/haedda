@@ -1,6 +1,6 @@
 export type RecurrenceType = 'daily' | 'weekly' | 'monthly';
 
-export interface MissionRecurrence {
+export interface TodoRecurrence {
   type: RecurrenceType;
   /** 0=일, 1=월, ... 6=토 */
   weekdays?: number[];
@@ -8,15 +8,15 @@ export interface MissionRecurrence {
   dayOfMonth?: number | 'last';
 }
 
-export interface Mission {
+export interface Todo {
   id: string;
   content: string;
   deadline: string; // "YYYY-MM-DD"
   stickerCount: number;
-  recurrence?: MissionRecurrence; // 없으면 일회성
-  /** 반복 미션: 놓친 주기 수 */
+  recurrence?: TodoRecurrence; // 없으면 일회성
+  /** 반복 할일: 놓친 주기 수 */
   missedCount?: number;
-  /** 반복 미션: 기한 내 연속 완료 수 */
+  /** 반복 할일: 기한 내 연속 완료 수 */
   consecutiveCompletions?: number;
 }
 
@@ -26,11 +26,11 @@ export interface Reward {
   stickerCost: number;
 }
 
-export type TabType = 'mission' | 'reward';
+export type TabType = 'todo' | 'reward';
 
-export type MissionInput = Omit<Mission, 'id'>;
+export type TodoInput = Omit<Todo, 'id'>;
 
-export interface MissionCompleteResult {
+export interface TodoCompleteResult {
   earned: number;
   content: string;
   isRecurring: boolean;
