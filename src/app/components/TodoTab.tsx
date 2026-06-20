@@ -244,6 +244,7 @@ export default function TodoTab({
         <TodoCompleteResultModal
           content={completeResult.content}
           earned={completeResult.earned}
+          stickerCount={completeResult.stickerCount}
           isRecurring={completeResult.isRecurring}
           nextDeadline={completeResult.nextDeadline}
           onConfirm={() => setCompleteResult(null)}

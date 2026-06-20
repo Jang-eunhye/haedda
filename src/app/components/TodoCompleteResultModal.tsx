@@ -8,6 +8,7 @@ import StickerStar from './StickerStar';
 interface Props {
   content: string;
   earned: number;
+  stickerCount: number;
   isRecurring: boolean;
   nextDeadline?: string;
   onConfirm: () => void;
@@ -16,6 +17,7 @@ interface Props {
 export default function TodoCompleteResultModal({
   content,
   earned,
+  stickerCount,
   isRecurring,
   nextDeadline,
   onConfirm,
@@ -44,21 +46,23 @@ export default function TodoCompleteResultModal({
           <p className="text-sm text-muted mt-1 break-words px-2">{content}</p>
         </div>
 
-        <div className="bg-background rounded-2xl p-5 text-center mb-4">
-          {earned > 0 ? (
-            <>
-              <p className="text-xs font-medium text-muted mb-1">획득 스티커</p>
-              <p className="text-3xl font-bold text-accent tabular-nums inline-flex items-center justify-center gap-1">
-                +{earned} <StickerStar size="xl" />
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="text-sm font-medium text-muted">스티커 없음</p>
-              <p className="text-xs text-muted mt-1">기한이 지나 스티커를 받지 못했어요</p>
-            </>
-          )}
-        </div>
+        {stickerCount > 0 && (
+          <div className="bg-background rounded-2xl p-5 text-center mb-4">
+            {earned > 0 ? (
+              <>
+                <p className="text-xs font-medium text-muted mb-1">획득 스티커</p>
+                <p className="text-3xl font-bold text-accent tabular-nums inline-flex items-center justify-center gap-1">
+                  +{earned} <StickerStar size="xl" />
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-sm font-medium text-muted">스티커 없음</p>
+                <p className="text-xs text-muted mt-1">기한이 지나 스티커를 받지 못했어요</p>
+              </>
+            )}
+          </div>
+        )}
 
         {isRecurring && nextDeadline ? (
           <p className="text-xs text-muted text-center mb-5">

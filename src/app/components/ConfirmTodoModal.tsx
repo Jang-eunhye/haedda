@@ -42,21 +42,23 @@ export default function ConfirmTodoModal({ todo, onCancel, onConfirm }: Props) {
           <p className="text-sm text-muted mt-2 break-words px-2">{todo.content}</p>
         </div>
 
-        <div className="bg-background rounded-2xl p-4 text-center mb-5">
-          {expectedStickers > 0 ? (
-            <>
-              <p className="text-xs font-medium text-muted mb-1">획득 예정 스티커</p>
-              <p className="text-2xl font-bold text-accent tabular-nums inline-flex items-center justify-center gap-1">
-                +{expectedStickers} <StickerStar size="lg" />
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="text-sm font-medium text-muted">획득 스티커 없음</p>
-              <p className="text-xs text-muted mt-1">기한이 지나 스티커를 받을 수 없어요</p>
-            </>
-          )}
-        </div>
+        {todo.stickerCount > 0 && (
+          <div className="bg-background rounded-2xl p-4 text-center mb-5">
+            {expectedStickers > 0 ? (
+              <>
+                <p className="text-xs font-medium text-muted mb-1">획득 예정 스티커</p>
+                <p className="text-2xl font-bold text-accent tabular-nums inline-flex items-center justify-center gap-1">
+                  +{expectedStickers} <StickerStar size="lg" />
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-sm font-medium text-muted">획득 스티커 없음</p>
+                <p className="text-xs text-muted mt-1">기한이 지나 스티커를 받을 수 없어요</p>
+              </>
+            )}
+          </div>
+        )}
 
         {todo.recurrence && (
           <p className="text-xs text-muted text-center mb-5">

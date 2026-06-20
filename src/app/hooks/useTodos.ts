@@ -123,6 +123,7 @@ export function useTodos() {
         const nextDeadline = computeNextDeadlineAfter(todo.recurrence, todo.deadline);
         result = {
           earned,
+          stickerCount: todo.stickerCount,
           content: todo.content,
           isRecurring: true,
           nextDeadline,
@@ -141,7 +142,7 @@ export function useTodos() {
         );
       }
 
-      result = { earned, content: todo.content, isRecurring: false };
+      result = { earned, stickerCount: todo.stickerCount, content: todo.content, isRecurring: false };
       return prev.filter(t => t.id !== id);
     });
     return result;

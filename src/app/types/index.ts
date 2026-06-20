@@ -32,6 +32,7 @@ export type TodoInput = Omit<Todo, 'id'>;
 
 export interface TodoCompleteResult {
   earned: number;
+  stickerCount: number;
   content: string;
   isRecurring: boolean;
   nextDeadline?: string;
