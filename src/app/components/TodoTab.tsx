@@ -11,10 +11,20 @@ import DeleteConfirmModal from './DeleteConfirmModal';
 import EmptyState from './EmptyState';
 import Fab from './Fab';
 import SortSelect from './SortSelect';
+import FilterChips from './FilterChips';
+import { matchesTodoFilter, TodoFilter } from '../utils/todoFilter';
 
 const APP_TAGLINE = '할일을 완료하고 스티커를 모아보세요';
 
 type TodoSort = 'registered' | 'deadline' | 'sticker-desc';
+
+const TODO_FILTER_OPTIONS = [
+  { value: 'all' as const, label: '전체' },
+  { value: 'today' as const, label: '오늘' },
+  { value: 'week' as const, label: '이번주' },
+  { value: 'month' as const, label: '이번달' },
+  { value: 'sticker' as const, label: '스티커' },
+];
 
 const TODO_SORT_OPTIONS = [
   { value: 'registered' as const, label: '등록순' },
@@ -44,14 +54,20 @@ export default function TodoTab({
   const [deleteTarget, setDeleteTarget] = useState<Todo | null>(null);
   const [completeResult, setCompleteResult] = useState<TodoCompleteResult | null>(null);
   const [sort, setSort] = useState<TodoSort>('registered');
+  const [filter, setFilter] = useState<TodoFilter>('all');
+
+  const filteredTodos = useMemo(
+    () => todos.filter(todo => matchesTodoFilter(todo, filter)),
+    [todos, filter]
+  );
 
   const sortedTodos = useMemo(() => {
-    if (sort === 'registered') return todos;
+    if (sort === 'registered') return filteredTodos;
     if (sort === 'deadline') {
-      return [...todos].sort((a, b) => a.deadline.localeCompare(b.deadline));
+      return [...filteredTodos].sort((a, b) => a.deadline.localeCompare(b.deadline));
     }
-    return [...todos].sort((a, b) => b.stickerCount - a.stickerCount);
-  }, [todos, sort]);
+    return [...filteredTodos].sort((a, b) => b.stickerCount - a.stickerCount);
+  }, [filteredTodos, sort]);
 
   const handleCompleteClick = (id: string) => {
     const todo = todos.find(t => t.id === id);
@@ -76,10 +92,12 @@ export default function TodoTab({
         />
       ) : (
         <>
-          <div className="mb-4 flex items-center justify-between gap-3">
+          <div className="mb-3 flex items-center justify-between gap-3">
             <h2 className="text-base font-bold text-foreground tracking-tight">
               할일
-              <span className="text-sm font-semibold text-muted tabular-nums">({todos.length})</span>
+              <span className="text-sm font-semibold text-muted tabular-nums">
+                ({sortedTodos.length})
+              </span>
             </h2>
             <SortSelect
               value={sort}
@@ -88,16 +106,33 @@ export default function TodoTab({
               ariaLabel="할일 정렬"
             />
           </div>
-          <div className="space-y-3">
-            {sortedTodos.map(todo => (
-              <TodoCard
-                key={todo.id}
-                todo={todo}
-                onComplete={handleCompleteClick}
-                onOpen={setDetailTarget}
-              />
-            ))}
+          <div className="mb-4">
+            <FilterChips
+              value={filter}
+              onChange={setFilter}
+              options={TODO_FILTER_OPTIONS}
+              ariaLabel="할일 필터"
+            />
           </div>
+          {sortedTodos.length === 0 ? (
+            <EmptyState
+              icon="🔍"
+              tagline={APP_TAGLINE}
+              title="해당하는 할일이 없어요"
+              description="다른 필터를 선택해 보세요"
+            />
+          ) : (
+            <div className="space-y-3">
+              {sortedTodos.map(todo => (
+                <TodoCard
+                  key={todo.id}
+                  todo={todo}
+                  onComplete={handleCompleteClick}
+                  onOpen={setDetailTarget}
+                />
+              ))}
+            </div>
+          )}
         </>
       )}
 

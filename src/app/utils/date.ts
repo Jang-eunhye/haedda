@@ -38,3 +38,28 @@ export function parseDateParts(iso: string): { year: number; month: number; day:
   const [year, month, day] = normalized.split('-').map(Number);
   return { year, month, day };
 }
+
+/** 월요일~일요일 (오늘 포함) */
+export function getWeekRangeISO(ref: Date = new Date()): { start: string; end: string } {
+  const monday = new Date(ref.getFullYear(), ref.getMonth(), ref.getDate());
+  const day = monday.getDay();
+  const daysSinceMonday = day === 0 ? 6 : day - 1;
+  monday.setDate(monday.getDate() - daysSinceMonday);
+  const sunday = new Date(monday);
+  sunday.setDate(sunday.getDate() + 6);
+  return { start: formatDateISO(monday), end: formatDateISO(sunday) };
+}
+
+export function isDeadlineInRange(deadline: string, start: string, end: string): boolean {
+  const d = normalizeDeadline(deadline);
+  return d >= start && d <= end;
+}
+
+export function isDeadlineToday(deadline: string): boolean {
+  return normalizeDeadline(deadline) === getTodayISO();
+}
+
+export function isDeadlineThisMonth(deadline: string, ref: Date = new Date()): boolean {
+  const { year, month } = parseDateParts(deadline);
+  return year === ref.getFullYear() && month === ref.getMonth() + 1;
+}
