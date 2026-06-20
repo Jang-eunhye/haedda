@@ -40,7 +40,7 @@ export default function RewardTab({
   };
 
   return (
-    <div className="pb-20">
+    <div className="pb-28">
       {rewards.length === 0 ? (
         <EmptyState
           icon="🎁"

@@ -66,7 +66,7 @@ export default function TodoTab({
   };
 
   return (
-    <div className="pb-20">
+    <div className="pb-28">
       {todos.length === 0 ? (
         <EmptyState
           icon="🎯"
