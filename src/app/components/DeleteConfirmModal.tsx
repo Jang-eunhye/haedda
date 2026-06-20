@@ -49,7 +49,7 @@ export default function DeleteConfirmModal({ title, content, onCancel, onConfirm
           <button
             type="button"
             onClick={onConfirm}
-            className="flex-1 py-3 rounded-xl bg-danger text-white text-sm font-semibold hover:bg-danger/90 transition-all active:scale-[0.98]"
+            className="flex-1 py-3 rounded-xl bg-foreground text-white text-sm font-semibold hover:bg-foreground/90 transition-all active:scale-[0.98]"
           >
             삭제
           </button>
