@@ -114,6 +114,7 @@ export default function TodoDetailModal({
         </div>
 
         <div className="px-5 pb-8 sm:px-6 sm:pb-6">
+          {todo.stickerCount > 0 && (
           <div
             className={`flex flex-wrap items-center justify-center gap-1 py-2 ${showExpired ? 'opacity-40' : ''}`}
             aria-label={`스티커 ${todo.stickerCount}개`}
@@ -122,8 +123,9 @@ export default function TodoDetailModal({
               <StickerStar key={i} size="lg" />
             ))}
           </div>
+          )}
 
-          <h2 className="mt-3 text-xl font-bold leading-snug break-words text-foreground text-center">
+          <h2 className={`${todo.stickerCount > 0 ? 'mt-3' : 'mt-1'} text-xl font-bold leading-snug break-words text-foreground text-center`}>
             {todo.content}
           </h2>
 

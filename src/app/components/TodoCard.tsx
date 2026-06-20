@@ -29,6 +29,7 @@ export default function TodoCard({ todo, onComplete, onOpen }: Props) {
           onClick={() => onOpen(todo)}
           className="w-full text-left cursor-pointer rounded-xl -m-1 p-1 hover:bg-background/60 transition-colors active:scale-[0.995]"
         >
+          {todo.stickerCount > 0 && (
           <div
             className={`inline-flex flex-wrap items-center gap-0.5 ${isExpired ? 'opacity-40' : ''}`}
             aria-label={`스티커 ${todo.stickerCount}개`}
@@ -37,8 +38,9 @@ export default function TodoCard({ todo, onComplete, onOpen }: Props) {
               <StickerStar key={i} size="md" />
             ))}
           </div>
+          )}
 
-          <p className="mt-2 font-medium text-[15px] leading-snug break-words text-foreground">
+          <p className={`font-medium text-[15px] leading-snug break-words text-foreground ${todo.stickerCount > 0 ? 'mt-2' : ''}`}>
             {todo.content}
           </p>
 
@@ -77,7 +79,7 @@ export default function TodoCard({ todo, onComplete, onOpen }: Props) {
           >
             완료하기
           </button>
-          {isExpired && (
+          {isExpired && todo.stickerCount > 0 && (
             <p className="text-center text-xs text-muted mt-2">
               기한이 지나 스티커를 받을 수 없어요
             </p>

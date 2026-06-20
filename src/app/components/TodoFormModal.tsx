@@ -27,7 +27,10 @@ export default function TodoFormModal({ onClose, onSave, todo }: Props) {
   const [deadline, setDeadline] = useState(
     todo ? normalizeDeadline(todo.deadline) : getTodayISO()
   );
-  const [stickerCount, setStickerCount] = useState(todo?.stickerCount ?? 1);
+  const [stickerCount, setStickerCount] = useState(
+    todo && todo.stickerCount > 0 ? todo.stickerCount : 1
+  );
+  const [hasSticker, setHasSticker] = useState((todo?.stickerCount ?? 0) > 0);
   const [isRecurring, setIsRecurring] = useState(!!todo?.recurrence);
   const [frequency, setFrequency] = useState<RecurrenceFrequency>(
     getFrequencyFromTodo(todo?.recurrence)
@@ -75,7 +78,7 @@ export default function TodoFormModal({ onClose, onSave, todo }: Props) {
     onSave({
       content: content.trim(),
       deadline: finalDeadline,
-      stickerCount,
+      stickerCount: hasSticker ? stickerCount : 0,
       recurrence,
     });
   };
@@ -100,12 +103,12 @@ export default function TodoFormModal({ onClose, onSave, todo }: Props) {
         onClick={e => e.stopPropagation()}
       >
         <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5 sm:hidden" />
-        <h3 className="text-lg font-bold text-foreground mb-1">
-          {isEdit ? '할일 수정' : '새 할일'}
+        <h3 className={`text-lg font-bold text-foreground ${isEdit ? 'mb-1' : 'mb-5'}`}>
+          {isEdit ? '할일 수정' : '할일 추가'}
         </h3>
-        <p className="text-xs text-muted mb-5">
-          {isEdit ? '할일 내용을 수정해 보세요' : '완료하면 스티커를 받을 수 있어요'}
-        </p>
+        {isEdit && (
+          <p className="text-xs text-muted mb-5">할일 내용을 수정해 보세요</p>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-0">
           <div>
@@ -174,31 +177,52 @@ export default function TodoFormModal({ onClose, onSave, todo }: Props) {
           )}
 
           <div className="border-t border-border/50 pt-5 mt-5">
-            <label className="block text-sm font-semibold text-foreground mb-2">
-              스티커 개수
-            </label>
-            <div className="flex items-center justify-center gap-6 py-2 bg-background rounded-xl border border-border">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold text-foreground">스티커 걸기</p>
               <button
                 type="button"
-                onClick={() => adjustSticker(-1)}
-                disabled={stickerCount <= 1}
-                className="w-10 h-10 rounded-xl bg-surface border border-border text-foreground font-bold text-lg hover:bg-background transition-colors disabled:opacity-30 active:scale-95"
+                role="switch"
+                aria-checked={hasSticker}
+                onClick={() => setHasSticker(v => !v)}
+                className={`relative w-12 h-7 rounded-full transition-colors duration-200 shrink-0 ${
+                  hasSticker ? 'bg-foreground' : 'bg-border'
+                }`}
               >
-                −
-              </button>
-              <div className="flex items-center gap-2 min-w-[80px] justify-center">
-                <StickerStar size="lg" />
-                <span className="text-2xl font-bold text-accent tabular-nums">{stickerCount}</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => adjustSticker(1)}
-                disabled={stickerCount >= 10}
-                className="w-10 h-10 rounded-xl bg-surface border border-border text-foreground font-bold text-lg hover:bg-background transition-colors disabled:opacity-30 active:scale-95"
-              >
-                +
+                <span
+                  className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                    hasSticker ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
               </button>
             </div>
+
+            {hasSticker && (
+              <div className="mt-4 flex items-center justify-center gap-6 py-2 bg-background rounded-xl border border-border">
+                <button
+                  type="button"
+                  onClick={() => adjustSticker(-1)}
+                  disabled={stickerCount <= 1}
+                  className="w-10 h-10 rounded-xl bg-surface border border-border text-foreground font-bold text-lg hover:bg-background transition-colors disabled:opacity-30 active:scale-95"
+                >
+                  −
+                </button>
+                <div className="flex items-center gap-2 min-w-[80px] justify-center">
+                  <StickerStar size="lg" />
+                  <span className="text-2xl font-bold text-accent tabular-nums">{stickerCount}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => adjustSticker(1)}
+                  disabled={stickerCount >= 10}
+                  className="w-10 h-10 rounded-xl bg-surface border border-border text-foreground font-bold text-lg hover:bg-background transition-colors disabled:opacity-30 active:scale-95"
+                >
+                  +
+                </button>
+              </div>
+            )}
+            {!isEdit && (
+              <p className="text-xs text-muted mt-3">완료하면 스티커를 받을 수 있어요</p>
+            )}
           </div>
 
           <div className="flex gap-2.5 pt-5 mt-5">
