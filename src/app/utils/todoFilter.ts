@@ -2,12 +2,23 @@ import { Todo } from '../types';
 import {
   getTodayISO,
   getWeekRangeISO,
+  isDeadlineExpired,
   isDeadlineInRange,
   isDeadlineThisMonth,
   isDeadlineToday,
 } from './date';
 
 export type TodoFilter = 'all' | 'today' | 'week' | 'month' | 'sticker';
+
+/** 일회성: 기한 지남 / 반복: 미완료 주기 누적 */
+export function isMissedTodo(todo: Todo): boolean {
+  if (todo.recurrence) return (todo.missedCount ?? 0) > 0;
+  return isDeadlineExpired(todo.deadline);
+}
+
+export function countMissedTodos(todos: Todo[]): number {
+  return todos.filter(isMissedTodo).length;
+}
 
 export function matchesTodoFilter(todo: Todo, filter: TodoFilter, ref: Date = new Date()): boolean {
   if (filter === 'all') return true;

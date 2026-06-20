@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Todo, TodoInput, TodoCompleteResult } from '../types';
 import TodoCard from './TodoCard';
 import TodoFormModal from './TodoFormModal';
@@ -12,7 +12,8 @@ import EmptyState from './EmptyState';
 import Fab from './Fab';
 import SortSelect from './SortSelect';
 import FilterChips from './FilterChips';
-import { matchesTodoFilter, TodoFilter } from '../utils/todoFilter';
+import MissedTodosBanner from './MissedTodosBanner';
+import { isMissedTodo, matchesTodoFilter, TodoFilter } from '../utils/todoFilter';
 
 const APP_TAGLINE = '할일을 완료하고 스티커를 모아보세요';
 
@@ -55,6 +56,14 @@ export default function TodoTab({
   const [completeResult, setCompleteResult] = useState<TodoCompleteResult | null>(null);
   const [sort, setSort] = useState<TodoSort>('registered');
   const [filter, setFilter] = useState<TodoFilter>('all');
+  const [missedExpanded, setMissedExpanded] = useState(false);
+
+  const missedTodos = useMemo(() => todos.filter(isMissedTodo), [todos]);
+  const missedTodoCount = missedTodos.length;
+
+  useEffect(() => {
+    if (missedTodoCount === 0) setMissedExpanded(false);
+  }, [missedTodoCount]);
 
   const filteredTodos = useMemo(
     () => todos.filter(todo => matchesTodoFilter(todo, filter)),
@@ -82,7 +91,7 @@ export default function TodoTab({
   };
 
   return (
-    <div className="pb-28">
+    <div className={`flex flex-col flex-1 min-h-0 ${missedExpanded ? '' : 'pb-28'}`}>
       {todos.length === 0 ? (
         <EmptyState
           icon="🎯"
@@ -106,32 +115,46 @@ export default function TodoTab({
               ariaLabel="할일 정렬"
             />
           </div>
-          <div className="mb-4">
-            <FilterChips
-              value={filter}
-              onChange={setFilter}
-              options={TODO_FILTER_OPTIONS}
-              ariaLabel="할일 필터"
+          {missedTodoCount > 0 && (
+            <MissedTodosBanner
+              count={missedTodoCount}
+              expanded={missedExpanded}
+              onToggle={() => setMissedExpanded(v => !v)}
+              todos={missedTodos}
+              onComplete={handleCompleteClick}
+              onOpen={setDetailTarget}
             />
-          </div>
-          {sortedTodos.length === 0 ? (
-            <EmptyState
-              icon="🔍"
-              tagline={APP_TAGLINE}
-              title="해당하는 할일이 없어요"
-              description="다른 필터를 선택해 보세요"
-            />
-          ) : (
-            <div className="space-y-3">
-              {sortedTodos.map(todo => (
-                <TodoCard
-                  key={todo.id}
-                  todo={todo}
-                  onComplete={handleCompleteClick}
-                  onOpen={setDetailTarget}
+          )}
+          {!missedExpanded && (
+            <>
+              <div className="mb-4">
+                <FilterChips
+                  value={filter}
+                  onChange={setFilter}
+                  options={TODO_FILTER_OPTIONS}
+                  ariaLabel="할일 필터"
                 />
-              ))}
-            </div>
+              </div>
+              {sortedTodos.length === 0 ? (
+                <EmptyState
+                  icon="🔍"
+                  tagline={APP_TAGLINE}
+                  title="해당하는 할일이 없어요"
+                  description="다른 필터를 선택해 보세요"
+                />
+              ) : (
+                <div className="space-y-3">
+                  {sortedTodos.map(todo => (
+                    <TodoCard
+                      key={todo.id}
+                      todo={todo}
+                      onComplete={handleCompleteClick}
+                      onOpen={setDetailTarget}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </>
       )}
