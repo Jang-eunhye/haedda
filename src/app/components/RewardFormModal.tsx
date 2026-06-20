@@ -10,10 +10,11 @@ const CONTENT_MAX = 50;
 interface Props {
   onClose: () => void;
   onSave: (data: Omit<Reward, 'id'>) => void;
+  onDelete?: () => void;
   reward?: Reward;
 }
 
-export default function RewardFormModal({ onClose, onSave, reward }: Props) {
+export default function RewardFormModal({ onClose, onSave, onDelete, reward }: Props) {
   const isEdit = !!reward;
   const [content, setContent] = useState(reward?.content ?? '');
   const [stickerCost, setStickerCost] = useState(reward?.stickerCost ?? 1);
@@ -123,6 +124,16 @@ export default function RewardFormModal({ onClose, onSave, reward }: Props) {
               {isEdit ? '저장하기' : '추가하기'}
             </button>
           </div>
+
+          {isEdit && onDelete && (
+            <button
+              type="button"
+              onClick={onDelete}
+              className="w-full mt-3 py-3 text-sm text-danger hover:text-danger/80 transition-colors active:scale-[0.98]"
+            >
+              삭제
+            </button>
+          )}
         </form>
       </div>
     </div>,

@@ -4,8 +4,10 @@ import { useMemo, useState } from 'react';
 import { Mission, MissionInput, MissionCompleteResult } from '../types';
 import MissionCard from './MissionCard';
 import MissionFormModal from './MissionFormModal';
+import MissionDetailModal from './MissionDetailModal';
 import ConfirmMissionModal from './ConfirmMissionModal';
 import MissionCompleteResultModal from './MissionCompleteResultModal';
+import DeleteConfirmModal from './DeleteConfirmModal';
 import EmptyState from './EmptyState';
 import Fab from './Fab';
 import SortSelect from './SortSelect';
@@ -36,8 +38,10 @@ export default function MissionTab({
   onCompleteMission,
 }: Props) {
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [detailTarget, setDetailTarget] = useState<Mission | null>(null);
   const [editTarget, setEditTarget] = useState<Mission | null>(null);
   const [confirmTarget, setConfirmTarget] = useState<Mission | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Mission | null>(null);
   const [completeResult, setCompleteResult] = useState<MissionCompleteResult | null>(null);
   const [sort, setSort] = useState<MissionSort>('registered');
 
@@ -90,8 +94,7 @@ export default function MissionTab({
                 key={mission.id}
                 mission={mission}
                 onComplete={handleCompleteClick}
-                onEdit={setEditTarget}
-                onDelete={onDeleteMission}
+                onOpen={setDetailTarget}
               />
             ))}
           </div>
@@ -104,6 +107,22 @@ export default function MissionTab({
           onSave={data => {
             onAddMission(data);
             setIsAddOpen(false);
+          }}
+        />
+      )}
+
+      {detailTarget && (
+        <MissionDetailModal
+          mission={detailTarget}
+          onClose={() => setDetailTarget(null)}
+          onEdit={() => {
+            setEditTarget(detailTarget);
+            setDetailTarget(null);
+          }}
+          onDelete={() => setDeleteTarget(detailTarget)}
+          onComplete={() => {
+            setConfirmTarget(detailTarget);
+            setDetailTarget(null);
           }}
         />
       )}
@@ -124,6 +143,20 @@ export default function MissionTab({
           mission={confirmTarget}
           onCancel={() => setConfirmTarget(null)}
           onConfirm={handleConfirmComplete}
+        />
+      )}
+
+      {deleteTarget && (
+        <DeleteConfirmModal
+          title="미션을 삭제할까요?"
+          content={deleteTarget.content}
+          onCancel={() => setDeleteTarget(null)}
+          onConfirm={() => {
+            onDeleteMission(deleteTarget.id);
+            setDeleteTarget(null);
+            setDetailTarget(null);
+            setEditTarget(null);
+          }}
         />
       )}
 

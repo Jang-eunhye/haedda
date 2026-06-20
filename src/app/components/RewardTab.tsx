@@ -5,6 +5,7 @@ import { Reward } from '../types';
 import RewardCard from './RewardCard';
 import RewardFormModal from './RewardFormModal';
 import ClaimRewardModal from './ClaimRewardModal';
+import DeleteConfirmModal from './DeleteConfirmModal';
 import EmptyState from './EmptyState';
 import Fab from './Fab';
 
@@ -30,6 +31,7 @@ export default function RewardTab({
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<Reward | null>(null);
   const [claimTarget, setClaimTarget] = useState<Reward | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Reward | null>(null);
 
   const handleClaimConfirm = () => {
     if (!claimTarget) return;
@@ -65,7 +67,6 @@ export default function RewardTab({
                   if (target) setClaimTarget(target);
                 }}
                 onEdit={setEditTarget}
-                onDelete={onDeleteReward}
               />
             ))}
           </div>
@@ -90,6 +91,7 @@ export default function RewardTab({
             onUpdateReward(editTarget.id, data);
             setEditTarget(null);
           }}
+          onDelete={() => setDeleteTarget(editTarget)}
         />
       )}
 
@@ -99,6 +101,19 @@ export default function RewardTab({
           totalStickers={totalStickers}
           onClose={() => setClaimTarget(null)}
           onConfirm={handleClaimConfirm}
+        />
+      )}
+
+      {deleteTarget && (
+        <DeleteConfirmModal
+          title="보상을 삭제할까요?"
+          content={deleteTarget.content}
+          onCancel={() => setDeleteTarget(null)}
+          onConfirm={() => {
+            onDeleteReward(deleteTarget.id);
+            setDeleteTarget(null);
+            setEditTarget(null);
+          }}
         />
       )}
 

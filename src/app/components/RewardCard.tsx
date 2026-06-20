@@ -1,5 +1,4 @@
 import { Reward } from '../types';
-import ItemMenu from './ItemMenu';
 import StickerStar from './StickerStar';
 
 interface Props {
@@ -7,7 +6,6 @@ interface Props {
   totalStickers: number;
   onClaim: (id: string) => void;
   onEdit: (reward: Reward) => void;
-  onDelete: (id: string) => void;
 }
 
 export default function RewardCard({
@@ -15,7 +13,6 @@ export default function RewardCard({
   totalStickers,
   onClaim,
   onEdit,
-  onDelete,
 }: Props) {
   const canClaim = totalStickers >= reward.stickerCost;
 
@@ -25,18 +22,21 @@ export default function RewardCard({
         canClaim ? 'hover:shadow-[0_2px_12px_rgba(0,0,0,0.04)]' : ''
       }`}
     >
-      <div className="flex justify-between items-start gap-2">
-        <p className="font-medium text-[15px] leading-snug flex-1 break-words min-w-0 text-foreground">
-          {reward.content}
-        </p>
-        <div className="flex items-center gap-1 shrink-0">
-          <div className="flex items-center gap-1 bg-accent-soft px-2.5 py-1 rounded-full border border-accent-muted/50">
+      <button
+        type="button"
+        onClick={() => onEdit(reward)}
+        className="w-full text-left cursor-pointer rounded-xl -m-1 p-1 hover:bg-background/60 transition-colors active:scale-[0.995]"
+      >
+        <div className="flex justify-between items-start gap-2">
+          <p className="font-medium text-[15px] leading-snug flex-1 break-words min-w-0 text-foreground">
+            {reward.content}
+          </p>
+          <div className="flex items-center gap-1 shrink-0 bg-accent-soft px-2.5 py-1 rounded-full border border-accent-muted/50">
             <StickerStar size="sm" />
             <span className="text-xs font-bold text-accent">×{reward.stickerCost}</span>
           </div>
-          <ItemMenu onEdit={() => onEdit(reward)} onDelete={() => onDelete(reward.id)} />
         </div>
-      </div>
+      </button>
 
       {canClaim ? (
         <button
