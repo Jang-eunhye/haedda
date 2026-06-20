@@ -99,7 +99,7 @@ export default function TodoTab({
   };
 
   return (
-    <div className={`flex flex-col flex-1 min-h-0 ${missedExpanded ? '' : 'pb-28'}`}>
+    <div className="flex flex-col flex-1 min-h-0">
       {todos.length === 0 ? (
         <EmptyState
           icon="🎯"
@@ -109,7 +109,7 @@ export default function TodoTab({
         />
       ) : (
         <>
-          <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="shrink-0 mb-3 flex items-center justify-between gap-3">
             <h2 className="text-base font-bold text-foreground tracking-tight">
               할일
               <span className="text-sm font-semibold text-muted tabular-nums">
@@ -135,7 +135,7 @@ export default function TodoTab({
           )}
           {!missedExpanded && (
             <>
-              <div className="mb-4">
+              <div className="shrink-0 mb-3">
                 <FilterChips
                   value={filter}
                   onChange={setFilter}
@@ -157,25 +157,27 @@ export default function TodoTab({
                   />
                 )}
               </div>
-              {sortedTodos.length === 0 ? (
-                <EmptyState
-                  icon="🔍"
-                  tagline={APP_TAGLINE}
-                  title="해당하는 할일이 없어요"
-                  description="다른 필터를 선택해 보세요"
-                />
-              ) : (
-                <div className="space-y-3">
-                  {sortedTodos.map(todo => (
-                    <TodoCard
-                      key={todo.id}
-                      todo={todo}
-                      onComplete={handleCompleteClick}
-                      onOpen={setDetailTarget}
-                    />
-                  ))}
-                </div>
-              )}
+              <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1 pb-28">
+                {sortedTodos.length === 0 ? (
+                  <EmptyState
+                    icon="🔍"
+                    tagline={APP_TAGLINE}
+                    title="해당하는 할일이 없어요"
+                    description="다른 필터를 선택해 보세요"
+                  />
+                ) : (
+                  <div className="space-y-3">
+                    {sortedTodos.map(todo => (
+                      <TodoCard
+                        key={todo.id}
+                        todo={todo}
+                        onComplete={handleCompleteClick}
+                        onOpen={setDetailTarget}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
             </>
           )}
         </>

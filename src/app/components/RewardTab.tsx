@@ -40,7 +40,7 @@ export default function RewardTab({
   };
 
   return (
-    <div className="pb-28">
+    <div className="flex flex-col flex-1 min-h-0">
       {rewards.length === 0 ? (
         <EmptyState
           icon="🎁"
@@ -50,25 +50,27 @@ export default function RewardTab({
         />
       ) : (
         <>
-          <div className="mb-4">
+          <div className="shrink-0 mb-3">
             <h2 className="text-base font-bold text-foreground tracking-tight">
               보상
               <span className="text-sm font-semibold text-muted tabular-nums">({rewards.length})</span>
             </h2>
           </div>
-          <div className="space-y-3">
-            {rewards.map(reward => (
-              <RewardCard
-                key={reward.id}
-                reward={reward}
-                totalStickers={totalStickers}
-                onClaim={id => {
-                  const target = rewards.find(r => r.id === id);
-                  if (target) setClaimTarget(target);
-                }}
-                onEdit={setEditTarget}
-              />
-            ))}
+          <div className="flex-1 min-h-0 overflow-y-auto pb-28">
+            <div className="space-y-3">
+              {rewards.map(reward => (
+                <RewardCard
+                  key={reward.id}
+                  reward={reward}
+                  totalStickers={totalStickers}
+                  onClaim={id => {
+                    const target = rewards.find(r => r.id === id);
+                    if (target) setClaimTarget(target);
+                  }}
+                  onEdit={setEditTarget}
+                />
+              ))}
+            </div>
           </div>
         </>
       )}
