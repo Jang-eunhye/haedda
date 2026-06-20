@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Reward } from '../types';
+import { MdClose, MdDeleteOutline } from 'react-icons/md';
 import StickerStar from './StickerStar';
 
 const CONTENT_MAX = 50;
@@ -50,12 +51,32 @@ export default function RewardFormModal({ onClose, onSave, onDelete, reward }: P
         onClick={e => e.stopPropagation()}
       >
         <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5 sm:hidden" />
-        <h3 className="text-lg font-bold text-foreground mb-1">
-          {isEdit ? '보상 수정' : '새 보상'}
-        </h3>
-        <p className="text-xs text-muted mb-5">
-          {isEdit ? '보상 내용을 수정해 보세요' : '스티커를 모아 받을 보상을 만들어 보세요'}
-        </p>
+
+        <div className="relative flex items-center justify-center min-h-[36px] mb-5">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="닫기"
+            className="absolute left-0 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-lg text-muted hover:text-foreground hover:bg-background transition-colors active:scale-95"
+          >
+            <MdClose size={20} aria-hidden />
+          </button>
+          <span className="text-sm font-semibold text-muted">
+            {isEdit ? '보상 수정' : '새 보상'}
+          </span>
+          {isEdit && onDelete ? (
+            <button
+              type="button"
+              onClick={onDelete}
+              aria-label="삭제"
+              className="absolute right-0 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-lg text-muted hover:text-danger hover:bg-background transition-colors active:scale-95"
+            >
+              <MdDeleteOutline size={18} aria-hidden />
+            </button>
+          ) : (
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-9 h-9" aria-hidden />
+          )}
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
@@ -124,16 +145,6 @@ export default function RewardFormModal({ onClose, onSave, onDelete, reward }: P
               {isEdit ? '저장하기' : '추가하기'}
             </button>
           </div>
-
-          {isEdit && onDelete && (
-            <button
-              type="button"
-              onClick={onDelete}
-              className="w-full mt-3 py-3 text-sm text-danger hover:text-danger/80 transition-colors active:scale-[0.98]"
-            >
-              삭제
-            </button>
-          )}
         </form>
       </div>
     </div>,

@@ -1,4 +1,5 @@
 import { Reward } from '../types';
+import { MdOutlineEdit } from 'react-icons/md';
 import StickerStar from './StickerStar';
 
 interface Props {
@@ -22,21 +23,33 @@ export default function RewardCard({
         canClaim ? 'hover:shadow-[0_2px_12px_rgba(0,0,0,0.04)]' : ''
       }`}
     >
-      <button
-        type="button"
-        onClick={() => onEdit(reward)}
-        className="w-full text-left cursor-pointer rounded-xl -m-1 p-1 hover:bg-background/60 transition-colors active:scale-[0.995]"
-      >
-        <div className="flex justify-between items-start gap-2">
-          <p className="font-medium text-[15px] leading-snug flex-1 break-words min-w-0 text-foreground">
-            {reward.content}
-          </p>
-          <div className="flex items-center gap-1 shrink-0 bg-accent-soft px-2.5 py-1 rounded-full border border-accent-muted/50">
+      <div className="flex justify-between items-start gap-2">
+        <p
+          className={`font-medium text-[15px] leading-snug flex-1 break-words min-w-0 text-foreground ${
+            !canClaim ? 'opacity-60' : ''
+          }`}
+        >
+          {reward.content}
+        </p>
+        <div className="flex items-center shrink-0 gap-0.5">
+          <div
+            className={`flex items-center gap-1 bg-accent-soft px-2.5 py-1 rounded-full border border-accent-muted/50 ${
+              !canClaim ? 'opacity-60' : ''
+            }`}
+          >
             <StickerStar size="sm" />
             <span className="text-xs font-bold text-accent">×{reward.stickerCost}</span>
           </div>
+          <button
+            type="button"
+            onClick={() => onEdit(reward)}
+            aria-label="수정"
+            className="w-9 h-9 flex items-center justify-center rounded-lg text-muted hover:text-foreground hover:bg-background transition-colors active:scale-95"
+          >
+            <MdOutlineEdit size={18} aria-hidden />
+          </button>
         </div>
-      </button>
+      </div>
 
       {canClaim ? (
         <button

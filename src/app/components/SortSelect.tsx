@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { MdKeyboardArrowDown } from 'react-icons/md';
 
 interface Option<T extends string> {
   value: T;
@@ -44,16 +45,11 @@ export default function SortSelect<T extends string>({
         className="flex items-center gap-0.5 text-xs text-muted hover:text-foreground transition-colors"
       >
         <span>{current?.label}</span>
-        <svg
-          className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
+        <MdKeyboardArrowDown
+          size={14}
+          className={`shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
           aria-hidden
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-        </svg>
+        />
       </button>
 
       {open && (
