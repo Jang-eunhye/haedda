@@ -12,7 +12,7 @@ import {
 } from "../utils/date";
 import { formatRecurrenceLabel } from "../utils/recurrence";
 import { MdClose, MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
-import StickerStar from "./StickerStar";
+import StickerRow from "./StickerRow";
 
 interface Props {
   todo: Todo;
@@ -122,13 +122,19 @@ export default function TodoDetailModal({
 
         <div className="px-5 pb-8 sm:px-6 sm:pb-6">
           {todo.stickerCount > 0 && (
-            <div
-              className={`flex flex-wrap items-center justify-center gap-1 py-2 ${isOneTimeExpired ? "opacity-40" : ""}`}
-              aria-label={`스티커 ${todo.stickerCount}개`}
-            >
-              {Array.from({ length: todo.stickerCount }, (_, i) => (
-                <StickerStar key={i} size="lg" />
-              ))}
+            <div className="py-2">
+              <StickerRow
+                count={todo.stickerCount}
+                size="lg"
+                crossedOut={isOneTimeExpired}
+                centered
+                className="gap-1 [--sticker-gap:0.25rem]"
+              />
+              {isOneTimeExpired && (
+                <p className="mt-2 text-xs text-muted text-center">
+                  기한이 지나 스티커를 받을 수 없어요
+                </p>
+              )}
             </div>
           )}
 

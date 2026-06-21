@@ -3,7 +3,7 @@ import { FiCheck } from 'react-icons/fi';
 import { Todo } from '../types';
 import { formatDeadlineCardLine, isDeadlineExpired } from '../utils/date';
 import { formatRecurrenceLabel } from '../utils/recurrence';
-import StickerStar from './StickerStar';
+import StickerRow from './StickerRow';
 
 interface Props {
   todo: Todo;
@@ -33,14 +33,12 @@ export default function TodoCard({ todo, onComplete, onOpen }: Props) {
           className="w-full text-left cursor-pointer rounded-xl -m-1 p-1 hover:bg-background/60 transition-colors active:scale-[0.995]"
         >
           {showStickerRow && (
-            <div
-              className={`flex flex-wrap items-center gap-0.5 mb-2 ${isOneTimeExpired ? 'opacity-40' : ''}`}
-              aria-label={`스티커 ${todo.stickerCount}개`}
-            >
-              {Array.from({ length: todo.stickerCount }, (_, i) => (
-                <StickerStar key={i} size="md" />
-              ))}
-            </div>
+            <StickerRow
+              count={todo.stickerCount}
+              size="md"
+              crossedOut={isOneTimeExpired}
+              className="mb-2"
+            />
           )}
 
           <p className="font-medium text-[15px] leading-snug break-words text-foreground">
@@ -81,9 +79,6 @@ export default function TodoCard({ todo, onComplete, onOpen }: Props) {
             </div>
           )}
 
-          {isOneTimeExpired && todo.stickerCount > 0 && (
-            <p className="text-xs text-muted mt-2">기한이 지나 스티커를 받을 수 없어요</p>
-          )}
         </button>
       </div>
 
