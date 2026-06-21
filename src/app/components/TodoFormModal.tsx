@@ -14,6 +14,7 @@ import RecurrencePicker, {
 import StickerStar from './StickerStar';
 
 const CONTENT_MAX = 50;
+const MEMO_MAX = 200;
 
 interface Props {
   onClose: () => void;
@@ -24,6 +25,7 @@ interface Props {
 export default function TodoFormModal({ onClose, onSave, todo }: Props) {
   const isEdit = !!todo;
   const [content, setContent] = useState(todo?.content ?? '');
+  const [memo, setMemo] = useState(todo?.memo ?? '');
   const [deadline, setDeadline] = useState(
     todo ? normalizeDeadline(todo.deadline) : getTodayISO()
   );
@@ -75,10 +77,12 @@ export default function TodoFormModal({ onClose, onSave, todo }: Props) {
       return;
     }
 
+    const trimmedMemo = memo.trim();
     onSave({
       content: content.trim(),
       deadline: finalDeadline,
       stickerCount: hasSticker ? stickerCount : 0,
+      memo: trimmedMemo || undefined,
       recurrence,
     });
   };
@@ -129,6 +133,28 @@ export default function TodoFormModal({ onClose, onSave, todo }: Props) {
                 }`}
               >
                 {content.length}/{CONTENT_MAX}
+              </span>
+            </div>
+          </div>
+
+          <div className="border-t border-border/50 pt-5 mt-5">
+            <label className="block text-sm font-semibold text-foreground mb-2">
+              메모 <span className="text-xs font-normal text-muted">(선택)</span>
+            </label>
+            <div className="relative">
+              <textarea
+                value={memo}
+                onChange={e => setMemo(e.target.value.slice(0, MEMO_MAX))}
+                placeholder="메모를 남겨보세요"
+                rows={3}
+                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-colors placeholder:text-muted/60"
+              />
+              <span
+                className={`absolute bottom-3 right-3 text-xs tabular-nums ${
+                  memo.length >= MEMO_MAX ? 'text-danger' : 'text-muted/60'
+                }`}
+              >
+                {memo.length}/{MEMO_MAX}
               </span>
             </div>
           </div>

@@ -35,11 +35,13 @@ function normalizeTodo(raw: unknown): Todo | null {
   if (m.completed === true) return null;
 
   const recurrence = normalizeRecurrence(m.recurrence);
+  const memo = typeof m.memo === 'string' ? m.memo.trim() : undefined;
   const todo: Todo = {
     id: m.id,
     content: m.content,
     deadline: normalizeDeadline(m.deadline),
     stickerCount: m.stickerCount,
+    ...(memo ? { memo } : {}),
     recurrence,
     missedCount: typeof m.missedCount === 'number' ? m.missedCount : 0,
     consecutiveCompletions:
@@ -106,7 +108,13 @@ export function useTodos() {
   }, [totalStickers, ready]);
 
   const addTodo = (data: TodoInput) => {
-    setTodos(prev => [...prev, { ...data, id: crypto.randomUUID() }]);
+    const { memo, ...rest } = data;
+    const todo: Todo = {
+      ...rest,
+      id: crypto.randomUUID(),
+      ...(memo ? { memo } : {}),
+    };
+    setTodos(prev => [...prev, todo]);
   };
 
   const completeTodo = (id: string): TodoCompleteResult | null => {
@@ -166,7 +174,14 @@ export function useTodos() {
   };
 
   const updateTodo = (id: string, data: TodoInput) => {
-    setTodos(prev => prev.map(t => (t.id === id ? { ...t, ...data } : t)));
+    setTodos(prev =>
+      prev.map(t => {
+        if (t.id !== id) return t;
+        const next = { ...t, ...data };
+        if (!data.memo) delete next.memo;
+        return next;
+      })
+    );
   };
 
   const deleteTodo = (id: string) => {

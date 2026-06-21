@@ -129,6 +129,14 @@ export default function TodoDetailModal({
             {todo.content}
           </h2>
 
+          {todo.memo && (
+            <div className="mt-4 rounded-2xl bg-background border border-border px-4 py-3.5">
+              <p className="text-sm leading-relaxed break-words text-foreground whitespace-pre-wrap">
+                {todo.memo}
+              </p>
+            </div>
+          )}
+
           {showStreak && (
             <div className="mt-4 rounded-xl bg-success-soft border border-success/20 px-3 py-3 text-center">
               <p className="text-2xl font-bold text-success tabular-nums">{streak}</p>
@@ -150,11 +158,6 @@ export default function TodoDetailModal({
             </InfoRow>
             {isRecurring && todo.recurrence && (
               <InfoRow label="반복">{formatRecurrenceLabel(todo.recurrence)}</InfoRow>
-            )}
-            {!isRecurring && (
-              <InfoRow label="유형">
-                <span className="text-muted">1회성 할일</span>
-              </InfoRow>
             )}
           </div>
 

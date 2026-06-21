@@ -13,6 +13,7 @@ export interface Todo {
   content: string;
   deadline: string; // "YYYY-MM-DD"
   stickerCount: number;
+  memo?: string;
   recurrence?: TodoRecurrence; // 없으면 일회성
   /** 반복 할일: 놓친 주기 수 */
   missedCount?: number;
