@@ -14,7 +14,7 @@ import SortSelect from './SortSelect';
 import FilterChips from './FilterChips';
 import FilterExcludeOption from './FilterExcludeOption';
 import MissedTodosBanner from './MissedTodosBanner';
-import { isMissedTodo, matchesTodoFilter, TodoFilter } from '../utils/todoFilter';
+import { isMissedTodo, matchesTodoFilter, sortMissedTodos, TodoFilter } from '../utils/todoFilter';
 
 const APP_TAGLINE = '할일을 완료하고 스티커를 모아보세요';
 
@@ -67,7 +67,10 @@ export default function TodoTab({
     [excludeTodayFromWeek, excludeWeekFromMonth]
   );
 
-  const missedTodos = useMemo(() => todos.filter(isMissedTodo), [todos]);
+  const missedTodos = useMemo(
+    () => sortMissedTodos(todos.filter(isMissedTodo)),
+    [todos]
+  );
   const missedTodoCount = missedTodos.length;
 
   useEffect(() => {
@@ -112,19 +115,13 @@ export default function TodoTab({
         />
       ) : (
         <>
-          <div className="shrink-0 mb-3 flex items-center justify-between gap-3">
+          <div className="shrink-0 mb-3">
             <h2 className="text-base font-bold text-foreground tracking-tight">
               할일
               <span className="text-sm font-semibold text-muted tabular-nums">
                 ({sortedTodos.length})
               </span>
             </h2>
-            <SortSelect
-              value={sort}
-              onChange={setSort}
-              options={TODO_SORT_OPTIONS}
-              ariaLabel="할일 정렬"
-            />
           </div>
           {missedTodoCount > 0 && (
             <MissedTodosBanner
@@ -138,27 +135,41 @@ export default function TodoTab({
           )}
           {!missedExpanded && (
             <>
-              <div className="shrink-0 mb-3">
+              <div className="shrink-0 mb-3 space-y-1.5">
                 <FilterChips
                   value={filter}
                   onChange={setFilter}
                   options={TODO_FILTER_OPTIONS}
                   ariaLabel="할일 필터"
                 />
-                {filter === 'week' && (
-                  <FilterExcludeOption
-                    label="오늘 목록 제외"
-                    checked={excludeTodayFromWeek}
-                    onChange={setExcludeTodayFromWeek}
+                <div className="flex items-center justify-end gap-3">
+                  {filter === 'week' && (
+                    <>
+                      <FilterExcludeOption
+                        label="오늘 목록 제외"
+                        checked={excludeTodayFromWeek}
+                        onChange={setExcludeTodayFromWeek}
+                      />
+                      <span className="w-px h-4 bg-border shrink-0" aria-hidden />
+                    </>
+                  )}
+                  {filter === 'month' && (
+                    <>
+                      <FilterExcludeOption
+                        label="이번주 목록 제외"
+                        checked={excludeWeekFromMonth}
+                        onChange={setExcludeWeekFromMonth}
+                      />
+                      <span className="w-px h-4 bg-border shrink-0" aria-hidden />
+                    </>
+                  )}
+                  <SortSelect
+                    value={sort}
+                    onChange={setSort}
+                    options={TODO_SORT_OPTIONS}
+                    ariaLabel="할일 목록 정렬"
                   />
-                )}
-                {filter === 'month' && (
-                  <FilterExcludeOption
-                    label="이번주 목록 제외"
-                    checked={excludeWeekFromMonth}
-                    onChange={setExcludeWeekFromMonth}
-                  />
-                )}
+                </div>
               </div>
               <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1 pb-28">
                 {sortedTodos.length === 0 ? (
