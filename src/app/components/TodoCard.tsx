@@ -1,6 +1,6 @@
 import { MdOutlineAutorenew, MdCalendarToday } from 'react-icons/md';
 import { Todo } from '../types';
-import { formatDeadlineDisplay, isDeadlineExpired } from '../utils/date';
+import { formatDeadlineCardLine, isDeadlineExpired } from '../utils/date';
 import { formatRecurrenceLabel } from '../utils/recurrence';
 import StickerStar from './StickerStar';
 
@@ -15,8 +15,9 @@ export default function TodoCard({ todo, onComplete, onOpen }: Props) {
   const isRecurring = !!todo.recurrence;
   const missedCount = todo.missedCount ?? 0;
   const streak = todo.consecutiveCompletions ?? 0;
-  const showExpiredStyle = isExpired && !isRecurring;
+  const isOneTimeExpired = !isRecurring && isExpired;
   const showMissedStripe = isRecurring && missedCount > 0;
+  const deadlineLine = formatDeadlineCardLine(todo.deadline);
 
   return (
     <article className="group flex overflow-hidden bg-surface rounded-2xl border border-border transition-all duration-200 hover:shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
@@ -39,7 +40,7 @@ export default function TodoCard({ todo, onComplete, onOpen }: Props) {
               )}
               {todo.stickerCount > 0 && (
                 <div
-                  className={`flex flex-wrap items-center gap-0.5 ${isExpired ? 'opacity-40' : ''}`}
+                  className={`flex flex-wrap items-center gap-0.5 ${isOneTimeExpired ? 'opacity-40' : ''}`}
                   aria-label={`스티커 ${todo.stickerCount}개`}
                 >
                   {Array.from({ length: todo.stickerCount }, (_, i) => (
@@ -62,17 +63,25 @@ export default function TodoCard({ todo, onComplete, onOpen }: Props) {
             <p className="mt-1.5 text-xs text-success">{streak}회 연속 완료</p>
           )}
 
-          <div
-            className={`mt-2 text-xs flex items-center gap-1.5 flex-wrap ${
-              showExpiredStyle ? 'text-danger' : 'text-muted'
-            }`}
-          >
-            <MdCalendarToday size={14} className="shrink-0" aria-hidden />
-            <span>{formatDeadlineDisplay(todo.deadline)}</span>
-            {showExpiredStyle && (
-              <span className="font-semibold text-danger/80">· 기한 초과</span>
-            )}
-          </div>
+          {deadlineLine && (
+            <div
+              className={`mt-2 text-xs flex items-center gap-1.5 flex-wrap ${
+                isOneTimeExpired ? 'text-danger' : 'text-muted'
+              }`}
+            >
+              <MdCalendarToday size={14} className="shrink-0" aria-hidden />
+              <span>{deadlineLine.label}</span>
+              <span
+                className={`inline-flex items-center text-[11px] font-semibold tabular-nums px-2 py-0.5 rounded-full border ${
+                  isOneTimeExpired
+                    ? 'text-danger bg-red-50 border-danger/20'
+                    : 'text-muted bg-background border-border'
+                }`}
+              >
+                {deadlineLine.dday}
+              </span>
+            </div>
+          )}
         </button>
 
         <div className="mt-3.5">
@@ -83,7 +92,7 @@ export default function TodoCard({ todo, onComplete, onOpen }: Props) {
           >
             완료하기
           </button>
-          {isExpired && todo.stickerCount > 0 && (
+          {isOneTimeExpired && todo.stickerCount > 0 && (
             <p className="text-center text-xs text-muted mt-2">
               기한이 지나 스티커를 받을 수 없어요
             </p>

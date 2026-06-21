@@ -5,9 +5,10 @@ import { createPortal } from "react-dom";
 import { Todo } from "../types";
 import {
   formatDeadlineDisplay,
-  getTodayISO,
+  formatDeadlineDDay,
   isDeadlineExpired,
-  normalizeDeadline,
+  isDeadlineToday,
+  isDeadlineTomorrow,
 } from "../utils/date";
 import { formatRecurrenceLabel } from "../utils/recurrence";
 import { MdClose, MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
@@ -26,20 +27,12 @@ function getDeadlineStatus(
   isRecurring: boolean,
 ): string {
   if (!deadline) return "기한 없음";
-  const normalized = normalizeDeadline(deadline);
-  const today = getTodayISO();
-
-  if (!isRecurring && today > normalized) return "기한 초과";
-  if (today === normalized) return "오늘까지";
-
-  const [y, m, d] = normalized.split("-").map(Number);
-  const target = new Date(y, m - 1, d);
-  const now = new Date();
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const diff = Math.round(
-    (target.getTime() - todayStart.getTime()) / 86_400_000,
-  );
-  return diff === 1 ? "내일까지" : `D-${diff}`;
+  if (!isRecurring && isDeadlineExpired(deadline)) {
+    return formatDeadlineDDay(deadline);
+  }
+  if (isDeadlineToday(deadline)) return "오늘까지";
+  if (isDeadlineTomorrow(deadline)) return "내일까지";
+  return formatDeadlineDDay(deadline);
 }
 
 function InfoRow({
@@ -71,7 +64,7 @@ export default function TodoDetailModal({
   const isRecurring = !!todo.recurrence;
   const missedCount = todo.missedCount ?? 0;
   const streak = todo.consecutiveCompletions ?? 0;
-  const showExpired = isExpired && !isRecurring;
+  const isOneTimeExpired = isExpired && !isRecurring;
   const deadlineStatus = getDeadlineStatus(todo.deadline, isRecurring);
   const showStreak = isRecurring && streak > 0;
   const showMissed = isRecurring && missedCount > 0;
@@ -130,7 +123,7 @@ export default function TodoDetailModal({
         <div className="px-5 pb-8 sm:px-6 sm:pb-6">
           {todo.stickerCount > 0 && (
             <div
-              className={`flex flex-wrap items-center justify-center gap-1 py-2 ${showExpired ? "opacity-40" : ""}`}
+              className={`flex flex-wrap items-center justify-center gap-1 py-2 ${isOneTimeExpired ? "opacity-40" : ""}`}
               aria-label={`스티커 ${todo.stickerCount}개`}
             >
               {Array.from({ length: todo.stickerCount }, (_, i) => (
@@ -176,7 +169,7 @@ export default function TodoDetailModal({
               {formatDeadlineDisplay(todo.deadline)}
             </InfoRow>
             <InfoRow label="남은 기한">
-              <span className={showExpired ? "text-danger" : ""}>
+              <span className={isOneTimeExpired ? "text-danger" : ""}>
                 {deadlineStatus}
               </span>
             </InfoRow>

@@ -42,18 +42,27 @@ export function isDeadlineExpired(deadline?: string): boolean {
   return getTodayISO() > normalizeDeadline(deadline);
 }
 
-export function formatDeadlineCountdown(deadline?: string): string | null {
-  if (!deadline) return null;
+/** 오늘 기준 마감일까지 일수 (양수=남음, 0=오늘, 음수=지남) */
+export function getDeadlineDayDiff(deadline: string): number {
   const normalized = normalizeDeadline(deadline);
-  const today = getTodayISO();
-  if (today > normalized) return null;
-
   const [y, m, d] = normalized.split('-').map(Number);
   const target = new Date(y, m - 1, d);
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const diff = Math.round((target.getTime() - todayStart.getTime()) / 86_400_000);
-  return `D-${diff}`;
+  return Math.round((target.getTime() - todayStart.getTime()) / 86_400_000);
+}
+
+/** D-n (남음) / D-0 (오늘) / D+n (지남) */
+export function formatDeadlineDDay(deadline: string): string {
+  const diff = getDeadlineDayDiff(deadline);
+  if (diff >= 0) return `D-${diff}`;
+  return `D+${Math.abs(diff)}`;
+}
+
+export function formatDeadlineCountdown(deadline?: string): string | null {
+  if (!deadline) return null;
+  if (isDeadlineExpired(deadline)) return null;
+  return formatDeadlineDDay(deadline);
 }
 
 export function formatDeadlineLabel(deadline: string): string {
@@ -64,6 +73,27 @@ export function formatDeadlineLabel(deadline: string): string {
     month: 'long',
     day: 'numeric',
   });
+}
+
+/** 카드용: 년도 생략 (6월 18일) */
+export function formatDeadlineShortLabel(deadline: string): string {
+  const [y, m, d] = normalizeDeadline(deadline).split('-').map(Number);
+  const date = new Date(y, m - 1, d);
+  return date.toLocaleDateString('ko-KR', {
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
+/** 카드용: 기한 없음 null / label + D-day */
+export function formatDeadlineCardLine(
+  deadline?: string
+): { label: string; dday: string } | null {
+  if (!deadline) return null;
+  return {
+    label: formatDeadlineShortLabel(deadline),
+    dday: formatDeadlineDDay(deadline),
+  };
 }
 
 export function getDaysInMonth(year: number, month: number): number {
