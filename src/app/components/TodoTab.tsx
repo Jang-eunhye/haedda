@@ -135,7 +135,7 @@ export default function TodoTab({
           )}
           {!missedExpanded && (
             <>
-              <div className="shrink-0 mb-3 space-y-1.5">
+              <div className="shrink-0 mb-3 space-y-2">
                 <FilterChips
                   value={filter}
                   onChange={setFilter}
