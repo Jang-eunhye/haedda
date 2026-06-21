@@ -1,4 +1,5 @@
-import { MdOutlineAutorenew, MdCalendarToday } from 'react-icons/md';
+import { MdCalendarToday, MdOutlineAutorenew } from 'react-icons/md';
+import { FiCheck } from 'react-icons/fi';
 import { Todo } from '../types';
 import { formatDeadlineCardLine, isDeadlineExpired } from '../utils/date';
 import { formatRecurrenceLabel } from '../utils/recurrence';
@@ -18,19 +19,20 @@ export default function TodoCard({ todo, onComplete, onOpen }: Props) {
   const isOneTimeExpired = !isRecurring && isExpired;
   const showMissedStripe = isRecurring && missedCount > 0;
   const deadlineLine = formatDeadlineCardLine(todo.deadline);
+  const showMeta = (isRecurring && todo.recurrence) || todo.stickerCount > 0;
 
   return (
     <article className="group flex overflow-hidden bg-surface rounded-2xl border border-border transition-all duration-200 hover:shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
       {showMissedStripe && (
         <div className="w-1 shrink-0 bg-danger" aria-hidden />
       )}
-      <div className="min-w-0 flex-1 p-4">
+      <div className="flex-1 min-w-0 py-4 px-4">
         <button
           type="button"
           onClick={() => onOpen(todo)}
           className="w-full text-left cursor-pointer rounded-xl -m-1 p-1 hover:bg-background/60 transition-colors active:scale-[0.995]"
         >
-          {((isRecurring && todo.recurrence) || todo.stickerCount > 0) && (
+          {showMeta && (
             <div className="flex flex-wrap items-center gap-2 mb-2">
               {isRecurring && todo.recurrence && (
                 <span className="flex w-fit shrink-0 items-center gap-1 text-[11px] font-semibold text-accent bg-accent-soft px-2 py-0.5 rounded-full border border-accent-muted/50">
@@ -82,23 +84,21 @@ export default function TodoCard({ todo, onComplete, onOpen }: Props) {
               </span>
             </div>
           )}
-        </button>
 
-        <div className="mt-3.5">
-          <button
-            type="button"
-            onClick={() => onComplete(todo.id)}
-            className="w-full py-2.5 rounded-xl text-sm font-semibold bg-foreground text-white hover:bg-foreground/90 active:scale-[0.98] transition-all duration-150"
-          >
-            완료하기
-          </button>
           {isOneTimeExpired && todo.stickerCount > 0 && (
-            <p className="text-center text-xs text-muted mt-2">
-              기한이 지나 스티커를 받을 수 없어요
-            </p>
+            <p className="text-xs text-muted mt-2">기한이 지나 스티커를 받을 수 없어요</p>
           )}
-        </div>
+        </button>
       </div>
+
+      <button
+        type="button"
+        onClick={() => onComplete(todo.id)}
+        aria-label="완료하기"
+        className="w-10 shrink-0 flex items-center justify-center bg-foreground text-background hover:opacity-90 active:opacity-80 transition-opacity cursor-pointer"
+      >
+        <FiCheck size={20} strokeWidth={2.5} aria-hidden />
+      </button>
     </article>
   );
 }
