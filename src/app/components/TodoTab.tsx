@@ -99,9 +99,10 @@ export default function TodoTab({
 
   const handleConfirmComplete = () => {
     if (!confirmTarget) return;
+    const hadStickers = confirmTarget.stickerCount > 0;
     const result = onCompleteTodo(confirmTarget.id);
     setConfirmTarget(null);
-    if (result) setCompleteResult(result);
+    if (result && hadStickers) setCompleteResult(result);
   };
 
   return (

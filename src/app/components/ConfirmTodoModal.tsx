@@ -38,8 +38,10 @@ export default function ConfirmTodoModal({ todo, onCancel, onConfirm }: Props) {
       >
         <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5 sm:hidden" />
         <div className="text-center mb-5">
-          <h3 className="text-lg font-bold text-foreground">할일을 완료할까요?</h3>
-          <p className="text-sm text-muted mt-2 break-words px-2">{todo.content}</p>
+          <h3 className="text-lg font-bold text-foreground leading-snug break-words px-2">
+            {todo.content}
+          </h3>
+          <p className="text-sm text-muted mt-1.5">할일을 완료할까요?</p>
         </div>
 
         {todo.stickerCount > 0 && (
@@ -58,6 +60,12 @@ export default function ConfirmTodoModal({ todo, onCancel, onConfirm }: Props) {
               </>
             )}
           </div>
+        )}
+
+        {!todo.recurrence && (
+          <p className="text-xs text-muted text-center mb-5">
+            해당 할일은 목록에서 삭제됩니다
+          </p>
         )}
 
         {todo.recurrence && (

@@ -64,13 +64,9 @@ export default function TodoCompleteResultModal({
           </div>
         )}
 
-        {isRecurring && nextDeadline ? (
+        {isRecurring && nextDeadline && (
           <p className="text-xs text-muted text-center mb-5">
             다음 마감: {formatDeadlineLabel(nextDeadline)}
-          </p>
-        ) : (
-          <p className="text-xs text-muted text-center mb-5">
-            해당 할일은 목록에서 삭제됩니다
           </p>
         )}
 
