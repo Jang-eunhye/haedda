@@ -8,7 +8,7 @@ import {
   isDeadlineToday,
 } from './date';
 
-export type TodoFilter = 'all' | 'today' | 'week' | 'month' | 'sticker';
+export type TodoFilter = 'all' | 'today' | 'week' | 'month' | 'later' | 'sticker';
 
 export interface TodoFilterOptions {
   /** 이번주 필터: 오늘 마감 제외 (기본 true) */
@@ -28,6 +28,11 @@ export function countMissedTodos(todos: Todo[]): number {
   return todos.filter(isMissedTodo).length;
 }
 
+/** 기한 없음 (나중에) */
+export function isLaterTodo(todo: Todo): boolean {
+  return !todo.deadline;
+}
+
 export function matchesTodoFilter(
   todo: Todo,
   filter: TodoFilter,
@@ -35,6 +40,7 @@ export function matchesTodoFilter(
   ref: Date = new Date()
 ): boolean {
   if (filter === 'all') return true;
+  if (filter === 'later') return isLaterTodo(todo);
   if (filter === 'sticker') return todo.stickerCount > 0;
   if (filter === 'today') return isDeadlineToday(todo.deadline);
   if (filter === 'week') {

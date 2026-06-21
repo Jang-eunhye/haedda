@@ -25,7 +25,8 @@ const TODO_FILTER_OPTIONS = [
   { value: 'today' as const, label: '오늘' },
   { value: 'week' as const, label: '이번주' },
   { value: 'month' as const, label: '이번달' },
-  { value: 'sticker' as const, label: '스티커' },
+  { value: 'later' as const, label: '나중에' },
+  { value: 'sticker' as const, label: '⭐', ariaLabel: '스티커' },
 ];
 
 const TODO_SORT_OPTIONS = [
