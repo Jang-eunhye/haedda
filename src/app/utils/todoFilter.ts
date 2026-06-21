@@ -28,6 +28,19 @@ export function countMissedTodos(todos: Todo[]): number {
   return todos.filter(isMissedTodo).length;
 }
 
+/** 놓친 할일: 마감일 오래된 순 → 미완료 많은 순 */
+export function sortMissedTodos(todos: Todo[]): Todo[] {
+  return [...todos].sort((a, b) => {
+    const deadlineCompare = (a.deadline ?? '9999-12-31').localeCompare(
+      b.deadline ?? '9999-12-31'
+    );
+    if (deadlineCompare !== 0) return deadlineCompare;
+    const aMissed = a.recurrence ? (a.missedCount ?? 0) : 0;
+    const bMissed = b.recurrence ? (b.missedCount ?? 0) : 0;
+    return bMissed - aMissed;
+  });
+}
+
 /** 기한 없음 (나중에) */
 export function isLaterTodo(todo: Todo): boolean {
   return !todo.deadline;
