@@ -19,7 +19,7 @@ export default function TodoCard({ todo, onComplete, onOpen }: Props) {
   const isOneTimeExpired = !isRecurring && isExpired;
   const showMissedStripe = isRecurring && missedCount > 0;
   const deadlineLine = formatDeadlineCardLine(todo.deadline);
-  const showMeta = (isRecurring && todo.recurrence) || todo.stickerCount > 0;
+  const showStickerRow = todo.stickerCount > 0;
 
   return (
     <article className="group flex overflow-hidden bg-surface rounded-2xl border border-border transition-all duration-200 hover:shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
@@ -32,28 +32,24 @@ export default function TodoCard({ todo, onComplete, onOpen }: Props) {
           onClick={() => onOpen(todo)}
           className="w-full text-left cursor-pointer rounded-xl -m-1 p-1 hover:bg-background/60 transition-colors active:scale-[0.995]"
         >
-          {showMeta && (
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              {isRecurring && todo.recurrence && (
-                <span className="flex w-fit shrink-0 items-center gap-1 text-[11px] font-semibold text-accent bg-accent-soft px-2 py-0.5 rounded-full border border-accent-muted/50">
-                  <MdOutlineAutorenew size={12} className="shrink-0" aria-hidden />
-                  {formatRecurrenceLabel(todo.recurrence)}
-                </span>
-              )}
-              {todo.stickerCount > 0 && (
-                <div
-                  className={`flex flex-wrap items-center gap-0.5 ${isOneTimeExpired ? 'opacity-40' : ''}`}
-                  aria-label={`스티커 ${todo.stickerCount}개`}
-                >
-                  {Array.from({ length: todo.stickerCount }, (_, i) => (
-                    <StickerStar key={i} size="md" />
-                  ))}
-                </div>
-              )}
+          {showStickerRow && (
+            <div
+              className={`flex flex-wrap items-center gap-0.5 mb-2 ${isOneTimeExpired ? 'opacity-40' : ''}`}
+              aria-label={`스티커 ${todo.stickerCount}개`}
+            >
+              {Array.from({ length: todo.stickerCount }, (_, i) => (
+                <StickerStar key={i} size="md" />
+              ))}
             </div>
           )}
 
           <p className="font-medium text-[15px] leading-snug break-words text-foreground">
+            {isRecurring && todo.recurrence && (
+              <span className="inline-flex align-middle shrink-0 items-center gap-1 mr-1.5 text-[11px] font-semibold text-accent bg-accent-soft px-2 py-0.5 rounded-full border border-accent-muted/50">
+                <MdOutlineAutorenew size={12} className="shrink-0" aria-hidden />
+                {formatRecurrenceLabel(todo.recurrence)}
+              </span>
+            )}
             {todo.content}
           </p>
 
