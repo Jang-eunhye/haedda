@@ -1,9 +1,9 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import {
   formatDateISO,
-  getDaysInMonth,
   getTodayISO,
   parseDateParts,
 } from '../utils/date';
@@ -13,74 +13,117 @@ interface Props {
   onChange: (value: string) => void;
 }
 
-const CURRENT_YEAR = new Date().getFullYear();
-const YEAR_RANGE = 3;
+const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'] as const;
 
-const selectClass =
-  'flex-1 min-w-0 bg-background border border-border rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-colors appearance-none';
+function getCalendarCells(year: number, month: number): (number | null)[] {
+  const firstWeekday = new Date(year, month - 1, 1).getDay();
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const cells: (number | null)[] = Array.from({ length: firstWeekday }, () => null);
+  for (let day = 1; day <= daysInMonth; day++) {
+    cells.push(day);
+  }
+  return cells;
+}
 
 export default function DatePicker({ value, onChange }: Props) {
   const today = getTodayISO();
   const resolved = value || today;
   const { year, month, day } = parseDateParts(resolved);
 
-  const years = useMemo(
-    () => Array.from({ length: YEAR_RANGE }, (_, i) => CURRENT_YEAR + i),
-    []
+  const [viewYear, setViewYear] = useState(year);
+  const [viewMonth, setViewMonth] = useState(month);
+
+  useEffect(() => {
+    setViewYear(year);
+    setViewMonth(month);
+  }, [year, month]);
+
+  const cells = useMemo(
+    () => getCalendarCells(viewYear, viewMonth),
+    [viewYear, viewMonth]
   );
 
-  const daysInMonth = getDaysInMonth(year, month);
-  const days = useMemo(
-    () => Array.from({ length: daysInMonth }, (_, i) => i + 1),
-    [daysInMonth]
-  );
+  const moveMonth = (delta: number) => {
+    const next = new Date(viewYear, viewMonth - 1 + delta, 1);
+    setViewYear(next.getFullYear());
+    setViewMonth(next.getMonth() + 1);
+  };
 
-  const update = (nextYear: number, nextMonth: number, nextDay: number) => {
-    const maxDay = getDaysInMonth(nextYear, nextMonth);
-    const clampedDay = Math.min(nextDay, maxDay);
-    onChange(formatDateISO(new Date(nextYear, nextMonth - 1, clampedDay)));
+  const selectDay = (nextDay: number) => {
+    onChange(formatDateISO(new Date(viewYear, viewMonth - 1, nextDay)));
   };
 
   return (
-    <div className="flex gap-2">
-      <select
-        value={year}
-        onChange={e => update(Number(e.target.value), month, day)}
-        className={selectClass}
-        aria-label="연도"
-      >
-        {years.map(y => (
-          <option key={y} value={y}>
-            {y}년
-          </option>
-        ))}
-      </select>
+    <div className="rounded-xl border border-border bg-background p-3">
+      <div className="flex items-center justify-between mb-3 px-0.5">
+        <button
+          type="button"
+          onClick={() => moveMonth(-1)}
+          aria-label="이전 달"
+          className="w-8 h-8 flex items-center justify-center rounded-lg text-muted hover:text-foreground hover:bg-surface transition-colors active:scale-95"
+        >
+          <MdChevronLeft size={20} aria-hidden />
+        </button>
+        <span className="text-sm font-semibold text-foreground tabular-nums">
+          {viewYear}년 {viewMonth}월
+        </span>
+        <button
+          type="button"
+          onClick={() => moveMonth(1)}
+          aria-label="다음 달"
+          className="w-8 h-8 flex items-center justify-center rounded-lg text-muted hover:text-foreground hover:bg-surface transition-colors active:scale-95"
+        >
+          <MdChevronRight size={20} aria-hidden />
+        </button>
+      </div>
 
-      <select
-        value={month}
-        onChange={e => update(year, Number(e.target.value), day)}
-        className={selectClass}
-        aria-label="월"
-      >
-        {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
-          <option key={m} value={m}>
-            {m}월
-          </option>
+      <div className="grid grid-cols-7 gap-1 mb-1">
+        {WEEKDAYS.map((label, index) => (
+          <span
+            key={label}
+            className={`h-8 flex items-center justify-center text-[11px] font-medium ${
+              index === 0 ? 'text-danger/70' : 'text-muted'
+            }`}
+          >
+            {label}
+          </span>
         ))}
-      </select>
+      </div>
 
-      <select
-        value={day}
-        onChange={e => update(year, month, Number(e.target.value))}
-        className={selectClass}
-        aria-label="일"
-      >
-        {days.map(d => (
-          <option key={d} value={d}>
-            {d}일
-          </option>
-        ))}
-      </select>
+      <div className="grid grid-cols-7 gap-1" role="grid" aria-label="날짜 선택">
+        {cells.map((cellDay, index) => {
+          if (cellDay === null) {
+            return <span key={`empty-${index}`} className="h-9" aria-hidden />;
+          }
+
+          const iso = formatDateISO(new Date(viewYear, viewMonth - 1, cellDay));
+          const isSelected = viewYear === year && viewMonth === month && cellDay === day;
+          const isToday = iso === today;
+          const isSunday = new Date(viewYear, viewMonth - 1, cellDay).getDay() === 0;
+
+          return (
+            <button
+              key={iso}
+              type="button"
+              role="gridcell"
+              aria-selected={isSelected}
+              aria-label={`${viewMonth}월 ${cellDay}일`}
+              onClick={() => selectDay(cellDay)}
+              className={`h-9 rounded-lg text-sm font-medium tabular-nums transition-colors active:scale-95 ${
+                isSelected
+                  ? 'bg-foreground text-white'
+                  : isToday
+                    ? 'bg-surface text-foreground ring-1 ring-foreground/20 hover:bg-background'
+                    : isSunday
+                      ? 'text-danger/80 hover:bg-surface'
+                      : 'text-foreground hover:bg-surface'
+              }`}
+            >
+              {cellDay}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
