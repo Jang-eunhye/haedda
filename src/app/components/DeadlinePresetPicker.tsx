@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { MdCalendarToday } from 'react-icons/md';
 import {
   DeadlinePreset,
   DEADLINE_PRESET_OPTIONS,
@@ -16,11 +17,7 @@ interface Props {
   onChange: (deadline: string | undefined) => void;
 }
 
-function initialPreset(deadline: string | undefined): DeadlinePreset {
-  const detected = detectDeadlinePreset(deadline);
-  if (detected === 'custom') return 'today';
-  return detected;
-}
+type SelectedOption = DeadlinePreset | 'custom';
 
 function DeadlineSummaryBox({ deadline }: { deadline: string | undefined }) {
   if (!deadline) return null;
@@ -38,17 +35,27 @@ function DeadlineSummaryBox({ deadline }: { deadline: string | undefined }) {
   );
 }
 
+const presetChipClass = (selected: boolean) =>
+  `shrink-0 px-3 py-2 rounded-full text-xs font-semibold transition-all active:scale-[0.97] ${
+    selected
+      ? 'bg-foreground text-white'
+      : 'bg-background text-muted border border-border hover:text-foreground'
+  }`;
+
+const customChipClass = (selected: boolean) =>
+  `shrink-0 inline-flex items-center gap-1 px-3 py-2 rounded-full text-xs font-semibold transition-all active:scale-[0.97] ${
+    selected
+      ? 'bg-foreground text-white'
+      : 'bg-transparent text-muted border border-dashed border-foreground/25 hover:text-foreground hover:border-foreground/40'
+  }`;
+
 export default function DeadlinePresetPicker({ deadline, onChange }: Props) {
-  const [isCustomOpen, setIsCustomOpen] = useState(
-    () => detectDeadlinePreset(deadline) === 'custom'
-  );
-  const [selectedPreset, setSelectedPreset] = useState<DeadlinePreset>(() =>
-    initialPreset(deadline)
+  const [selected, setSelected] = useState<SelectedOption>(() =>
+    detectDeadlinePreset(deadline)
   );
 
   const handlePreset = (next: DeadlinePreset) => {
-    setIsCustomOpen(false);
-    setSelectedPreset(next);
+    setSelected(next);
     if (next === 'later') {
       onChange(undefined);
       return;
@@ -56,45 +63,41 @@ export default function DeadlinePresetPicker({ deadline, onChange }: Props) {
     onChange(getDeadlineForPreset(next));
   };
 
-  const handleToggleCustom = () => {
-    if (isCustomOpen) {
-      setIsCustomOpen(false);
-      const detected = detectDeadlinePreset(deadline);
-      if (detected !== 'custom' && detected !== 'later') {
-        setSelectedPreset(detected);
-      }
-      return;
+  const handleCustom = () => {
+    setSelected('custom');
+    if (!deadline) {
+      onChange(getDeadlineForPreset('today'));
     }
-    setIsCustomOpen(true);
-    if (!deadline) onChange(getDeadlineForPreset('today'));
   };
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-sm font-semibold text-foreground">기한</p>
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xs font-medium text-muted">직접 선택</span>
+      <p className="text-sm font-semibold text-foreground">기한</p>
+
+      <div className="flex flex-wrap gap-1.5">
+        {DEADLINE_PRESET_OPTIONS.map(opt => (
           <button
+            key={opt.value}
             type="button"
-            role="switch"
-            aria-checked={isCustomOpen}
-            aria-label="날짜 직접 선택"
-            onClick={handleToggleCustom}
-            className={`relative w-12 h-7 rounded-full transition-colors duration-200 shrink-0 ${
-              isCustomOpen ? 'bg-foreground' : 'bg-border'
-            }`}
+            aria-pressed={selected === opt.value}
+            onClick={() => handlePreset(opt.value)}
+            className={presetChipClass(selected === opt.value)}
           >
-            <span
-              className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
-                isCustomOpen ? 'translate-x-5' : 'translate-x-0'
-              }`}
-            />
+            {opt.label}
           </button>
-        </div>
+        ))}
+        <button
+          type="button"
+          aria-pressed={selected === 'custom'}
+          onClick={handleCustom}
+          className={customChipClass(selected === 'custom')}
+        >
+          <MdCalendarToday size={14} className="shrink-0" aria-hidden />
+          직접 선택
+        </button>
       </div>
 
-      {isCustomOpen ? (
+      {selected === 'custom' ? (
         <>
           <DatePicker
             value={deadline ?? getDeadlineForPreset('today')}
@@ -102,34 +105,10 @@ export default function DeadlinePresetPicker({ deadline, onChange }: Props) {
           />
           {deadline && <DeadlineSummaryBox deadline={deadline} />}
         </>
+      ) : selected === 'later' ? (
+        <p className="text-xs text-muted leading-relaxed">{formatPresetHint('later')}</p>
       ) : (
-        <>
-          <div className="flex flex-wrap gap-1.5">
-            {DEADLINE_PRESET_OPTIONS.map(opt => {
-              const selected = selectedPreset === opt.value;
-              return (
-                <button
-                  key={opt.value}
-                  type="button"
-                  aria-pressed={selected}
-                  onClick={() => handlePreset(opt.value)}
-                  className={`shrink-0 px-3 py-2 rounded-full text-xs font-semibold transition-all active:scale-[0.97] ${
-                    selected
-                      ? 'bg-foreground text-white'
-                      : 'bg-background text-muted border border-border hover:text-foreground'
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              );
-            })}
-          </div>
-          {selectedPreset === 'later' ? (
-            <p className="text-xs text-muted leading-relaxed">{formatPresetHint('later')}</p>
-          ) : (
-            deadline && <DeadlineSummaryBox deadline={deadline} />
-          )}
-        </>
+        deadline && <DeadlineSummaryBox deadline={deadline} />
       )}
     </div>
   );
