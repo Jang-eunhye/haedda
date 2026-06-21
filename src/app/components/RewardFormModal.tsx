@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Reward } from '../types';
 import { MdClose, MdDeleteOutline } from 'react-icons/md';
-import StickerStar from './StickerStar';
+import StickerCountPicker from './StickerCountPicker';
 
 const CONTENT_MAX = 50;
 
@@ -33,10 +33,6 @@ export default function RewardFormModal({ onClose, onSave, onDelete, reward }: P
     e.preventDefault();
     if (!content.trim()) return;
     onSave({ content: content.trim(), stickerCost });
-  };
-
-  const adjustCost = (delta: number) => {
-    setStickerCost(prev => Math.max(1, Math.min(99, prev + delta)));
   };
 
   if (!mounted) return null;
@@ -105,28 +101,12 @@ export default function RewardFormModal({ onClose, onSave, onDelete, reward }: P
             <label className="block text-sm font-semibold text-foreground mb-2">
               필요 스티커
             </label>
-            <div className="flex items-center justify-center gap-6 py-2 bg-background rounded-xl border border-border">
-              <button
-                type="button"
-                onClick={() => adjustCost(-1)}
-                disabled={stickerCost <= 1}
-                className="w-10 h-10 rounded-xl bg-surface border border-border text-foreground font-bold text-lg hover:bg-background transition-colors disabled:opacity-30 active:scale-95"
-              >
-                −
-              </button>
-              <div className="flex items-center gap-2 min-w-[80px] justify-center">
-                <StickerStar size="lg" />
-                <span className="text-2xl font-bold text-accent tabular-nums">{stickerCost}</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => adjustCost(1)}
-                disabled={stickerCost >= 99}
-                className="w-10 h-10 rounded-xl bg-surface border border-border text-foreground font-bold text-lg hover:bg-background transition-colors disabled:opacity-30 active:scale-95"
-              >
-                +
-              </button>
-            </div>
+            <StickerCountPicker
+              value={stickerCost}
+              onChange={setStickerCost}
+              max={99}
+              inputAriaLabel="필요 스티커 개수"
+            />
           </div>
 
           <div className="flex gap-2.5 pt-1">

@@ -11,7 +11,7 @@ import RecurrencePicker, {
   getFrequencyFromTodo,
   RecurrenceFrequency,
 } from './RecurrencePicker';
-import StickerStar from './StickerStar';
+import StickerCountPicker from './StickerCountPicker';
 
 const CONTENT_MAX = 50;
 const MEMO_MAX = 200;
@@ -83,10 +83,6 @@ export default function TodoFormModal({ onClose, onSave, todo }: Props) {
       memo: trimmedMemo || undefined,
       recurrence,
     });
-  };
-
-  const adjustSticker = (delta: number) => {
-    setStickerCount(prev => Math.max(1, Math.min(10, prev + delta)));
   };
 
   const canSubmit =
@@ -220,28 +216,13 @@ export default function TodoFormModal({ onClose, onSave, todo }: Props) {
             </div>
 
             {hasSticker && (
-              <div className="mt-4 flex items-center justify-center gap-6 py-2 bg-background rounded-xl border border-border">
-                <button
-                  type="button"
-                  onClick={() => adjustSticker(-1)}
-                  disabled={stickerCount <= 1}
-                  className="w-10 h-10 rounded-xl bg-surface border border-border text-foreground font-bold text-lg hover:bg-background transition-colors disabled:opacity-30 active:scale-95"
-                >
-                  −
-                </button>
-                <div className="flex items-center gap-2 min-w-[80px] justify-center">
-                  <StickerStar size="lg" />
-                  <span className="text-2xl font-bold text-accent tabular-nums">{stickerCount}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => adjustSticker(1)}
-                  disabled={stickerCount >= 10}
-                  className="w-10 h-10 rounded-xl bg-surface border border-border text-foreground font-bold text-lg hover:bg-background transition-colors disabled:opacity-30 active:scale-95"
-                >
-                  +
-                </button>
-              </div>
+              <StickerCountPicker
+                className="mt-4"
+                value={stickerCount}
+                onChange={setStickerCount}
+                max={10}
+                inputAriaLabel="스티커 개수"
+              />
             )}
             {!isEdit && (
               <p className="text-xs text-muted mt-3">완료하면 스티커를 받을 수 있어요</p>
