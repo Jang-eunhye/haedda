@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { Todo } from '../types';
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { Todo } from "../types";
 import {
   formatDeadlineDisplay,
   getTodayISO,
   isDeadlineExpired,
   normalizeDeadline,
-} from '../utils/date';
-import { formatRecurrenceLabel } from '../utils/recurrence';
-import { MdClose, MdDeleteOutline, MdOutlineEdit } from 'react-icons/md';
-import StickerStar from './StickerStar';
+} from "../utils/date";
+import { formatRecurrenceLabel } from "../utils/recurrence";
+import { MdClose, MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
+import StickerStar from "./StickerStar";
 
 interface Props {
   todo: Todo;
@@ -21,27 +21,40 @@ interface Props {
   onComplete: () => void;
 }
 
-function getDeadlineStatus(deadline: string | undefined, isRecurring: boolean): string {
-  if (!deadline) return '기한 없음';
+function getDeadlineStatus(
+  deadline: string | undefined,
+  isRecurring: boolean,
+): string {
+  if (!deadline) return "기한 없음";
   const normalized = normalizeDeadline(deadline);
   const today = getTodayISO();
 
-  if (!isRecurring && today > normalized) return '기한 초과';
-  if (today === normalized) return '오늘까지';
+  if (!isRecurring && today > normalized) return "기한 초과";
+  if (today === normalized) return "오늘까지";
 
-  const [y, m, d] = normalized.split('-').map(Number);
+  const [y, m, d] = normalized.split("-").map(Number);
   const target = new Date(y, m - 1, d);
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const diff = Math.round((target.getTime() - todayStart.getTime()) / 86_400_000);
-  return diff === 1 ? '내일까지' : `D-${diff}`;
+  const diff = Math.round(
+    (target.getTime() - todayStart.getTime()) / 86_400_000,
+  );
+  return diff === 1 ? "내일까지" : `D-${diff}`;
 }
 
-function InfoRow({ label, children }: { label: string; children: React.ReactNode }) {
+function InfoRow({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex items-start justify-between gap-4 py-3.5 px-4">
       <span className="text-sm text-muted shrink-0">{label}</span>
-      <div className="text-sm font-medium text-foreground text-right">{children}</div>
+      <div className="text-sm font-medium text-foreground text-right">
+        {children}
+      </div>
     </div>
   );
 }
@@ -65,9 +78,9 @@ export default function TodoDetailModal({
 
   useEffect(() => {
     setMounted(true);
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     };
   }, []);
 
@@ -80,7 +93,7 @@ export default function TodoDetailModal({
     >
       <div
         className="bg-surface w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-[0_-8px_40px_-12px_rgba(0,0,0,0.15)] sm:shadow-xl max-h-[92vh] overflow-y-auto"
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="w-10 h-1 bg-border rounded-full mx-auto mt-3 sm:hidden" />
 
@@ -116,17 +129,19 @@ export default function TodoDetailModal({
 
         <div className="px-5 pb-8 sm:px-6 sm:pb-6">
           {todo.stickerCount > 0 && (
-          <div
-            className={`flex flex-wrap items-center justify-center gap-1 py-2 ${showExpired ? 'opacity-40' : ''}`}
-            aria-label={`스티커 ${todo.stickerCount}개`}
-          >
-            {Array.from({ length: todo.stickerCount }, (_, i) => (
-              <StickerStar key={i} size="lg" />
-            ))}
-          </div>
+            <div
+              className={`flex flex-wrap items-center justify-center gap-1 py-2 ${showExpired ? "opacity-40" : ""}`}
+              aria-label={`스티커 ${todo.stickerCount}개`}
+            >
+              {Array.from({ length: todo.stickerCount }, (_, i) => (
+                <StickerStar key={i} size="lg" />
+              ))}
+            </div>
           )}
 
-          <h2 className={`${todo.stickerCount > 0 ? 'mt-3' : 'mt-1'} text-xl font-bold leading-snug break-words text-foreground text-center`}>
+          <h2
+            className={`${todo.stickerCount > 0 ? "mt-3" : "mt-1"} text-xl font-bold leading-snug break-words text-foreground text-center`}
+          >
             {todo.content}
           </h2>
 
@@ -140,25 +155,35 @@ export default function TodoDetailModal({
 
           {showStreak && (
             <div className="mt-4 rounded-xl bg-success-soft border border-success/20 px-3 py-3 text-center">
-              <p className="text-2xl font-bold text-success tabular-nums">{streak}</p>
+              <p className="text-2xl font-bold text-success tabular-nums">
+                {streak}
+              </p>
               <p className="text-xs text-muted mt-0.5">연속 완료</p>
             </div>
           )}
 
           {showMissed && (
             <div className="mt-4 rounded-xl bg-red-50 border border-danger/20 px-3 py-3 text-center">
-              <p className="text-2xl font-bold text-danger tabular-nums">{missedCount}</p>
+              <p className="text-2xl font-bold text-danger tabular-nums">
+                {missedCount}
+              </p>
               <p className="text-xs text-muted mt-0.5">미완료</p>
             </div>
           )}
 
           <div className="mt-4 rounded-2xl bg-background border border-border divide-y divide-border">
-            <InfoRow label="마감일">{formatDeadlineDisplay(todo.deadline)}</InfoRow>
+            <InfoRow label="마감일">
+              {formatDeadlineDisplay(todo.deadline)}
+            </InfoRow>
             <InfoRow label="남은 기한">
-              <span className={showExpired ? 'text-danger' : ''}>{deadlineStatus}</span>
+              <span className={showExpired ? "text-danger" : ""}>
+                {deadlineStatus}
+              </span>
             </InfoRow>
             {isRecurring && todo.recurrence && (
-              <InfoRow label="반복">{formatRecurrenceLabel(todo.recurrence)}</InfoRow>
+              <InfoRow label="반복">
+                {formatRecurrenceLabel(todo.recurrence)}
+              </InfoRow>
             )}
           </div>
 
@@ -178,6 +203,6 @@ export default function TodoDetailModal({
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }
