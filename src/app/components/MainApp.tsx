@@ -37,7 +37,7 @@ export default function MainApp() {
             </div>
           </header>
 
-          <main className="flex-1 min-h-0 overflow-hidden px-4 py-4 sm:px-6 flex flex-col">
+          <main className="flex-1 min-h-0 overflow-hidden px-4 pt-4 sm:px-6 flex flex-col">
             {activeTab === 'todo' ? (
               <TodoTab
                 todos={todos}
