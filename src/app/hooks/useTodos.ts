@@ -31,16 +31,18 @@ function normalizeTodo(raw: unknown): Todo | null {
   if (!raw || typeof raw !== 'object') return null;
   const m = raw as Record<string, unknown>;
   if (typeof m.id !== 'string' || typeof m.content !== 'string') return null;
-  if (typeof m.deadline !== 'string' || typeof m.stickerCount !== 'number') return null;
+  if (typeof m.stickerCount !== 'number') return null;
   if (m.completed === true) return null;
 
+  const deadline =
+    typeof m.deadline === 'string' ? normalizeDeadline(m.deadline) : undefined;
   const recurrence = normalizeRecurrence(m.recurrence);
   const memo = typeof m.memo === 'string' ? m.memo.trim() : undefined;
   const todo: Todo = {
     id: m.id,
     content: m.content,
-    deadline: normalizeDeadline(m.deadline),
     stickerCount: m.stickerCount,
+    ...(deadline ? { deadline } : {}),
     ...(memo ? { memo } : {}),
     recurrence,
     missedCount: typeof m.missedCount === 'number' ? m.missedCount : 0,
@@ -108,10 +110,11 @@ export function useTodos() {
   }, [totalStickers, ready]);
 
   const addTodo = (data: TodoInput) => {
-    const { memo, ...rest } = data;
+    const { memo, deadline, ...rest } = data;
     const todo: Todo = {
       ...rest,
       id: crypto.randomUUID(),
+      ...(deadline ? { deadline } : {}),
       ...(memo ? { memo } : {}),
     };
     setTodos(prev => [...prev, todo]);
@@ -128,7 +131,7 @@ export function useTodos() {
 
       if (todo.recurrence) {
         const onTime = !isDeadlineExpired(todo.deadline);
-        const nextDeadline = computeNextDeadlineAfter(todo.recurrence, todo.deadline);
+        const nextDeadline = computeNextDeadlineAfter(todo.recurrence, todo.deadline!);
         result = {
           earned,
           stickerCount: todo.stickerCount,
@@ -179,6 +182,7 @@ export function useTodos() {
         if (t.id !== id) return t;
         const next = { ...t, ...data };
         if (!data.memo) delete next.memo;
+        if (!data.deadline) delete next.deadline;
         return next;
       })
     );

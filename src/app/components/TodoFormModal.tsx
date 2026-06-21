@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { Todo, TodoInput } from '../types';
 import { getTodayISO, normalizeDeadline } from '../utils/date';
 import { computeNextDeadline } from '../utils/recurrence';
-import DatePicker from './DatePicker';
+import DeadlinePresetPicker from './DeadlinePresetPicker';
 import RecurrencePicker, {
   buildRecurrenceFromForm,
   getFrequencyFromTodo,
@@ -26,8 +26,8 @@ export default function TodoFormModal({ onClose, onSave, todo }: Props) {
   const isEdit = !!todo;
   const [content, setContent] = useState(todo?.content ?? '');
   const [memo, setMemo] = useState(todo?.memo ?? '');
-  const [deadline, setDeadline] = useState(
-    todo ? normalizeDeadline(todo.deadline) : getTodayISO()
+  const [deadline, setDeadline] = useState<string | undefined>(
+    todo?.deadline ? normalizeDeadline(todo.deadline) : getTodayISO()
   );
   const [stickerCount, setStickerCount] = useState(
     todo && todo.stickerCount > 0 ? todo.stickerCount : 1
@@ -73,8 +73,6 @@ export default function TodoFormModal({ onClose, onSave, todo }: Props) {
     let finalDeadline = deadline;
     if (recurrence) {
       finalDeadline = computeNextDeadline(recurrence, new Date(), true);
-    } else if (!deadline) {
-      return;
     }
 
     const trimmedMemo = memo.trim();
@@ -93,7 +91,7 @@ export default function TodoFormModal({ onClose, onSave, todo }: Props) {
 
   const canSubmit =
     content.trim() &&
-    (isRecurring ? frequency !== 'weekly' || weekdays.length > 0 : !!deadline);
+    (isRecurring ? frequency !== 'weekly' || weekdays.length > 0 : true);
 
   if (!mounted) return null;
 
@@ -197,8 +195,7 @@ export default function TodoFormModal({ onClose, onSave, todo }: Props) {
 
           {!isRecurring && (
             <div className="border-t border-border/50 pt-5 mt-5">
-              <label className="block text-sm font-semibold text-foreground mb-2">기한</label>
-              <DatePicker value={deadline} onChange={setDeadline} />
+              <DeadlinePresetPicker deadline={deadline} onChange={setDeadline} />
             </div>
           )}
 

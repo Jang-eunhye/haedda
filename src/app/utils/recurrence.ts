@@ -247,6 +247,15 @@ export function refreshRecurringTodo(todo: Todo): Todo {
   const currentPeriod = computeCurrentPeriodDeadline(todo.recurrence);
   const stored = todo.deadline;
 
+  if (!stored) {
+    return {
+      ...todo,
+      deadline: currentPeriod,
+      missedCount: todo.missedCount ?? 0,
+      consecutiveCompletions: todo.consecutiveCompletions ?? 0,
+    };
+  }
+
   if (stored >= currentPeriod) {
     return {
       ...todo,

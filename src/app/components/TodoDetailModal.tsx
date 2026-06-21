@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Todo } from '../types';
 import {
-  formatDeadlineLabel,
+  formatDeadlineDisplay,
   getTodayISO,
   isDeadlineExpired,
   normalizeDeadline,
@@ -21,7 +21,8 @@ interface Props {
   onComplete: () => void;
 }
 
-function getDeadlineStatus(deadline: string, isRecurring: boolean): string {
+function getDeadlineStatus(deadline: string | undefined, isRecurring: boolean): string {
+  if (!deadline) return '기한 없음';
   const normalized = normalizeDeadline(deadline);
   const today = getTodayISO();
 
@@ -152,7 +153,7 @@ export default function TodoDetailModal({
           )}
 
           <div className="mt-4 rounded-2xl bg-background border border-border divide-y divide-border">
-            <InfoRow label="마감일">{formatDeadlineLabel(todo.deadline)}</InfoRow>
+            <InfoRow label="마감일">{formatDeadlineDisplay(todo.deadline)}</InfoRow>
             <InfoRow label="남은 기한">
               <span className={showExpired ? 'text-danger' : ''}>{deadlineStatus}</span>
             </InfoRow>

@@ -11,7 +11,7 @@ export interface TodoRecurrence {
 export interface Todo {
   id: string;
   content: string;
-  deadline: string; // "YYYY-MM-DD"
+  deadline?: string; // 없으면 나중에(기한 없음)
   stickerCount: number;
   memo?: string;
   recurrence?: TodoRecurrence; // 없으면 일회성

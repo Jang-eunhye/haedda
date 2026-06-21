@@ -20,6 +20,7 @@ export interface TodoFilterOptions {
 /** 일회성: 기한 지남 / 반복: 미완료 주기 누적 */
 export function isMissedTodo(todo: Todo): boolean {
   if (todo.recurrence) return (todo.missedCount ?? 0) > 0;
+  if (!todo.deadline) return false;
   return isDeadlineExpired(todo.deadline);
 }
 

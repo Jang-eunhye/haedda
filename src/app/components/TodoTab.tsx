@@ -81,7 +81,9 @@ export default function TodoTab({
   const sortedTodos = useMemo(() => {
     if (sort === 'recent') return [...filteredTodos].reverse();
     if (sort === 'deadline') {
-      return [...filteredTodos].sort((a, b) => a.deadline.localeCompare(b.deadline));
+      return [...filteredTodos].sort((a, b) =>
+        (a.deadline ?? '9999-12-31').localeCompare(b.deadline ?? '9999-12-31')
+      );
     }
     return [...filteredTodos].sort((a, b) => b.stickerCount - a.stickerCount);
   }, [filteredTodos, sort]);

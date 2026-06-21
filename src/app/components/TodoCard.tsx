@@ -1,6 +1,6 @@
 import { MdOutlineAutorenew, MdCalendarToday } from 'react-icons/md';
 import { Todo } from '../types';
-import { formatDeadlineLabel, isDeadlineExpired } from '../utils/date';
+import { formatDeadlineDisplay, isDeadlineExpired } from '../utils/date';
 import { formatRecurrenceLabel } from '../utils/recurrence';
 import StickerStar from './StickerStar';
 
@@ -58,7 +58,7 @@ export default function TodoCard({ todo, onComplete, onOpen }: Props) {
             }`}
           >
             <MdCalendarToday size={14} className="shrink-0" aria-hidden />
-            <span>{formatDeadlineLabel(todo.deadline)}</span>
+            <span>{formatDeadlineDisplay(todo.deadline)}</span>
             {isRecurring && todo.recurrence && (
               <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-accent bg-accent-soft px-2 py-0.5 rounded-full border border-accent-muted/50">
                 <MdOutlineAutorenew size={12} className="shrink-0" aria-hidden />
