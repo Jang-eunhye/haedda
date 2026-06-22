@@ -14,7 +14,7 @@ import RecurrencePicker, {
 } from './RecurrencePicker';
 import StickerCountPicker from './StickerCountPicker';
 import CategoryPicker from './CategoryPicker';
-import { DEFAULT_CATEGORIES } from '../utils/categories';
+import { TodoCategory } from '../utils/categories';
 
 const CONTENT_MAX = 50;
 const MEMO_MAX = 200;
@@ -22,10 +22,11 @@ const MEMO_MAX = 200;
 interface Props {
   onClose: () => void;
   onSave: (data: TodoInput) => void;
+  categories: TodoCategory[];
   todo?: Todo;
 }
 
-export default function TodoFormModal({ onClose, onSave, todo }: Props) {
+export default function TodoFormModal({ onClose, onSave, categories, todo }: Props) {
   const isEdit = !!todo;
   const [content, setContent] = useState(todo?.content ?? '');
   const [memo, setMemo] = useState(todo?.memo ?? '');
@@ -170,7 +171,7 @@ export default function TodoFormModal({ onClose, onSave, todo }: Props) {
             <CategoryPicker
               value={categoryId}
               onChange={setCategoryId}
-              categories={DEFAULT_CATEGORIES}
+              categories={categories}
             />
           </div>
 

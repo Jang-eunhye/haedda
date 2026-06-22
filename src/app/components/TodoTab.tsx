@@ -16,6 +16,7 @@ import CategoryFilterChips from './CategoryFilterChips';
 import FilterExcludeOption from './FilterExcludeOption';
 import MissedTodosBanner from './MissedTodosBanner';
 import { isMissedTodo, matchesCategoryFilter, matchesTodoFilter, sortMissedTodos, TodoFilter } from '../utils/todoFilter';
+import { TodoCategory } from '../utils/categories';
 
 const APP_TAGLINE = '할일을 완료하고 스티커를 모아보세요';
 
@@ -38,6 +39,7 @@ const TODO_SORT_OPTIONS = [
 
 interface Props {
   todos: Todo[];
+  categories: TodoCategory[];
   onAddTodo: (todo: TodoInput) => void;
   onUpdateTodo: (id: string, data: TodoInput) => void;
   onDeleteTodo: (id: string) => void;
@@ -46,6 +48,7 @@ interface Props {
 
 export default function TodoTab({
   todos,
+  categories,
   onAddTodo,
   onUpdateTodo,
   onDeleteTodo,
@@ -129,6 +132,7 @@ export default function TodoTab({
               expanded={missedExpanded}
               onToggle={() => setMissedExpanded(v => !v)}
               todos={missedTodos}
+              categories={categories}
               onComplete={handleCompleteClick}
               onOpen={setDetailTarget}
             />
@@ -145,6 +149,7 @@ export default function TodoTab({
                 <CategoryFilterChips
                   value={categoryFilter}
                   onChange={setCategoryFilter}
+                  categories={categories}
                 />
                 <div className="flex items-center justify-end gap-3">
                   {filter === 'week' && (
@@ -189,6 +194,7 @@ export default function TodoTab({
                       <TodoCard
                         key={todo.id}
                         todo={todo}
+                        categories={categories}
                         onComplete={handleCompleteClick}
                         onOpen={setDetailTarget}
                       />
@@ -203,6 +209,7 @@ export default function TodoTab({
 
       {isAddOpen && (
         <TodoFormModal
+          categories={categories}
           onClose={() => setIsAddOpen(false)}
           onSave={data => {
             onAddTodo(data);
@@ -230,6 +237,7 @@ export default function TodoTab({
       {editTarget && (
         <TodoFormModal
           todo={editTarget}
+          categories={categories}
           onClose={() => setEditTarget(null)}
           onSave={data => {
             onUpdateTodo(editTarget.id, data);

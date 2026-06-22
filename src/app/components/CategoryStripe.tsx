@@ -1,11 +1,12 @@
-import { CATEGORY_STRIPE_CLASS, getCategoryById } from '../utils/categories';
+import { CATEGORY_STRIPE_CLASS, TodoCategory, getCategoryById } from '../utils/categories';
 
 interface Props {
   categoryId: string;
+  categories: TodoCategory[];
 }
 
-export default function CategoryStripe({ categoryId }: Props) {
-  const category = getCategoryById(categoryId);
+export default function CategoryStripe({ categoryId, categories }: Props) {
+  const category = getCategoryById(categories, categoryId);
   if (!category) return null;
 
   return (

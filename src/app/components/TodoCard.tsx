@@ -1,6 +1,7 @@
 import { MdCalendarToday, MdOutlineAutorenew } from 'react-icons/md';
 import { FiCheck } from 'react-icons/fi';
 import { Todo } from '../types';
+import { TodoCategory } from '../utils/categories';
 import { formatDeadlineCardLine, isDeadlineExpired } from '../utils/date';
 import { formatRecurrenceLabel } from '../utils/recurrence';
 import StickerRow from './StickerRow';
@@ -8,11 +9,12 @@ import CategoryStripe from './CategoryStripe';
 
 interface Props {
   todo: Todo;
+  categories: TodoCategory[];
   onComplete: (id: string) => void;
   onOpen: (todo: Todo) => void;
 }
 
-export default function TodoCard({ todo, onComplete, onOpen }: Props) {
+export default function TodoCard({ todo, categories, onComplete, onOpen }: Props) {
   const isExpired = isDeadlineExpired(todo.deadline);
   const isRecurring = !!todo.recurrence;
   const missedCount = todo.missedCount ?? 0;
@@ -26,7 +28,9 @@ export default function TodoCard({ todo, onComplete, onOpen }: Props) {
 
   return (
     <article className="group flex overflow-hidden bg-surface rounded-2xl border border-border transition-all duration-200 hover:shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-      {todo.categoryId && <CategoryStripe categoryId={todo.categoryId} />}
+      {todo.categoryId && (
+        <CategoryStripe categoryId={todo.categoryId} categories={categories} />
+      )}
       <div className="flex-1 min-w-0 pt-2.5 pb-2 px-4">
         <button
           type="button"

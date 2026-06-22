@@ -1,8 +1,11 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
+import { MdSettings } from 'react-icons/md';
 import { TabType } from '../types';
 import { useTodos } from '../hooks/useTodos';
+import { useCategories } from '../hooks/useCategories';
 import TodoTab from './TodoTab';
 import RewardTab from './RewardTab';
 import StickerBanner from './StickerBanner';
@@ -23,6 +26,7 @@ export default function MainApp() {
     updateReward,
     deleteReward,
   } = useTodos();
+  const { categories } = useCategories();
 
   return (
     <div className="h-dvh bg-background overflow-hidden">
@@ -33,7 +37,16 @@ export default function MainApp() {
               <h1 className="text-2xl font-bold text-foreground tracking-tight">
                 해따
               </h1>
-              <StickerBanner count={totalStickers} />
+              <div className="flex items-center gap-2 shrink-0">
+                <StickerBanner count={totalStickers} />
+                <Link
+                  href="/settings"
+                  aria-label="설정"
+                  className="w-9 h-9 flex items-center justify-center rounded-lg text-muted hover:text-foreground hover:bg-background transition-colors active:scale-95"
+                >
+                  <MdSettings size={20} aria-hidden />
+                </Link>
+              </div>
             </div>
           </header>
 
@@ -41,6 +54,7 @@ export default function MainApp() {
             {activeTab === 'todo' ? (
               <TodoTab
                 todos={todos}
+                categories={categories}
                 onAddTodo={addTodo}
                 onUpdateTodo={updateTodo}
                 onDeleteTodo={deleteTodo}

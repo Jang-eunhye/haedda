@@ -204,6 +204,17 @@ export function useTodos() {
     setRewards(prev => prev.filter(r => r.id !== id));
   };
 
+  const clearCategoryFromTodos = (categoryId: string) => {
+    setTodos(prev =>
+      prev.map(t => {
+        if (t.categoryId !== categoryId) return t;
+        const next = { ...t };
+        delete next.categoryId;
+        return next;
+      })
+    );
+  };
+
   return {
     todos,
     rewards,
@@ -216,5 +227,6 @@ export function useTodos() {
     claimReward,
     updateReward,
     deleteReward,
+    clearCategoryFromTodos,
   };
 }

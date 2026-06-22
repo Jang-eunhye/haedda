@@ -1,4 +1,14 @@
-export type CategoryColor = 'red' | 'amber' | 'emerald';
+export type CategoryColor =
+  | 'red'
+  | 'orange'
+  | 'lime'
+  | 'yellow'
+  | 'indigo'
+  | 'teal'
+  | 'cyan'
+  | 'blue'
+  | 'violet'
+  | 'pink';
 
 export interface TodoCategory {
   id: string;
@@ -6,12 +16,53 @@ export interface TodoCategory {
   color: CategoryColor;
 }
 
-/** 관리 페이지 연동 전까지 모달·표시에 사용하는 기본 카테고리 */
+export const CATEGORY_COLORS: CategoryColor[] = [
+  'red',
+  'orange',
+  'yellow',
+  'lime',
+  'teal',
+  'cyan',
+  'blue',
+  'indigo',
+  'violet',
+  'pink',
+];
+
+/** 스크린 리더용 (UI에는 동그라미만 표시) */
+export const CATEGORY_COLOR_LABELS: Record<CategoryColor, string> = {
+  red: '빨강',
+  orange: '주황',
+  lime: '연두',
+  yellow: '노랑',
+  indigo: '남색',
+  teal: '청록',
+  cyan: '하늘',
+  blue: '파랑',
+  violet: '보라',
+  pink: '분홍',
+};
+
 export const DEFAULT_CATEGORIES: TodoCategory[] = [
   { id: 'work', label: '업무', color: 'red' },
-  { id: 'life', label: '생활', color: 'amber' },
-  { id: 'health', label: '건강', color: 'emerald' },
+  { id: 'life', label: '생활', color: 'yellow' },
+  { id: 'health', label: '건강', color: 'teal' },
 ];
+
+export const CATEGORY_COLOR_CLASS: Record<CategoryColor, string> = {
+  red: 'bg-red-500',
+  orange: 'bg-orange-500',
+  lime: 'bg-lime-500',
+  yellow: 'bg-yellow-400',
+  indigo: 'bg-indigo-500',
+  teal: 'bg-teal-500',
+  cyan: 'bg-cyan-500',
+  blue: 'bg-blue-500',
+  violet: 'bg-violet-500',
+  pink: 'bg-pink-500',
+};
+
+export const CATEGORY_STRIPE_CLASS = CATEGORY_COLOR_CLASS;
 
 export const CATEGORY_CHIP_CLASS: Record<
   CategoryColor,
@@ -22,24 +73,65 @@ export const CATEGORY_CHIP_CLASS: Record<
     unselected:
       'bg-red-50 text-red-700 border-red-200 hover:bg-red-100 hover:text-red-800',
   },
-  amber: {
-    selected: 'bg-accent text-white border-accent',
+  orange: {
+    selected: 'bg-orange-500 text-white border-orange-500',
     unselected:
-      'bg-accent-soft text-accent border-amber-200 hover:bg-accent-muted/40',
+      'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100 hover:text-orange-800',
   },
-  emerald: {
-    selected: 'bg-emerald-500 text-white border-emerald-500',
+  lime: {
+    selected: 'bg-lime-500 text-white border-lime-500',
     unselected:
-      'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:text-emerald-800',
+      'bg-lime-50 text-lime-800 border-lime-200 hover:bg-lime-100 hover:text-lime-900',
+  },
+  yellow: {
+    selected: 'bg-yellow-400 text-yellow-950 border-yellow-400',
+    unselected:
+      'bg-yellow-50 text-yellow-800 border-yellow-200 hover:bg-yellow-100 hover:text-yellow-900',
+  },
+  indigo: {
+    selected: 'bg-indigo-500 text-white border-indigo-500',
+    unselected:
+      'bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 hover:text-indigo-800',
+  },
+  teal: {
+    selected: 'bg-teal-500 text-white border-teal-500',
+    unselected:
+      'bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100 hover:text-teal-800',
+  },
+  cyan: {
+    selected: 'bg-cyan-500 text-white border-cyan-500',
+    unselected:
+      'bg-cyan-50 text-cyan-700 border-cyan-200 hover:bg-cyan-100 hover:text-cyan-800',
+  },
+  blue: {
+    selected: 'bg-blue-500 text-white border-blue-500',
+    unselected:
+      'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 hover:text-blue-800',
+  },
+  violet: {
+    selected: 'bg-violet-500 text-white border-violet-500',
+    unselected:
+      'bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100 hover:text-violet-800',
+  },
+  pink: {
+    selected: 'bg-pink-500 text-white border-pink-500',
+    unselected:
+      'bg-pink-50 text-pink-700 border-pink-200 hover:bg-pink-100 hover:text-pink-800',
   },
 };
 
-export const CATEGORY_STRIPE_CLASS: Record<CategoryColor, string> = {
-  red: 'bg-red-500',
-  amber: 'bg-accent',
-  emerald: 'bg-emerald-500',
-};
+export function normalizeCategoryColor(raw: unknown): CategoryColor | null {
+  if (raw === 'emerald' || raw === 'green') return 'teal';
+  if (raw === 'amber') return 'yellow';
+  if (typeof raw === 'string' && (CATEGORY_COLORS as string[]).includes(raw)) {
+    return raw as CategoryColor;
+  }
+  return null;
+}
 
-export function getCategoryById(id: string): TodoCategory | undefined {
-  return DEFAULT_CATEGORIES.find(c => c.id === id);
+export function getCategoryById(
+  categories: TodoCategory[],
+  id: string
+): TodoCategory | undefined {
+  return categories.find(c => c.id === id);
 }

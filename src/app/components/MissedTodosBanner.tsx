@@ -2,6 +2,7 @@
 
 import { MdKeyboardArrowDown, MdWarningAmber } from 'react-icons/md';
 import { Todo } from '../types';
+import { TodoCategory } from '../utils/categories';
 import TodoCard from './TodoCard';
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
   expanded: boolean;
   onToggle: () => void;
   todos: Todo[];
+  categories: TodoCategory[];
   onComplete: (id: string) => void;
   onOpen: (todo: Todo) => void;
 }
@@ -18,6 +20,7 @@ export default function MissedTodosBanner({
   expanded,
   onToggle,
   todos,
+  categories,
   onComplete,
   onOpen,
 }: Props) {
@@ -78,6 +81,7 @@ export default function MissedTodosBanner({
             <TodoCard
               key={todo.id}
               todo={todo}
+              categories={categories}
               onComplete={onComplete}
               onOpen={onOpen}
             />
