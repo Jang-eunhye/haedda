@@ -128,7 +128,7 @@ export default function TodoDetailModal({
                 size="lg"
                 crossedOut={isOneTimeExpired}
                 centered
-                className="gap-1 [--sticker-gap:0.25rem]"
+                className="gap-1"
               />
               {isOneTimeExpired && (
                 <p className="mt-2 text-xs text-muted text-center">

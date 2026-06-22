@@ -19,7 +19,7 @@ export default function StickerRow({
 }: Props) {
   return (
     <div
-      className={`flex flex-wrap items-center gap-0.5 [--sticker-gap:0.125rem] max-w-full ${
+      className={`flex flex-wrap items-center gap-0.5 max-w-full ${
         centered ? 'w-full justify-center' : 'w-fit'
       } ${className}`}
       aria-label={
