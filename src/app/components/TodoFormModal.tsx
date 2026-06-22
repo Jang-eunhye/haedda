@@ -129,12 +129,11 @@ export default function TodoFormModal({ onClose, onSave, todo }: Props) {
         onClick={e => e.stopPropagation()}
       >
         <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5 sm:hidden" />
-        <h3 className={`text-lg font-bold text-foreground ${isEdit ? 'mb-1' : 'mb-5'}`}>
-          {isEdit ? '할일 수정' : '할일 추가'}
-        </h3>
-        {isEdit && (
-          <p className="text-xs text-muted mb-5">할일 내용을 수정해 보세요</p>
-        )}
+        <div className="flex items-center justify-center min-h-[36px] mb-5">
+          <span className="text-sm font-semibold text-muted">
+            {isEdit ? '할일 수정' : '새 할일'}
+          </span>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-0">
           <div>

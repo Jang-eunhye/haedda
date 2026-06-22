@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Reward } from '../types';
-import { MdClose, MdDeleteOutline } from 'react-icons/md';
+import { MdDeleteOutline } from 'react-icons/md';
 import StickerCountPicker from './StickerCountPicker';
 
 const CONTENT_MAX = 50;
@@ -48,19 +48,15 @@ export default function RewardFormModal({ onClose, onSave, onDelete, reward }: P
       >
         <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5 sm:hidden" />
 
-        <div className="relative flex items-center justify-center min-h-[36px] mb-5">
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="닫기"
-            className="absolute left-0 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-lg text-muted hover:text-foreground hover:bg-background transition-colors active:scale-95"
-          >
-            <MdClose size={20} aria-hidden />
-          </button>
+        <div
+          className={`flex items-center justify-center min-h-[36px] mb-5 ${
+            isEdit && onDelete ? 'relative' : ''
+          }`}
+        >
           <span className="text-sm font-semibold text-muted">
             {isEdit ? '보상 수정' : '새 보상'}
           </span>
-          {isEdit && onDelete ? (
+          {isEdit && onDelete && (
             <button
               type="button"
               onClick={onDelete}
@@ -69,8 +65,6 @@ export default function RewardFormModal({ onClose, onSave, onDelete, reward }: P
             >
               <MdDeleteOutline size={18} aria-hidden />
             </button>
-          ) : (
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-9 h-9" aria-hidden />
           )}
         </div>
 
