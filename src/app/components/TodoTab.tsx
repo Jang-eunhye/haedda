@@ -12,9 +12,10 @@ import EmptyState from './EmptyState';
 import Fab from './Fab';
 import SortSelect from './SortSelect';
 import FilterChips from './FilterChips';
+import CategoryFilterChips from './CategoryFilterChips';
 import FilterExcludeOption from './FilterExcludeOption';
 import MissedTodosBanner from './MissedTodosBanner';
-import { isMissedTodo, matchesTodoFilter, sortMissedTodos, TodoFilter } from '../utils/todoFilter';
+import { isMissedTodo, matchesCategoryFilter, matchesTodoFilter, sortMissedTodos, TodoFilter } from '../utils/todoFilter';
 
 const APP_TAGLINE = '할일을 완료하고 스티커를 모아보세요';
 
@@ -58,6 +59,7 @@ export default function TodoTab({
   const [completeResult, setCompleteResult] = useState<TodoCompleteResult | null>(null);
   const [sort, setSort] = useState<TodoSort>('recent');
   const [filter, setFilter] = useState<TodoFilter>('today');
+  const [categoryFilter, setCategoryFilter] = useState('all');
   const [excludeTodayFromWeek, setExcludeTodayFromWeek] = useState(true);
   const [excludeWeekFromMonth, setExcludeWeekFromMonth] = useState(true);
   const [missedExpanded, setMissedExpanded] = useState(false);
@@ -78,8 +80,13 @@ export default function TodoTab({
   }, [missedTodoCount]);
 
   const filteredTodos = useMemo(
-    () => todos.filter(todo => matchesTodoFilter(todo, filter, filterOptions)),
-    [todos, filter, filterOptions]
+    () =>
+      todos.filter(
+        todo =>
+          matchesTodoFilter(todo, filter, filterOptions) &&
+          matchesCategoryFilter(todo, categoryFilter)
+      ),
+    [todos, filter, filterOptions, categoryFilter]
   );
 
   const sortedTodos = useMemo(() => {
@@ -142,6 +149,10 @@ export default function TodoTab({
                   onChange={setFilter}
                   options={TODO_FILTER_OPTIONS}
                   ariaLabel="할일 필터"
+                />
+                <CategoryFilterChips
+                  value={categoryFilter}
+                  onChange={setCategoryFilter}
                 />
                 <div className="flex items-center justify-end gap-3">
                   {filter === 'week' && (

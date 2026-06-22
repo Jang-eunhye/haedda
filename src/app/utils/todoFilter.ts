@@ -46,6 +46,12 @@ export function isLaterTodo(todo: Todo): boolean {
   return !todo.deadline;
 }
 
+export function matchesCategoryFilter(todo: Todo, categoryFilter: string): boolean {
+  if (categoryFilter === 'all') return true;
+  if (categoryFilter === 'uncategorized') return !todo.categoryId;
+  return todo.categoryId === categoryFilter;
+}
+
 export function matchesTodoFilter(
   todo: Todo,
   filter: TodoFilter,

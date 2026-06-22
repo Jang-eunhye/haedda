@@ -34,6 +34,12 @@ export const CATEGORY_CHIP_CLASS: Record<
   },
 };
 
+export const CATEGORY_STRIPE_CLASS: Record<CategoryColor, string> = {
+  red: 'bg-red-500',
+  amber: 'bg-accent',
+  emerald: 'bg-emerald-500',
+};
+
 export function getCategoryById(id: string): TodoCategory | undefined {
   return DEFAULT_CATEGORIES.find(c => c.id === id);
 }

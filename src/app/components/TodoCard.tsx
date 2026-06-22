@@ -4,6 +4,7 @@ import { Todo } from '../types';
 import { formatDeadlineCardLine, isDeadlineExpired } from '../utils/date';
 import { formatRecurrenceLabel } from '../utils/recurrence';
 import StickerRow from './StickerRow';
+import CategoryStripe from './CategoryStripe';
 
 interface Props {
   todo: Todo;
@@ -17,7 +18,6 @@ export default function TodoCard({ todo, onComplete, onOpen }: Props) {
   const missedCount = todo.missedCount ?? 0;
   const streak = todo.consecutiveCompletions ?? 0;
   const isOneTimeExpired = !isRecurring && isExpired;
-  const showMissedStripe = isRecurring && missedCount > 0;
   const deadlineLine = formatDeadlineCardLine(todo.deadline);
   const showStickerRow = todo.stickerCount > 0;
   const showRecurringStatus =
@@ -26,9 +26,7 @@ export default function TodoCard({ todo, onComplete, onOpen }: Props) {
 
   return (
     <article className="group flex overflow-hidden bg-surface rounded-2xl border border-border transition-all duration-200 hover:shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-      {showMissedStripe && (
-        <div className="w-1 shrink-0 bg-danger" aria-hidden />
-      )}
+      {todo.categoryId && <CategoryStripe categoryId={todo.categoryId} />}
       <div className="flex-1 min-w-0 pt-2.5 pb-2 px-4">
         <button
           type="button"
