@@ -123,14 +123,6 @@ export default function TodoTab({
         />
       ) : (
         <>
-          <div className="shrink-0 mb-3">
-            <h2 className="text-base font-bold text-foreground tracking-tight">
-              할일
-              <span className="text-sm font-semibold text-muted tabular-nums">
-                ({sortedTodos.length})
-              </span>
-            </h2>
-          </div>
           {missedTodoCount > 0 && (
             <MissedTodosBanner
               count={missedTodoCount}
