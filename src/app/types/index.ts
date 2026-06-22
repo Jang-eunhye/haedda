@@ -19,6 +19,8 @@ export interface Todo {
   missedCount?: number;
   /** 반복 할일: 기한 내 연속 완료 수 */
   consecutiveCompletions?: number;
+  /** 카테고리 id (선택) */
+  categoryId?: string;
 }
 
 export interface Reward {

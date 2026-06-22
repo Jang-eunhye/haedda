@@ -13,6 +13,8 @@ import RecurrencePicker, {
   RecurrenceFrequency,
 } from './RecurrencePicker';
 import StickerCountPicker from './StickerCountPicker';
+import CategoryPicker from './CategoryPicker';
+import { DEFAULT_CATEGORIES } from '../utils/categories';
 
 const CONTENT_MAX = 50;
 const MEMO_MAX = 200;
@@ -49,6 +51,7 @@ export default function TodoFormModal({ onClose, onSave, todo }: Props) {
     typeof todo?.recurrence?.dayOfMonth === 'number' ? todo.recurrence.dayOfMonth : 1
   );
   const [memoOpen, setMemoOpen] = useState(!!todo?.memo?.trim());
+  const [categoryId, setCategoryId] = useState<string | undefined>(todo?.categoryId);
   const [mounted, setMounted] = useState(false);
   const contentRef = useRef<HTMLTextAreaElement>(null);
 
@@ -110,6 +113,7 @@ export default function TodoFormModal({ onClose, onSave, todo }: Props) {
       stickerCount: hasSticker ? stickerCount : 0,
       memo: trimmedMemo || undefined,
       recurrence,
+      categoryId,
     });
   };
 
@@ -157,6 +161,17 @@ export default function TodoFormModal({ onClose, onSave, todo }: Props) {
                 {content.length}/{CONTENT_MAX}
               </span>
             </div>
+          </div>
+
+          <div className="border-t border-border/50 pt-5 mt-5">
+            <p className="text-sm font-semibold text-foreground mb-2">
+              카테고리 <span className="text-xs font-normal text-muted">(선택)</span>
+            </p>
+            <CategoryPicker
+              value={categoryId}
+              onChange={setCategoryId}
+              categories={DEFAULT_CATEGORIES}
+            />
           </div>
 
           <div className="border-t border-border/50 pt-5 mt-5">

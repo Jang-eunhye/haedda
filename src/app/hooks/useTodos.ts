@@ -38,12 +38,14 @@ function normalizeTodo(raw: unknown): Todo | null {
     typeof m.deadline === 'string' ? normalizeDeadline(m.deadline) : undefined;
   const recurrence = normalizeRecurrence(m.recurrence);
   const memo = typeof m.memo === 'string' ? m.memo.trim() : undefined;
+  const categoryId = typeof m.categoryId === 'string' ? m.categoryId : undefined;
   const todo: Todo = {
     id: m.id,
     content: m.content,
     stickerCount: m.stickerCount,
     ...(deadline ? { deadline } : {}),
     ...(memo ? { memo } : {}),
+    ...(categoryId ? { categoryId } : {}),
     recurrence,
     missedCount: typeof m.missedCount === 'number' ? m.missedCount : 0,
     consecutiveCompletions:
@@ -110,12 +112,13 @@ export function useTodos() {
   }, [totalStickers, ready]);
 
   const addTodo = (data: TodoInput) => {
-    const { memo, deadline, ...rest } = data;
+    const { memo, deadline, categoryId, ...rest } = data;
     const todo: Todo = {
       ...rest,
       id: crypto.randomUUID(),
       ...(deadline ? { deadline } : {}),
       ...(memo ? { memo } : {}),
+      ...(categoryId ? { categoryId } : {}),
     };
     setTodos(prev => [...prev, todo]);
   };
@@ -183,6 +186,7 @@ export function useTodos() {
         const next = { ...t, ...data };
         if (!data.memo) delete next.memo;
         if (!data.deadline) delete next.deadline;
+        if (!data.categoryId) delete next.categoryId;
         return next;
       })
     );
