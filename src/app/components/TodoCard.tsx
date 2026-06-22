@@ -20,62 +20,70 @@ export default function TodoCard({ todo, onComplete, onOpen }: Props) {
   const showMissedStripe = isRecurring && missedCount > 0;
   const deadlineLine = formatDeadlineCardLine(todo.deadline);
   const showStickerRow = todo.stickerCount > 0;
+  const showRecurringStatus =
+    (isRecurring && missedCount > 0) || (isRecurring && missedCount === 0 && streak > 0);
+  const showMetaSection = showRecurringStatus || !!deadlineLine;
 
   return (
     <article className="group flex overflow-hidden bg-surface rounded-2xl border border-border transition-all duration-200 hover:shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
       {showMissedStripe && (
         <div className="w-1 shrink-0 bg-danger" aria-hidden />
       )}
-      <div className="flex-1 min-w-0 py-4 px-4">
+      <div className="flex-1 min-w-0 pt-2.5 pb-2 px-4">
         <button
           type="button"
           onClick={() => onOpen(todo)}
-          className="w-full text-left cursor-pointer rounded-xl -m-1 p-1 hover:bg-background/60 transition-colors active:scale-[0.995]"
+          className="w-full text-left cursor-pointer rounded-xl -m-1 p-1 hover:bg-background/60 transition-colors active:scale-[0.995] flex flex-col gap-1.5"
         >
-          {showStickerRow && (
-            <StickerRow
-              count={todo.stickerCount}
-              size="md"
-              crossedOut={isOneTimeExpired}
-              className="mb-2"
-            />
-          )}
-
-          <p className="font-medium text-[15px] leading-snug break-words text-foreground">
-            {isRecurring && todo.recurrence && (
-              <span className="inline-flex align-middle shrink-0 items-center gap-1 mr-1.5 text-[11px] font-semibold text-accent bg-accent-soft px-2 py-0.5 rounded-full border border-accent-muted/50">
-                <MdOutlineAutorenew size={12} className="shrink-0" aria-hidden />
-                {formatRecurrenceLabel(todo.recurrence)}
-              </span>
+          <div className="flex flex-col gap-1.5">
+            {showStickerRow && (
+              <StickerRow
+                count={todo.stickerCount}
+                size="md"
+                crossedOut={isOneTimeExpired}
+              />
             )}
-            {todo.content}
-          </p>
 
-          {isRecurring && missedCount > 0 && (
-            <p className="mt-1.5 text-xs text-danger">미완료 {missedCount}회</p>
-          )}
+            <div className="flex items-center flex-wrap gap-x-1.5 font-medium text-[15px] leading-snug break-words text-foreground">
+              {isRecurring && todo.recurrence && (
+                <span className="inline-flex align-middle shrink-0 items-center gap-1 text-[11px] font-semibold text-accent bg-accent-soft px-2 py-0.5 rounded-full border border-accent-muted/50">
+                  <MdOutlineAutorenew size={12} className="shrink-0" aria-hidden />
+                  {formatRecurrenceLabel(todo.recurrence)}
+                </span>
+              )}
+              {todo.content}
+            </div>
+          </div>
 
-          {isRecurring && missedCount === 0 && streak > 0 && (
-            <p className="mt-1.5 text-xs text-success">{streak}회 연속 완료</p>
-          )}
+          {showMetaSection && (
+            <div className="flex flex-col gap-1">
+              {isRecurring && missedCount > 0 && (
+                <p className="text-xs text-danger">미완료 {missedCount}회</p>
+              )}
 
-          {deadlineLine && (
-            <div
-              className={`mt-2 text-xs flex items-center gap-1.5 flex-wrap ${
-                isOneTimeExpired ? 'text-danger' : 'text-muted'
-              }`}
-            >
-              <MdCalendarToday size={14} className="shrink-0" aria-hidden />
-              <span>{deadlineLine.label}</span>
-              <span
-                className={`inline-flex items-center text-[11px] font-semibold tabular-nums px-2 py-0.5 rounded-full border ${
-                  isOneTimeExpired
-                    ? 'text-danger bg-red-50 border-danger/20'
-                    : 'text-muted bg-background border-border'
-                }`}
-              >
-                {deadlineLine.dday}
-              </span>
+              {isRecurring && missedCount === 0 && streak > 0 && (
+                <p className="text-xs text-success">{streak}회 연속 완료</p>
+              )}
+
+              {deadlineLine && (
+                <div
+                  className={`text-xs flex items-center gap-1.5 flex-wrap ${
+                    isOneTimeExpired ? 'text-danger' : 'text-muted'
+                  }`}
+                >
+                  <MdCalendarToday size={14} className="shrink-0" aria-hidden />
+                  <span>{deadlineLine.label}</span>
+                  <span
+                    className={`inline-flex items-center text-[11px] font-semibold tabular-nums px-2 py-0.5 rounded-full border ${
+                      isOneTimeExpired
+                        ? 'text-danger bg-red-50 border-danger/20'
+                        : 'text-muted bg-background border-border'
+                    }`}
+                  >
+                    {deadlineLine.dday}
+                  </span>
+                </div>
+              )}
             </div>
           )}
 
