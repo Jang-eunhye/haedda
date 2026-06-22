@@ -57,7 +57,7 @@ export default function TodoTab({
   const [deleteTarget, setDeleteTarget] = useState<Todo | null>(null);
   const [completeResult, setCompleteResult] = useState<TodoCompleteResult | null>(null);
   const [sort, setSort] = useState<TodoSort>('recent');
-  const [filter, setFilter] = useState<TodoFilter>('all');
+  const [filter, setFilter] = useState<TodoFilter>('today');
   const [excludeTodayFromWeek, setExcludeTodayFromWeek] = useState(true);
   const [excludeWeekFromMonth, setExcludeWeekFromMonth] = useState(true);
   const [missedExpanded, setMissedExpanded] = useState(false);
