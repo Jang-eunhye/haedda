@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { MdKeyboardArrowDown } from 'react-icons/md';
 import { Todo, TodoInput } from '../types';
 import { getTodayISO, normalizeDeadline } from '../utils/date';
 import { computeNextDeadline } from '../utils/recurrence';
@@ -47,7 +48,30 @@ export default function TodoFormModal({ onClose, onSave, todo }: Props) {
   const [dayOfMonth, setDayOfMonth] = useState<number>(
     typeof todo?.recurrence?.dayOfMonth === 'number' ? todo.recurrence.dayOfMonth : 1
   );
+  const [memoOpen, setMemoOpen] = useState(!!todo?.memo?.trim());
   const [mounted, setMounted] = useState(false);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+
+  const resizeContentField = useCallback(() => {
+    const el = contentRef.current;
+    if (!el) return;
+
+    const style = getComputedStyle(el);
+    const lineHeight = parseFloat(style.lineHeight) || 20;
+    const padding =
+      parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+    const oneLine = lineHeight + padding;
+    const twoLine = lineHeight * 2 + padding;
+
+    el.style.height = 'auto';
+    const scrollHeight = el.scrollHeight;
+
+    if (scrollHeight <= twoLine) {
+      el.style.height = `${Math.max(oneLine, scrollHeight)}px`;
+    } else {
+      el.style.height = `${scrollHeight}px`;
+    }
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -56,6 +80,10 @@ export default function TodoFormModal({ onClose, onSave, todo }: Props) {
       document.body.style.overflow = '';
     };
   }, []);
+
+  useEffect(() => {
+    resizeContentField();
+  }, [content, resizeContentField]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,11 +143,12 @@ export default function TodoFormModal({ onClose, onSave, todo }: Props) {
             </label>
             <div className="relative">
               <textarea
+                ref={contentRef}
                 value={content}
                 onChange={e => setContent(e.target.value.slice(0, CONTENT_MAX))}
                 placeholder="무엇을 할까요?"
-                rows={3}
-                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-colors placeholder:text-muted/60"
+                rows={1}
+                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm leading-normal resize-none overflow-hidden focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-colors placeholder:text-muted/60"
               />
               <span
                 className={`absolute bottom-3 right-3 text-xs tabular-nums ${
@@ -132,25 +161,41 @@ export default function TodoFormModal({ onClose, onSave, todo }: Props) {
           </div>
 
           <div className="border-t border-border/50 pt-5 mt-5">
-            <label className="block text-sm font-semibold text-foreground mb-2">
-              메모 <span className="text-xs font-normal text-muted">(선택)</span>
-            </label>
-            <div className="relative">
-              <textarea
-                value={memo}
-                onChange={e => setMemo(e.target.value.slice(0, MEMO_MAX))}
-                placeholder="메모를 남겨보세요"
-                rows={3}
-                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-colors placeholder:text-muted/60"
-              />
-              <span
-                className={`absolute bottom-3 right-3 text-xs tabular-nums ${
-                  memo.length >= MEMO_MAX ? 'text-danger' : 'text-muted/60'
-                }`}
-              >
-                {memo.length}/{MEMO_MAX}
+            <button
+              type="button"
+              onClick={() => setMemoOpen(open => !open)}
+              aria-expanded={memoOpen}
+              className="flex w-full items-center justify-between gap-3 text-left"
+            >
+              <span className="text-sm font-semibold text-foreground">
+                메모 <span className="text-xs font-normal text-muted">(선택)</span>
               </span>
-            </div>
+              <MdKeyboardArrowDown
+                size={20}
+                className={`shrink-0 text-muted transition-transform duration-200 ${
+                  memoOpen ? 'rotate-180' : ''
+                }`}
+                aria-hidden
+              />
+            </button>
+            {memoOpen && (
+              <div className="relative mt-2">
+                <textarea
+                  value={memo}
+                  onChange={e => setMemo(e.target.value.slice(0, MEMO_MAX))}
+                  placeholder="메모를 남겨보세요"
+                  rows={3}
+                  className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-colors placeholder:text-muted/60"
+                />
+                <span
+                  className={`absolute bottom-3 right-3 text-xs tabular-nums ${
+                    memo.length >= MEMO_MAX ? 'text-danger' : 'text-muted/60'
+                  }`}
+                >
+                  {memo.length}/{MEMO_MAX}
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="border-t border-border/50 pt-5 mt-5">
