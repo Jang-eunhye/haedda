@@ -4,6 +4,11 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Todo } from "../types";
 import {
+  CATEGORY_CHIP_CLASS,
+  getCategoryById,
+  TodoCategory,
+} from "../utils/categories";
+import {
   formatDeadlineDisplay,
   formatDeadlineDDay,
   isDeadlineExpired,
@@ -16,6 +21,7 @@ import StickerRow from "./StickerRow";
 
 interface Props {
   todo: Todo;
+  categories: TodoCategory[];
   onClose: () => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -54,6 +60,7 @@ function InfoRow({
 
 export default function TodoDetailModal({
   todo,
+  categories,
   onClose,
   onEdit,
   onDelete,
@@ -68,6 +75,9 @@ export default function TodoDetailModal({
   const deadlineStatus = getDeadlineStatus(todo.deadline, isRecurring);
   const showStreak = isRecurring && streak > 0;
   const showMissed = isRecurring && missedCount > 0;
+  const category = todo.categoryId
+    ? getCategoryById(categories, todo.categoryId)
+    : undefined;
 
   useEffect(() => {
     setMounted(true);
@@ -171,6 +181,17 @@ export default function TodoDetailModal({
           )}
 
           <div className="mt-4 rounded-2xl bg-background border border-border divide-y divide-border">
+            <InfoRow label="카테고리">
+              {category ? (
+                <span
+                  className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold border ${CATEGORY_CHIP_CLASS[category.color].selected}`}
+                >
+                  {category.label}
+                </span>
+              ) : (
+                <span className="text-muted">미분류</span>
+              )}
+            </InfoRow>
             <InfoRow label="마감일">
               {formatDeadlineDisplay(todo.deadline)}
             </InfoRow>

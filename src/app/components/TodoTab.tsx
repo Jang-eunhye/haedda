@@ -221,6 +221,7 @@ export default function TodoTab({
       {detailTarget && (
         <TodoDetailModal
           todo={detailTarget}
+          categories={categories}
           onClose={() => setDetailTarget(null)}
           onEdit={() => {
             setEditTarget(detailTarget);
