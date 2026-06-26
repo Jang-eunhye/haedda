@@ -10,6 +10,7 @@ import TodoTab from './TodoTab';
 import RewardTab from './RewardTab';
 import StickerBanner from './StickerBanner';
 import BottomNav from './BottomNav';
+import HaeddaLogo from './HaeddaLogo';
 
 export default function MainApp() {
   const [activeTab, setActiveTab] = useState<TabType>('todo');
@@ -34,8 +35,8 @@ export default function MainApp() {
         <div className="flex flex-col h-full bg-surface sm:rounded-3xl sm:shadow-[0_1px_3px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.04)] sm:border sm:border-border overflow-hidden">
           <header className="shrink-0 px-5 pt-5 pb-4 sm:px-6 border-b border-border/60">
             <div className="flex items-center justify-between gap-4">
-              <h1 className="text-2xl font-bold text-foreground tracking-tight">
-                해따
+              <h1 className="m-0 shrink-0">
+                <HaeddaLogo height={44} />
               </h1>
               <div className="flex items-center gap-2 shrink-0">
                 <StickerBanner count={totalStickers} />

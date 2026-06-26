@@ -16,11 +16,26 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "해따",
   description: "할일을 완료하고 스티커를 모아보세요",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "해따",
+    startupImage: "/splash.svg",
+  },
+  icons: {
+    icon: [
+      { url: "/icons/app-icon.svg", type: "image/svg+xml" },
+      { url: "/HAEDDA.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/icons/app-icon.svg",
+  },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  themeColor: "#f59e0b",
 };
 
 export default function RootLayout({

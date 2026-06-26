@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import HaeddaLogo from './HaeddaLogo';
 
 const EMBEDDED_BUILD_ID = process.env.NEXT_PUBLIC_BUILD_ID ?? '';
 
@@ -48,8 +49,9 @@ export default function AppVersionGuard({ children }: { children: React.ReactNod
 
   if (!verified) {
     return (
-      <div className="h-dvh flex items-center justify-center bg-background text-sm text-muted">
-        업데이트 확인 중…
+      <div className="h-dvh flex flex-col items-center justify-center gap-5 bg-background">
+        <HaeddaLogo height={44} />
+        <p className="text-sm text-muted">업데이트 확인 중…</p>
       </div>
     );
   }
