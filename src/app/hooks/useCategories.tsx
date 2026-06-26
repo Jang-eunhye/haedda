@@ -28,6 +28,7 @@ interface CategoriesContextValue {
   addCategory: (data: CategoryInput) => TodoCategory | null;
   updateCategory: (id: string, data: CategoryInput) => boolean;
   deleteCategory: (id: string) => boolean;
+  reorderCategories: (next: TodoCategory[]) => void;
 }
 
 const CategoriesContext = createContext<CategoriesContextValue | null>(null);
@@ -108,14 +109,19 @@ export function CategoriesProvider({ children }: { children: React.ReactNode }) 
     return removed;
   }, []);
 
+  const reorderCategories = useCallback((next: TodoCategory[]) => {
+    setCategories(next);
+  }, []);
+
   const value = useMemo(
     () => ({
       categories,
       addCategory,
       updateCategory,
       deleteCategory,
+      reorderCategories,
     }),
-    [categories, addCategory, updateCategory, deleteCategory]
+    [categories, addCategory, updateCategory, deleteCategory, reorderCategories]
   );
 
   return (

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
   CategoryColor,
-  CATEGORY_COLOR_CLASS,
+  CATEGORY_CHIP_CLASS,
   CATEGORY_COLOR_LABELS,
   CATEGORY_COLORS,
   TodoCategory,
@@ -77,12 +77,13 @@ export default function CategoryFormModal({ onClose, onSave, category }: Props) 
               색상
             </label>
             <div
-              className="flex flex-wrap gap-3"
+              className="flex flex-wrap gap-1.5"
               role="radiogroup"
               aria-label="카테고리 색상"
             >
               {CATEGORY_COLORS.map(value => {
                 const selected = color === value;
+                const styles = CATEGORY_CHIP_CLASS[value];
                 return (
                   <button
                     key={value}
@@ -91,12 +92,12 @@ export default function CategoryFormModal({ onClose, onSave, category }: Props) 
                     aria-checked={selected}
                     aria-label={CATEGORY_COLOR_LABELS[value]}
                     onClick={() => setColor(value)}
-                    className={`w-8 h-8 rounded-full shrink-0 transition-all active:scale-95 ${CATEGORY_COLOR_CLASS[value]} ${
-                      selected
-                        ? 'ring-2 ring-offset-2 ring-foreground scale-110'
-                        : 'hover:scale-105 opacity-80 hover:opacity-100'
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all active:scale-[0.97] ${
+                      selected ? styles.selected : styles.unselected
                     }`}
-                  />
+                  >
+                    Aa
+                  </button>
                 );
               })}
             </div>

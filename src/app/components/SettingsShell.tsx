@@ -26,7 +26,7 @@ export default function SettingsShell({ title, backHref = '/', children }: Props
               <h1 className="text-lg font-bold text-foreground tracking-tight">{title}</h1>
             </div>
           </header>
-          <main className="flex-1 min-h-0 overflow-y-auto px-4 py-4 sm:px-6">{children}</main>
+          <main className="flex-1 min-h-0 overflow-y-auto px-4 pb-4 sm:px-6">{children}</main>
         </div>
       </div>
     </div>
