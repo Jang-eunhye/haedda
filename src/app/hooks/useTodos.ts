@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Todo, Reward, TodoInput, TodoCompleteResult, TodoRecurrence } from '../types';
 import { isDeadlineExpired, normalizeDeadline } from '../utils/date';
 import { computeNextDeadlineAfter, refreshRecurringTodo } from '../utils/recurrence';
@@ -79,15 +79,72 @@ function loadTodosFromStorage(): Todo[] {
   return [];
 }
 
+/** 로드 시 refresh 결과만 storage에 반영 (categoryId 등 다른 필드는 유지) */
+function persistRecurringRefresh(refreshedTodos: Todo[]): void {
+  try {
+    const raw = localStorage.getItem(TODOS_KEY);
+    if (!raw) return;
+
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return;
+
+    const refreshedById = new Map(
+      refreshedTodos.filter(t => t.recurrence).map(t => [t.id, t])
+    );
+
+    let changed = false;
+    const merged = parsed.map(item => {
+      if (!item || typeof item !== 'object') return item;
+      const record = item as Record<string, unknown>;
+      const id = typeof record.id === 'string' ? record.id : null;
+      if (!id) return item;
+
+      const refreshed = refreshedById.get(id);
+      if (!refreshed) return item;
+
+      const next = { ...record };
+      let itemChanged = false;
+
+      const newMissed = refreshed.missedCount ?? 0;
+      const oldMissed = typeof record.missedCount === 'number' ? record.missedCount : 0;
+      if (newMissed !== oldMissed) {
+        next.missedCount = newMissed;
+        itemChanged = true;
+      }
+
+      const newDeadline = refreshed.deadline;
+      const oldDeadline = typeof record.deadline === 'string' ? record.deadline : undefined;
+      if (newDeadline !== oldDeadline) {
+        if (newDeadline) next.deadline = newDeadline;
+        else delete next.deadline;
+        itemChanged = true;
+      }
+
+      if (itemChanged) {
+        changed = true;
+        return next;
+      }
+      return item;
+    });
+
+    if (changed) {
+      localStorage.setItem(TODOS_KEY, JSON.stringify(merged));
+    }
+  } catch {}
+}
+
 export function useTodos() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [totalStickers, setTotalStickers] = useState<number>(0);
   const [ready, setReady] = useState(false);
+  const userMutatedRef = useRef(false);
 
   useEffect(() => {
     try {
-      setTodos(loadTodosFromStorage());
+      const loaded = loadTodosFromStorage();
+      persistRecurringRefresh(loaded);
+      setTodos(loaded);
       const r = localStorage.getItem(REWARDS_KEY);
       const s = localStorage.getItem(STICKERS_KEY);
       if (r) setRewards(JSON.parse(r));
@@ -97,7 +154,7 @@ export function useTodos() {
   }, []);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || !userMutatedRef.current) return;
     localStorage.setItem(TODOS_KEY, JSON.stringify(todos));
   }, [todos, ready]);
 
@@ -112,6 +169,7 @@ export function useTodos() {
   }, [totalStickers, ready]);
 
   const addTodo = (data: TodoInput) => {
+    userMutatedRef.current = true;
     const { memo, deadline, categoryId, ...rest } = data;
     const todo: Todo = {
       ...rest,
@@ -124,6 +182,7 @@ export function useTodos() {
   };
 
   const completeTodo = (id: string): TodoCompleteResult | null => {
+    userMutatedRef.current = true;
     let result: TodoCompleteResult | null = null;
     setTodos(prev => {
       const todo = prev.find(t => t.id === id);
@@ -180,6 +239,7 @@ export function useTodos() {
   };
 
   const updateTodo = (id: string, data: TodoInput) => {
+    userMutatedRef.current = true;
     setTodos(prev =>
       prev.map(t => {
         if (t.id !== id) return t;
@@ -193,6 +253,7 @@ export function useTodos() {
   };
 
   const deleteTodo = (id: string) => {
+    userMutatedRef.current = true;
     setTodos(prev => prev.filter(t => t.id !== id));
   };
 
@@ -205,6 +266,7 @@ export function useTodos() {
   };
 
   const clearCategoryFromTodos = (categoryId: string) => {
+    userMutatedRef.current = true;
     setTodos(prev =>
       prev.map(t => {
         if (t.categoryId !== categoryId) return t;
