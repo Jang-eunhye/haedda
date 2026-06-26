@@ -10,9 +10,8 @@ import {
 } from 'react';
 import {
   CategoryColor,
-  DEFAULT_CATEGORIES,
+  createDefaultCategories,
   TodoCategory,
-  getCategoryById,
   normalizeCategoryColor,
 } from '../utils/categories';
 
@@ -26,11 +25,9 @@ export interface CategoryInput {
 
 interface CategoriesContextValue {
   categories: TodoCategory[];
-  ready: boolean;
   addCategory: (data: CategoryInput) => TodoCategory | null;
   updateCategory: (id: string, data: CategoryInput) => boolean;
   deleteCategory: (id: string) => boolean;
-  getById: (id: string) => TodoCategory | undefined;
 }
 
 const CategoriesContext = createContext<CategoriesContextValue | null>(null);
@@ -47,17 +44,19 @@ function normalizeCategory(raw: unknown): TodoCategory | null {
 }
 
 function loadCategoriesFromStorage(): TodoCategory[] {
+  const stored = localStorage.getItem(CATEGORIES_KEY);
+  if (stored === null) {
+    return createDefaultCategories();
+  }
   try {
-    const stored = localStorage.getItem(CATEGORIES_KEY);
-    if (stored) {
-      const parsed: unknown[] = JSON.parse(stored);
-      const categories = parsed
-        .map(normalizeCategory)
-        .filter((x): x is TodoCategory => x !== null);
-      if (categories.length > 0) return categories;
-    }
-  } catch {}
-  return DEFAULT_CATEGORIES;
+    const parsed: unknown = JSON.parse(stored);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map(normalizeCategory)
+      .filter((x): x is TodoCategory => x !== null);
+  } catch {
+    return [];
+  }
 }
 
 function normalizeLabel(label: string): string {
@@ -65,7 +64,7 @@ function normalizeLabel(label: string): string {
 }
 
 export function CategoriesProvider({ children }: { children: React.ReactNode }) {
-  const [categories, setCategories] = useState<TodoCategory[]>(DEFAULT_CATEGORIES);
+  const [categories, setCategories] = useState<TodoCategory[]>([]);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -77,11 +76,6 @@ export function CategoriesProvider({ children }: { children: React.ReactNode }) 
     if (!ready) return;
     localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
   }, [categories, ready]);
-
-  const getById = useCallback(
-    (id: string) => getCategoryById(categories, id),
-    [categories]
-  );
 
   const addCategory = useCallback((data: CategoryInput): TodoCategory | null => {
     const label = normalizeLabel(data.label);
@@ -117,13 +111,11 @@ export function CategoriesProvider({ children }: { children: React.ReactNode }) 
   const value = useMemo(
     () => ({
       categories,
-      ready,
       addCategory,
       updateCategory,
       deleteCategory,
-      getById,
     }),
-    [categories, ready, addCategory, updateCategory, deleteCategory, getById]
+    [categories, addCategory, updateCategory, deleteCategory]
   );
 
   return (

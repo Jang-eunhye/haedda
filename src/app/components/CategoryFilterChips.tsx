@@ -2,7 +2,6 @@
 
 import {
   CATEGORY_CHIP_CLASS,
-  DEFAULT_CATEGORIES,
   TodoCategory,
 } from '../utils/categories';
 
@@ -21,7 +20,7 @@ const UNCATEGORIZED_CHIP_CLASS = {
 export default function CategoryFilterChips({
   value,
   onChange,
-  categories = DEFAULT_CATEGORIES,
+  categories = [],
 }: Props) {
   const uncategorizedSelected = value === 'uncategorized';
 

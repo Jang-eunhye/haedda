@@ -16,6 +16,14 @@ export interface TodoCategory {
   color: CategoryColor;
 }
 
+export function createDefaultCategories(): TodoCategory[] {
+  return [
+    { id: crypto.randomUUID(), label: '업무', color: 'red' },
+    { id: crypto.randomUUID(), label: '일정', color: 'blue' },
+    { id: crypto.randomUUID(), label: '일상', color: 'yellow' },
+  ];
+}
+
 export const CATEGORY_COLORS: CategoryColor[] = [
   'red',
   'orange',
@@ -42,12 +50,6 @@ export const CATEGORY_COLOR_LABELS: Record<CategoryColor, string> = {
   violet: '보라',
   pink: '분홍',
 };
-
-export const DEFAULT_CATEGORIES: TodoCategory[] = [
-  { id: 'work', label: '업무', color: 'red' },
-  { id: 'life', label: '생활', color: 'yellow' },
-  { id: 'health', label: '건강', color: 'teal' },
-];
 
 export const CATEGORY_COLOR_CLASS: Record<CategoryColor, string> = {
   red: 'bg-red-500',
