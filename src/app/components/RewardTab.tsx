@@ -56,7 +56,7 @@ export default function RewardTab({
               <span className="text-sm font-semibold text-muted tabular-nums">({rewards.length})</span>
             </h2>
           </div>
-          <div className="flex-1 min-h-0 overflow-y-auto pb-28">
+          <div className="flex-1 min-h-0 overflow-y-auto pb-20">
             <div className="space-y-3">
               {rewards.map(reward => (
                 <RewardCard

@@ -8,8 +8,7 @@ import { useTodos } from '../hooks/useTodos';
 import { useCategories } from '../hooks/useCategories';
 import TodoTab from './TodoTab';
 import RewardTab from './RewardTab';
-import StickerBanner from './StickerBanner';
-import BottomNav from './BottomNav';
+import RewardNavButton from './RewardNavButton';
 import HaeddaLogo from './HaeddaLogo';
 
 export default function MainApp() {
@@ -36,10 +35,24 @@ export default function MainApp() {
           <header className="shrink-0 px-5 pt-5 pb-4 sm:px-6 border-b border-border/60">
             <div className="flex items-center justify-between gap-4">
               <h1 className="m-0 shrink-0">
-                <HaeddaLogo height={44} />
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('todo')}
+                  aria-label="할일"
+                  aria-current={activeTab === 'todo' ? 'page' : undefined}
+                  className="rounded-lg active:scale-[0.98] transition-transform"
+                >
+                  <HaeddaLogo height={44} />
+                </button>
               </h1>
               <div className="flex items-center gap-2 shrink-0">
-                <StickerBanner count={totalStickers} />
+                <RewardNavButton
+                  count={totalStickers}
+                  isActive={activeTab === 'reward'}
+                  onClick={() =>
+                    setActiveTab((tab) => (tab === 'reward' ? 'todo' : 'reward'))
+                  }
+                />
                 <Link
                   href="/settings"
                   aria-label="설정"
@@ -72,8 +85,6 @@ export default function MainApp() {
               />
             )}
           </main>
-
-          <BottomNav activeTab={activeTab} onChange={setActiveTab} />
         </div>
       </div>
     </div>

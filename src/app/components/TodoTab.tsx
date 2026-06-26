@@ -180,7 +180,7 @@ export default function TodoTab({
                   />
                 </div>
               </div>
-              <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1 pb-28">
+              <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1 pb-20">
                 {sortedTodos.length === 0 ? (
                   <EmptyState
                     icon="🔍"
