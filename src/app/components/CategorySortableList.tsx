@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback, useEffect, useRef } from 'react';
 import {
   DndContext,
   KeyboardSensor,
@@ -100,6 +101,27 @@ export default function CategorySortableList({
   onEdit,
   onDelete,
 }: Props) {
+  const listRootRef = useRef<HTMLUListElement>(null);
+  const scrollParentRef = useRef<HTMLElement | null>(null);
+
+  const lockScroll = useCallback(() => {
+    const main = listRootRef.current?.closest('main');
+    if (!main) return;
+    scrollParentRef.current = main;
+    main.style.overflow = 'hidden';
+    main.style.touchAction = 'none';
+  }, []);
+
+  const unlockScroll = useCallback(() => {
+    const main = scrollParentRef.current;
+    if (!main) return;
+    main.style.overflow = '';
+    main.style.touchAction = '';
+    scrollParentRef.current = null;
+  }, []);
+
+  useEffect(() => () => unlockScroll(), [unlockScroll]);
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
@@ -117,10 +139,24 @@ export default function CategorySortableList({
     onReorder(arrayMove(categories, oldIndex, newIndex));
   };
 
+  const handleDragEndWithUnlock = (event: DragEndEvent) => {
+    unlockScroll();
+    handleDragEnd(event);
+  };
+
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={lockScroll}
+      onDragCancel={unlockScroll}
+      onDragEnd={handleDragEndWithUnlock}
+    >
       <SortableContext items={categories.map(c => c.id)} strategy={verticalListSortingStrategy}>
-        <ul className="-mx-4 sm:-mx-6 divide-y divide-border border-b border-border">
+        <ul
+          ref={listRootRef}
+          className="-mx-4 sm:-mx-6 divide-y divide-border border-b border-border"
+        >
           {categories.map(category => (
             <SortableCategoryRow
               key={category.id}
