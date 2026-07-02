@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   DndContext,
   KeyboardSensor,
@@ -8,6 +8,7 @@ import {
   TouchSensor,
   closestCenter,
   type DragEndEvent,
+  type DragStartEvent,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -24,11 +25,23 @@ import { CATEGORY_CHIP_CLASS, TodoCategory } from "../utils/categories";
 
 interface RowProps {
   category: TodoCategory;
+  isActive: boolean;
+  isPressing: boolean;
+  onPressStart: () => void;
+  onPressEnd: () => void;
   onEdit: () => void;
   onDelete: () => void;
 }
 
-function SortableCategoryRow({ category, onEdit, onDelete }: RowProps) {
+function SortableCategoryRow({
+  category,
+  isActive,
+  isPressing,
+  onPressStart,
+  onPressEnd,
+  onEdit,
+  onDelete,
+}: RowProps) {
   const {
     attributes,
     listeners,
@@ -36,10 +49,10 @@ function SortableCategoryRow({ category, onEdit, onDelete }: RowProps) {
     setActivatorNodeRef,
     transform,
     transition,
-    isDragging,
   } = useSortable({ id: category.id });
 
   const chipClass = CATEGORY_CHIP_CLASS[category.color].unselected;
+  const showDragFeedback = isPressing || isActive;
 
   return (
     <li
@@ -49,16 +62,27 @@ function SortableCategoryRow({ category, onEdit, onDelete }: RowProps) {
         transition,
       }}
       className={`flex items-stretch gap-2 px-4 sm:px-6 ${
-        isDragging ? "relative z-10 bg-background shadow-sm" : ""
+        showDragFeedback ? "relative z-10 bg-background" : ""
       }`}
     >
       <button
         type="button"
         ref={setActivatorNodeRef}
         aria-label={`${category.label} 순서 변경`}
-        className="-ml-4 sm:-ml-6 pl-3 sm:pl-5 pr-2 min-w-12 flex items-center justify-center text-muted hover:text-foreground transition-colors shrink-0 touch-none cursor-grab active:cursor-grabbing"
+        className={`-ml-4 sm:-ml-6 pl-3 sm:pl-5 pr-2 min-w-12 flex items-center justify-center transition-colors shrink-0 touch-none cursor-grab active:cursor-grabbing ${
+          showDragFeedback
+            ? "text-foreground bg-background"
+            : "text-muted hover:text-foreground hover:bg-background"
+        }`}
         {...attributes}
         {...listeners}
+        onPointerDown={(e) => {
+          onPressStart();
+          listeners?.onPointerDown?.(e);
+        }}
+        onPointerUp={onPressEnd}
+        onPointerCancel={onPressEnd}
+        onLostPointerCapture={onPressEnd}
       >
         <MdDragIndicator size={22} aria-hidden />
       </button>
@@ -105,6 +129,8 @@ export default function CategorySortableList({
 }: Props) {
   const listRootRef = useRef<HTMLUListElement>(null);
   const scrollParentRef = useRef<HTMLElement | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [pressingId, setPressingId] = useState<string | null>(null);
 
   const lockScroll = useCallback(() => {
     const main = listRootRef.current?.closest("main");
@@ -134,6 +160,12 @@ export default function CategorySortableList({
     }),
   );
 
+  const handleDragStart = (event: DragStartEvent) => {
+    lockScroll();
+    setActiveId(String(event.active.id));
+    setPressingId(null);
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -147,15 +179,23 @@ export default function CategorySortableList({
 
   const handleDragEndWithUnlock = (event: DragEndEvent) => {
     unlockScroll();
+    setActiveId(null);
+    setPressingId(null);
     handleDragEnd(event);
+  };
+
+  const handleDragCancel = () => {
+    unlockScroll();
+    setActiveId(null);
+    setPressingId(null);
   };
 
   return (
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
-      onDragStart={lockScroll}
-      onDragCancel={unlockScroll}
+      onDragStart={handleDragStart}
+      onDragCancel={handleDragCancel}
       onDragEnd={handleDragEndWithUnlock}
     >
       <SortableContext
@@ -170,6 +210,12 @@ export default function CategorySortableList({
             <SortableCategoryRow
               key={category.id}
               category={category}
+              isActive={activeId === category.id}
+              isPressing={pressingId === category.id}
+              onPressStart={() => setPressingId(category.id)}
+              onPressEnd={() =>
+                setPressingId((id) => (id === category.id ? null : id))
+              }
               onEdit={() => onEdit(category)}
               onDelete={() => onDelete(category)}
             />
