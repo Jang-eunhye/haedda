@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   DndContext,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
   TouchSensor,
   closestCenter,
   type DragEndEvent,
@@ -28,7 +28,6 @@ interface RowProps {
   isActive: boolean;
   isPressing: boolean;
   onPressStart: () => void;
-  onPressEnd: () => void;
   onEdit: () => void;
   onDelete: () => void;
 }
@@ -38,7 +37,6 @@ function SortableCategoryRow({
   isActive,
   isPressing,
   onPressStart,
-  onPressEnd,
   onEdit,
   onDelete,
 }: RowProps) {
@@ -72,7 +70,7 @@ function SortableCategoryRow({
         className={`-ml-4 sm:-ml-6 pl-3 sm:pl-5 pr-2 min-w-12 flex items-center justify-center transition-colors shrink-0 touch-none cursor-grab active:cursor-grabbing ${
           showDragFeedback
             ? "text-foreground bg-background"
-            : "text-muted hover:text-foreground hover:bg-background"
+            : "text-muted hover:text-foreground"
         }`}
         {...attributes}
         {...listeners}
@@ -80,9 +78,10 @@ function SortableCategoryRow({
           onPressStart();
           listeners?.onPointerDown?.(e);
         }}
-        onPointerUp={onPressEnd}
-        onPointerCancel={onPressEnd}
-        onLostPointerCapture={onPressEnd}
+        onTouchStart={(e) => {
+          onPressStart();
+          listeners?.onTouchStart?.(e);
+        }}
       >
         <MdDragIndicator size={22} aria-hidden />
       </button>
@@ -150,10 +149,25 @@ export default function CategorySortableList({
 
   useEffect(() => () => unlockScroll(), [unlockScroll]);
 
+  useEffect(() => {
+    if (!pressingId || activeId) return;
+
+    const clearPressing = () => setPressingId(null);
+    document.addEventListener("pointerup", clearPressing);
+    document.addEventListener("pointercancel", clearPressing);
+    document.addEventListener("touchend", clearPressing);
+
+    return () => {
+      document.removeEventListener("pointerup", clearPressing);
+      document.removeEventListener("pointercancel", clearPressing);
+      document.removeEventListener("touchend", clearPressing);
+    };
+  }, [pressingId, activeId]);
+
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
     useSensor(TouchSensor, {
-      activationConstraint: { delay: 150, tolerance: 5 },
+      activationConstraint: { delay: 200, tolerance: 12 },
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
@@ -213,9 +227,6 @@ export default function CategorySortableList({
               isActive={activeId === category.id}
               isPressing={pressingId === category.id}
               onPressStart={() => setPressingId(category.id)}
-              onPressEnd={() =>
-                setPressingId((id) => (id === category.id ? null : id))
-              }
               onEdit={() => onEdit(category)}
               onDelete={() => onDelete(category)}
             />
