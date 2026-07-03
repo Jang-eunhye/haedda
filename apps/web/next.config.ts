@@ -16,6 +16,7 @@ fs.writeFileSync(
 const monorepoRoot = path.resolve(__dirname, "../..");
 
 const nextConfig: NextConfig = {
+  transpilePackages: ['@haedda/types'],
   env: {
     NEXT_PUBLIC_BUILD_ID: buildId,
   },

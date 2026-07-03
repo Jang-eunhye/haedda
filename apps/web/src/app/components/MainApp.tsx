@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { MdSettings } from 'react-icons/md';
-import { TabType } from '../types';
+import { TabType } from '@haedda/types';
 import { useTodos } from '../hooks/useTodos';
 import { useCategories } from '../hooks/useCategories';
 import TodoTab from './TodoTab';

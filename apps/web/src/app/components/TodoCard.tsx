@@ -1,6 +1,6 @@
 import { MdCalendarToday, MdOutlineAutorenew } from 'react-icons/md';
 import { FiCheck } from 'react-icons/fi';
-import { Todo } from '../types';
+import { Todo } from '@haedda/types';
 import { TodoCategory } from '../utils/categories';
 import { formatDeadlineCardLine, isDeadlineExpired } from '../utils/date';
 import { formatRecurrenceLabel } from '../utils/recurrence';

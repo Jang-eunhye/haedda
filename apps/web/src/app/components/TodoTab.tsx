@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState, useEffect } from 'react';
-import { Todo, TodoInput, TodoCompleteResult } from '../types';
+import { Todo, TodoInput, TodoCompleteResult } from '@haedda/types';
 import TodoCard from './TodoCard';
 import TodoFormModal from './TodoFormModal';
 import TodoDetailModal from './TodoDetailModal';

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { MdKeyboardArrowDown } from 'react-icons/md';
-import { Todo, TodoInput } from '../types';
+import { Todo, TodoInput } from '@haedda/types';
 import { getTodayISO, normalizeDeadline } from '../utils/date';
 import { computeNextDeadline } from '../utils/recurrence';
 import DeadlinePresetPicker from './DeadlinePresetPicker';

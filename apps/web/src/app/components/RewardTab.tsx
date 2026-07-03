@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Reward } from '../types';
+import { Reward } from '@haedda/types';
 import RewardCard from './RewardCard';
 import RewardFormModal from './RewardFormModal';
 import ClaimRewardModal from './ClaimRewardModal';

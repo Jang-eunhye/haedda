@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Reward } from '../types';
+import { Reward } from '@haedda/types';
 import { MdDeleteOutline } from 'react-icons/md';
 import StickerCountPicker from './StickerCountPicker';
 

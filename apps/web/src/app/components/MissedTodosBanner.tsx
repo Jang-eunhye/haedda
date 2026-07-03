@@ -1,7 +1,7 @@
 'use client';
 
 import { MdKeyboardArrowDown, MdWarningAmber } from 'react-icons/md';
-import { Todo } from '../types';
+import { Todo } from '@haedda/types';
 import { TodoCategory } from '../utils/categories';
 import TodoCard from './TodoCard';
 

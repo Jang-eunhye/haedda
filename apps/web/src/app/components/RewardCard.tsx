@@ -1,4 +1,4 @@
-import { Reward } from '../types';
+import { Reward } from '@haedda/types';
 import { MdOutlineEdit } from 'react-icons/md';
 import StickerStar from './StickerStar';
 

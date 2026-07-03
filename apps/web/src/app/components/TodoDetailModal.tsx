@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Todo } from "../types";
+import { Todo } from '@haedda/types';
 import {
   CATEGORY_CHIP_CLASS,
   getCategoryById,

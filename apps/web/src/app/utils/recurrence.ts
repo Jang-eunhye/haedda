@@ -1,4 +1,4 @@
-import { Todo, TodoRecurrence } from '../types';
+import { Todo, TodoRecurrence } from '@haedda/types';
 import { formatDateISO, formatDeadlineLabel, getDaysInMonth, parseDateParts } from './date';
 
 export const WEEKDAY_LABELS: { value: number; label: string }[] = [

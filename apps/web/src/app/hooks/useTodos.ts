@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Todo, Reward, TodoInput, TodoCompleteResult, TodoRecurrence } from '../types';
+import { Todo, Reward, TodoInput, TodoCompleteResult, TodoRecurrence } from '@haedda/types';
 import { isDeadlineExpired, normalizeDeadline } from '../utils/date';
 import { computeNextDeadlineAfter, refreshRecurringTodo } from '../utils/recurrence';
 

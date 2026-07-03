@@ -1,20 +1,6 @@
-export type CategoryColor =
-  | 'red'
-  | 'orange'
-  | 'lime'
-  | 'yellow'
-  | 'indigo'
-  | 'teal'
-  | 'cyan'
-  | 'blue'
-  | 'violet'
-  | 'pink';
+import type { CategoryColor, TodoCategory } from '@haedda/types';
 
-export interface TodoCategory {
-  id: string;
-  label: string;
-  color: CategoryColor;
-}
+export type { CategoryColor, TodoCategory };
 
 export function createDefaultCategories(): TodoCategory[] {
   return [
