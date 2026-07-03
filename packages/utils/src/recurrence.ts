@@ -1,8 +1,6 @@
-import { Todo, TodoRecurrence } from '@haedda/types';
+import type { Todo, TodoRecurrence } from '@haedda/types';
 import { WEEKDAY_LABELS } from '@haedda/constants';
 import { formatDateISO, formatDeadlineLabel, getDaysInMonth, parseDateParts } from './date';
-
-export { WEEKDAY_LABELS };
 
 export function isRecurringTodo(recurrence?: TodoRecurrence): boolean {
   return !!recurrence;

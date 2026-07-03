@@ -8,8 +8,12 @@ import {
   STICKERS_STORAGE_KEY,
   TODOS_STORAGE_KEY,
 } from '@haedda/constants';
-import { isDeadlineExpired, normalizeDeadline } from '../utils/date';
-import { computeNextDeadlineAfter, refreshRecurringTodo } from '../utils/recurrence';
+import {
+  computeNextDeadlineAfter,
+  isDeadlineExpired,
+  normalizeDeadline,
+  refreshRecurringTodo,
+} from '@haedda/utils';
 
 function normalizeRecurrence(raw: unknown): TodoRecurrence | undefined {
   if (!raw || typeof raw !== 'object') return undefined;

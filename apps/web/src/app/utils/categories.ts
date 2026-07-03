@@ -3,17 +3,14 @@ import {
   CATEGORY_COLORS,
   CATEGORY_COLOR_LABELS,
 } from '@haedda/constants';
+export {
+  createDefaultCategories,
+  getCategoryById,
+  normalizeCategoryColor,
+} from '@haedda/utils';
 
 export type { CategoryColor, TodoCategory };
 export { CATEGORY_COLORS, CATEGORY_COLOR_LABELS };
-
-export function createDefaultCategories(): TodoCategory[] {
-  return [
-    { id: crypto.randomUUID(), label: '업무', color: 'red' },
-    { id: crypto.randomUUID(), label: '일정', color: 'blue' },
-    { id: crypto.randomUUID(), label: '일상', color: 'yellow' },
-  ];
-}
 
 export const CATEGORY_COLOR_CLASS: Record<CategoryColor, string> = {
   red: 'bg-red-500',
@@ -85,19 +82,3 @@ export const CATEGORY_CHIP_CLASS: Record<
       'bg-pink-50 text-pink-700 border-pink-200 hover:bg-pink-100 hover:text-pink-800',
   },
 };
-
-export function normalizeCategoryColor(raw: unknown): CategoryColor | null {
-  if (raw === 'emerald' || raw === 'green') return 'teal';
-  if (raw === 'amber') return 'yellow';
-  if (typeof raw === 'string' && (CATEGORY_COLORS as string[]).includes(raw)) {
-    return raw as CategoryColor;
-  }
-  return null;
-}
-
-export function getCategoryById(
-  categories: TodoCategory[],
-  id: string
-): TodoCategory | undefined {
-  return categories.find(c => c.id === id);
-}

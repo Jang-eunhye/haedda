@@ -1,7 +1,7 @@
 'use client';
 
 import { TodoRecurrence } from '@haedda/types';
-import { WEEKDAY_LABELS } from '../utils/recurrence';
+import { WEEKDAY_LABELS } from '@haedda/constants';
 
 export type RecurrenceFrequency = 'daily' | 'weekly' | 'monthly';
 

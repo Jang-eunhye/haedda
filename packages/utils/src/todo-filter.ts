@@ -1,4 +1,4 @@
-import { Todo } from '@haedda/types';
+import type { Todo } from '@haedda/types';
 import {
   getTodayISO,
   getWeekRangeISO,

@@ -6,7 +6,7 @@ import {
   formatDateISO,
   getTodayISO,
   parseDateParts,
-} from '../utils/date';
+} from '@haedda/utils';
 
 interface Props {
   value: string;

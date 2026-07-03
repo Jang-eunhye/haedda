@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Todo } from '@haedda/types';
-import { isDeadlineExpired } from '../utils/date';
+import { isDeadlineExpired } from '@haedda/utils';
 import StickerStar from './StickerStar';
 
 interface Props {

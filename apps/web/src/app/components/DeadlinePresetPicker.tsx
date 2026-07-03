@@ -2,14 +2,15 @@
 
 import { useState } from 'react';
 import { MdCalendarToday } from 'react-icons/md';
+import type { DeadlinePreset } from '@haedda/constants';
+import { DEADLINE_PRESET_OPTIONS } from '@haedda/constants';
 import {
-  DeadlinePreset,
-  DEADLINE_PRESET_OPTIONS,
   detectDeadlinePreset,
+  formatDeadlineCountdown,
+  formatDeadlineDisplay,
   formatPresetHint,
   getDeadlineForPreset,
-} from '../utils/deadlinePreset';
-import { formatDeadlineCountdown, formatDeadlineDisplay } from '../utils/date';
+} from '@haedda/utils';
 import DatePicker from './DatePicker';
 
 interface Props {

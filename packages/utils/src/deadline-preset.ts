@@ -1,3 +1,4 @@
+import type { DeadlinePreset } from '@haedda/constants';
 import {
   getMonthEndISO,
   getTodayISO,
@@ -5,11 +6,6 @@ import {
   getWeekEndISO,
   normalizeDeadline,
 } from './date';
-import type { DeadlinePreset } from '@haedda/constants';
-import { DEADLINE_PRESET_OPTIONS } from '@haedda/constants';
-
-export type { DeadlinePreset };
-export { DEADLINE_PRESET_OPTIONS };
 
 export function getDeadlineForPreset(
   preset: Exclude<DeadlinePreset, 'later'>,

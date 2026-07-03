@@ -29,6 +29,9 @@ importers:
       '@haedda/types':
         specifier: workspace:*
         version: link:../../packages/types
+      '@haedda/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
       next:
         specifier: 16.2.6
         version: 16.2.6(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -74,6 +77,15 @@ importers:
         version: link:../types
 
   packages/types: {}
+
+  packages/utils:
+    dependencies:
+      '@haedda/constants':
+        specifier: workspace:*
+        version: link:../constants
+      '@haedda/types':
+        specifier: workspace:*
+        version: link:../types
 
 packages:
 

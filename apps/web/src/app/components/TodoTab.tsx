@@ -15,7 +15,7 @@ import FilterChips from './FilterChips';
 import CategoryFilterChips from './CategoryFilterChips';
 import FilterExcludeOption from './FilterExcludeOption';
 import MissedTodosBanner from './MissedTodosBanner';
-import { isMissedTodo, matchesCategoryFilter, matchesTodoFilter, sortMissedTodos, TodoFilter } from '../utils/todoFilter';
+import { isMissedTodo, matchesCategoryFilter, matchesTodoFilter, sortMissedTodos, TodoFilter } from '@haedda/utils';
 import { TodoCategory } from '../utils/categories';
 
 const APP_TAGLINE = '할일을 완료하고 스티커를 모아보세요';

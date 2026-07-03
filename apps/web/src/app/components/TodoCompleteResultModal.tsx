@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { formatDeadlineLabel } from '../utils/date';
+import { formatDeadlineLabel } from '@haedda/utils';
 import StickerStar from './StickerStar';
 
 interface Props {
