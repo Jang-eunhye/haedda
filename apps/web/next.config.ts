@@ -13,13 +13,16 @@ fs.writeFileSync(
   JSON.stringify({ buildId })
 );
 
+const monorepoRoot = path.resolve(__dirname, "../..");
+
 const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_BUILD_ID: buildId,
   },
   turbopack: {
-    root: path.resolve(__dirname),
+    root: monorepoRoot,
   },
+  outputFileTracingRoot: monorepoRoot,
   async headers() {
     return [
       {
