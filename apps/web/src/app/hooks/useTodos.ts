@@ -3,12 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Todo, Reward, TodoInput, TodoCompleteResult } from '@haedda/types';
 import {
-  LEGACY_MISSIONS_STORAGE_KEY,
-  REWARDS_STORAGE_KEY,
-  STICKERS_STORAGE_KEY,
-  TODOS_STORAGE_KEY,
-} from '@haedda/constants';
-import {
   claimReward as claimRewardDomain,
   clearCategoryFromTodos,
   completeTodoInList,
@@ -16,44 +10,10 @@ import {
   createTodo,
   deleteRewardFromList,
   deleteTodoFromList,
-  mergeRecurringRefreshIntoStored,
-  parseTodosFromUnknown,
   updateRewardInList,
   updateTodoInList,
 } from '@haedda/domain';
-
-function loadTodosFromStorage(): Todo[] {
-  try {
-    const stored = localStorage.getItem(TODOS_STORAGE_KEY);
-    if (stored) {
-      return parseTodosFromUnknown(JSON.parse(stored));
-    }
-
-    const legacy = localStorage.getItem(LEGACY_MISSIONS_STORAGE_KEY);
-    if (legacy) {
-      const todos = parseTodosFromUnknown(JSON.parse(legacy));
-      localStorage.setItem(TODOS_STORAGE_KEY, JSON.stringify(todos));
-      localStorage.removeItem(LEGACY_MISSIONS_STORAGE_KEY);
-      return todos;
-    }
-  } catch {}
-  return [];
-}
-
-function persistRecurringRefresh(refreshedTodos: Todo[]): void {
-  try {
-    const raw = localStorage.getItem(TODOS_STORAGE_KEY);
-    if (!raw) return;
-
-    const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return;
-
-    const { merged, changed } = mergeRecurringRefreshIntoStored(parsed, refreshedTodos);
-    if (changed) {
-      localStorage.setItem(TODOS_STORAGE_KEY, JSON.stringify(merged));
-    }
-  } catch {}
-}
+import { appStorage } from '../storage';
 
 export function useTodos() {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -63,31 +23,45 @@ export function useTodos() {
   const userMutatedRef = useRef(false);
 
   useEffect(() => {
-    try {
-      const loaded = loadTodosFromStorage();
-      persistRecurringRefresh(loaded);
-      setTodos(loaded);
-      const r = localStorage.getItem(REWARDS_STORAGE_KEY);
-      const s = localStorage.getItem(STICKERS_STORAGE_KEY);
-      if (r) setRewards(JSON.parse(r));
-      if (s) setTotalStickers(JSON.parse(s));
-    } catch {}
-    setReady(true);
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const loaded = await appStorage.todos.loadTodos();
+        await appStorage.todos.persistRecurringRefresh(loaded);
+        if (cancelled) return;
+
+        setTodos(loaded);
+        const [loadedRewards, loadedStickers] = await Promise.all([
+          appStorage.rewards.loadRewards(),
+          appStorage.stickers.loadTotalStickers(),
+        ]);
+        if (cancelled) return;
+
+        setRewards(loadedRewards);
+        setTotalStickers(loadedStickers);
+      } catch {}
+      if (!cancelled) setReady(true);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
     if (!ready || !userMutatedRef.current) return;
-    localStorage.setItem(TODOS_STORAGE_KEY, JSON.stringify(todos));
+    void appStorage.todos.saveTodos(todos);
   }, [todos, ready]);
 
   useEffect(() => {
     if (!ready) return;
-    localStorage.setItem(REWARDS_STORAGE_KEY, JSON.stringify(rewards));
+    void appStorage.rewards.saveRewards(rewards);
   }, [rewards, ready]);
 
   useEffect(() => {
     if (!ready) return;
-    localStorage.setItem(STICKERS_STORAGE_KEY, JSON.stringify(totalStickers));
+    void appStorage.stickers.saveTotalStickers(totalStickers);
   }, [totalStickers, ready]);
 
   const addTodo = (data: TodoInput) => {

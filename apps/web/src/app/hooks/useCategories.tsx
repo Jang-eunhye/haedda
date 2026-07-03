@@ -8,15 +8,14 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { createDefaultCategories, TodoCategory } from '../utils/categories';
-import { CATEGORIES_STORAGE_KEY } from '@haedda/constants';
+import { TodoCategory } from '@haedda/types';
 import {
   type CategoryInput,
   createCategory,
   deleteCategoryFromList,
-  parseCategoriesFromUnknown,
   updateCategoryInList,
 } from '@haedda/domain';
+import { appStorage } from '../storage';
 
 export type { CategoryInput };
 
@@ -30,30 +29,29 @@ interface CategoriesContextValue {
 
 const CategoriesContext = createContext<CategoriesContextValue | null>(null);
 
-function loadCategoriesFromStorage(): TodoCategory[] {
-  const stored = localStorage.getItem(CATEGORIES_STORAGE_KEY);
-  if (stored === null) {
-    return createDefaultCategories();
-  }
-  try {
-    return parseCategoriesFromUnknown(JSON.parse(stored));
-  } catch {
-    return [];
-  }
-}
-
 export function CategoriesProvider({ children }: { children: React.ReactNode }) {
   const [categories, setCategories] = useState<TodoCategory[]>([]);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    setCategories(loadCategoriesFromStorage());
-    setReady(true);
+    let cancelled = false;
+
+    void (async () => {
+      const loaded = await appStorage.categories.loadCategories();
+      if (!cancelled) {
+        setCategories(loaded);
+        setReady(true);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
     if (!ready) return;
-    localStorage.setItem(CATEGORIES_STORAGE_KEY, JSON.stringify(categories));
+    void appStorage.categories.saveCategories(categories);
   }, [categories, ready]);
 
   const addCategory = useCallback((data: CategoryInput): TodoCategory | null => {
