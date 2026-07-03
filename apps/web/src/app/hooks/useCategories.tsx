@@ -14,9 +14,10 @@ import {
   TodoCategory,
   normalizeCategoryColor,
 } from '../utils/categories';
-
-const CATEGORIES_KEY = 'haedda_categories';
-const LABEL_MAX = 10;
+import {
+  CATEGORIES_STORAGE_KEY,
+  CATEGORY_LABEL_MAX_LENGTH,
+} from '@haedda/constants';
 
 export interface CategoryInput {
   label: string;
@@ -41,11 +42,11 @@ function normalizeCategory(raw: unknown): TodoCategory | null {
   if (!color) return null;
   const label = c.label.trim();
   if (!label) return null;
-  return { id: c.id, label: label.slice(0, LABEL_MAX), color };
+  return { id: c.id, label: label.slice(0, CATEGORY_LABEL_MAX_LENGTH), color };
 }
 
 function loadCategoriesFromStorage(): TodoCategory[] {
-  const stored = localStorage.getItem(CATEGORIES_KEY);
+  const stored = localStorage.getItem(CATEGORIES_STORAGE_KEY);
   if (stored === null) {
     return createDefaultCategories();
   }
@@ -61,7 +62,7 @@ function loadCategoriesFromStorage(): TodoCategory[] {
 }
 
 function normalizeLabel(label: string): string {
-  return label.trim().slice(0, LABEL_MAX);
+  return label.trim().slice(0, CATEGORY_LABEL_MAX_LENGTH);
 }
 
 export function CategoriesProvider({ children }: { children: React.ReactNode }) {
@@ -75,7 +76,7 @@ export function CategoriesProvider({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     if (!ready) return;
-    localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
+    localStorage.setItem(CATEGORIES_STORAGE_KEY, JSON.stringify(categories));
   }, [categories, ready]);
 
   const addCategory = useCallback((data: CategoryInput): TodoCategory | null => {

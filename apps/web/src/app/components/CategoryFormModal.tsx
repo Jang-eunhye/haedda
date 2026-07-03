@@ -9,8 +9,7 @@ import {
   CATEGORY_COLORS,
   TodoCategory,
 } from '../utils/categories';
-
-const LABEL_MAX = 10;
+import { CATEGORY_LABEL_MAX_LENGTH } from '@haedda/constants';
 
 interface Props {
   onClose: () => void;
@@ -65,7 +64,7 @@ export default function CategoryFormModal({ onClose, onSave, category }: Props) 
             <input
               type="text"
               value={label}
-              onChange={e => setLabel(e.target.value.slice(0, LABEL_MAX))}
+              onChange={e => setLabel(e.target.value.slice(0, CATEGORY_LABEL_MAX_LENGTH))}
               placeholder="예: 업무"
               autoFocus
               className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground text-sm placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-foreground/10"
