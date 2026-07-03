@@ -8,21 +8,17 @@ import {
   useMemo,
   useState,
 } from 'react';
+import { createDefaultCategories, TodoCategory } from '../utils/categories';
+import { CATEGORIES_STORAGE_KEY } from '@haedda/constants';
 import {
-  CategoryColor,
-  createDefaultCategories,
-  TodoCategory,
-  normalizeCategoryColor,
-} from '../utils/categories';
-import {
-  CATEGORIES_STORAGE_KEY,
-  CATEGORY_LABEL_MAX_LENGTH,
-} from '@haedda/constants';
+  type CategoryInput,
+  createCategory,
+  deleteCategoryFromList,
+  parseCategoriesFromUnknown,
+  updateCategoryInList,
+} from '@haedda/domain';
 
-export interface CategoryInput {
-  label: string;
-  color: CategoryColor;
-}
+export type { CategoryInput };
 
 interface CategoriesContextValue {
   categories: TodoCategory[];
@@ -34,35 +30,16 @@ interface CategoriesContextValue {
 
 const CategoriesContext = createContext<CategoriesContextValue | null>(null);
 
-function normalizeCategory(raw: unknown): TodoCategory | null {
-  if (!raw || typeof raw !== 'object') return null;
-  const c = raw as Record<string, unknown>;
-  if (typeof c.id !== 'string' || typeof c.label !== 'string') return null;
-  const color = normalizeCategoryColor(c.color);
-  if (!color) return null;
-  const label = c.label.trim();
-  if (!label) return null;
-  return { id: c.id, label: label.slice(0, CATEGORY_LABEL_MAX_LENGTH), color };
-}
-
 function loadCategoriesFromStorage(): TodoCategory[] {
   const stored = localStorage.getItem(CATEGORIES_STORAGE_KEY);
   if (stored === null) {
     return createDefaultCategories();
   }
   try {
-    const parsed: unknown = JSON.parse(stored);
-    if (!Array.isArray(parsed)) return [];
-    return parsed
-      .map(normalizeCategory)
-      .filter((x): x is TodoCategory => x !== null);
+    return parseCategoriesFromUnknown(JSON.parse(stored));
   } catch {
     return [];
   }
-}
-
-function normalizeLabel(label: string): string {
-  return label.trim().slice(0, CATEGORY_LABEL_MAX_LENGTH);
 }
 
 export function CategoriesProvider({ children }: { children: React.ReactNode }) {
@@ -80,32 +57,28 @@ export function CategoriesProvider({ children }: { children: React.ReactNode }) 
   }, [categories, ready]);
 
   const addCategory = useCallback((data: CategoryInput): TodoCategory | null => {
-    const label = normalizeLabel(data.label);
-    if (!label) return null;
-    const category: TodoCategory = {
-      id: crypto.randomUUID(),
-      label,
-      color: data.color,
-    };
+    const category = createCategory(data);
+    if (!category) return null;
     setCategories(prev => [...prev, category]);
     return category;
   }, []);
 
   const updateCategory = useCallback((id: string, data: CategoryInput): boolean => {
-    const label = normalizeLabel(data.label);
-    if (!label) return false;
-    setCategories(prev =>
-      prev.map(c => (c.id === id ? { ...c, label, color: data.color } : c))
-    );
-    return true;
+    let updated = false;
+    setCategories(prev => {
+      const outcome = updateCategoryInList(prev, id, data);
+      updated = outcome.updated;
+      return outcome.categories;
+    });
+    return updated;
   }, []);
 
   const deleteCategory = useCallback((id: string): boolean => {
     let removed = false;
     setCategories(prev => {
-      const next = prev.filter(c => c.id !== id);
-      removed = next.length !== prev.length;
-      return next;
+      const outcome = deleteCategoryFromList(prev, id);
+      removed = outcome.removed;
+      return outcome.categories;
     });
     return removed;
   }, []);

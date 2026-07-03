@@ -26,6 +26,9 @@ importers:
       '@haedda/constants':
         specifier: workspace:*
         version: link:../../packages/constants
+      '@haedda/domain':
+        specifier: workspace:*
+        version: link:../../packages/domain
       '@haedda/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -75,6 +78,18 @@ importers:
       '@haedda/types':
         specifier: workspace:*
         version: link:../types
+
+  packages/domain:
+    dependencies:
+      '@haedda/constants':
+        specifier: workspace:*
+        version: link:../constants
+      '@haedda/types':
+        specifier: workspace:*
+        version: link:../types
+      '@haedda/utils':
+        specifier: workspace:*
+        version: link:../utils
 
   packages/types: {}
 
