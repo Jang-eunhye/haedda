@@ -8,7 +8,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { useTodos } from '@/src/hooks/useTodos';
+import { useTodos } from '@haedda/hooks';
 import { formatDeadlineDisplay } from '@haedda/utils';
 
 export default function TodoListScreen() {

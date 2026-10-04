@@ -26,6 +26,9 @@ importers:
       '@haedda/domain':
         specifier: workspace:*
         version: link:../../packages/domain
+      '@haedda/hooks':
+        specifier: workspace:*
+        version: link:../../packages/hooks
       '@haedda/storage':
         specifier: workspace:*
         version: link:../../packages/storage

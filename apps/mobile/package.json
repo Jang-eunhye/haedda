@@ -15,6 +15,7 @@
     "@expo/metro-runtime": "~57.0.16",
     "@haedda/constants": "workspace:*",
     "@haedda/domain": "workspace:*",
+    "@haedda/hooks": "workspace:*",
     "@haedda/storage": "workspace:*",
     "@haedda/types": "workspace:*",
     "@haedda/utils": "workspace:*",
