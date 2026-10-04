@@ -1,4 +1,4 @@
-import CategorySettingsPage from '../../components/CategorySettingsPage';
+import CategorySettingsPage from '@/components/CategorySettingsPage';
 
 export default function Page() {
   return <CategorySettingsPage />;
