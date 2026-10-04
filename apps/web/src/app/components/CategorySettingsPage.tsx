@@ -7,8 +7,7 @@ import CategorySortableList from './CategorySortableList';
 import DeleteConfirmModal from './DeleteConfirmModal';
 import Fab from './Fab';
 import EmptyState from './EmptyState';
-import { useCategories } from '../hooks/useCategories';
-import { useTodos } from '../hooks/useTodos';
+import { useCategories, useTodos } from '@haedda/hooks';
 import { TodoCategory } from '../utils/categories';
 
 export default function CategorySettingsPage() {

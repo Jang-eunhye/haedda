@@ -117,6 +117,9 @@ importers:
       '@haedda/domain':
         specifier: workspace:*
         version: link:../../packages/domain
+      '@haedda/hooks':
+        specifier: workspace:*
+        version: link:../../packages/hooks
       '@haedda/storage':
         specifier: workspace:*
         version: link:../../packages/storage
@@ -181,6 +184,21 @@ importers:
       '@haedda/utils':
         specifier: workspace:*
         version: link:../utils
+
+  packages/hooks:
+    dependencies:
+      '@haedda/domain':
+        specifier: workspace:*
+        version: link:../domain
+      '@haedda/storage':
+        specifier: workspace:*
+        version: link:../storage
+      '@haedda/types':
+        specifier: workspace:*
+        version: link:../types
+      react:
+        specifier: '*'
+        version: 19.2.3
 
   packages/storage:
     dependencies:

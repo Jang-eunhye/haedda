@@ -15,7 +15,7 @@ import {
   deleteCategoryFromList,
   updateCategoryInList,
 } from '@haedda/domain';
-import { appStorage } from '../storage';
+import { useAppStorage } from './storage-context';
 
 export type { CategoryInput };
 
@@ -30,6 +30,7 @@ interface CategoriesContextValue {
 const CategoriesContext = createContext<CategoriesContextValue | null>(null);
 
 export function CategoriesProvider({ children }: { children: React.ReactNode }) {
+  const appStorage = useAppStorage();
   const [categories, setCategories] = useState<TodoCategory[]>([]);
   const [ready, setReady] = useState(false);
 
@@ -47,12 +48,12 @@ export function CategoriesProvider({ children }: { children: React.ReactNode }) 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [appStorage]);
 
   useEffect(() => {
     if (!ready) return;
     void appStorage.categories.saveCategories(categories);
-  }, [categories, ready]);
+  }, [categories, ready, appStorage]);
 
   const addCategory = useCallback((data: CategoryInput): TodoCategory | null => {
     const category = createCategory(data);

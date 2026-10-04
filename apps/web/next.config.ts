@@ -21,6 +21,7 @@ const nextConfig: NextConfig = {
     '@haedda/constants',
     '@haedda/utils',
     '@haedda/domain',
+    '@haedda/hooks',
     '@haedda/storage',
   ],
   env: {

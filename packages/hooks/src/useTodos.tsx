@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { Todo, Reward, TodoInput, TodoCompleteResult } from '@haedda/types';
 import {
   claimReward as claimRewardDomain,
@@ -13,9 +13,10 @@ import {
   updateRewardInList,
   updateTodoInList,
 } from '@haedda/domain';
-import { appStorage } from '../storage';
+import { useAppStorage } from './storage-context';
 
-export function useTodos() {
+function useTodosState() {
+  const appStorage = useAppStorage();
   const [todos, setTodos] = useState<Todo[]>([]);
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [totalStickers, setTotalStickers] = useState<number>(0);
@@ -47,22 +48,22 @@ export function useTodos() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [appStorage]);
 
   useEffect(() => {
     if (!ready || !userMutatedRef.current) return;
     void appStorage.todos.saveTodos(todos);
-  }, [todos, ready]);
+  }, [todos, ready, appStorage]);
 
   useEffect(() => {
     if (!ready) return;
     void appStorage.rewards.saveRewards(rewards);
-  }, [rewards, ready]);
+  }, [rewards, ready, appStorage]);
 
   useEffect(() => {
     if (!ready) return;
     void appStorage.stickers.saveTotalStickers(totalStickers);
-  }, [totalStickers, ready]);
+  }, [totalStickers, ready, appStorage]);
 
   const addTodo = (data: TodoInput) => {
     userMutatedRef.current = true;
@@ -124,6 +125,7 @@ export function useTodos() {
     todos,
     rewards,
     totalStickers,
+    ready,
     addTodo,
     completeTodo,
     updateTodo,
@@ -134,4 +136,21 @@ export function useTodos() {
     deleteReward,
     clearCategoryFromTodos: clearCategoryFromTodosHandler,
   };
+}
+
+type TodosContextValue = ReturnType<typeof useTodosState>;
+
+const TodosContext = createContext<TodosContextValue | null>(null);
+
+export function TodosProvider({ children }: { children: React.ReactNode }) {
+  const value = useTodosState();
+  return <TodosContext.Provider value={value}>{children}</TodosContext.Provider>;
+}
+
+export function useTodos() {
+  const ctx = useContext(TodosContext);
+  if (!ctx) {
+    throw new Error('useTodos must be used within TodosProvider');
+  }
+  return ctx;
 }
