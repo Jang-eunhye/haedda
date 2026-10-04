@@ -7,6 +7,9 @@
     "./web": "./src/web.ts",
     "./native": "./src/native.ts"
   },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": {
     "@haedda/constants": "workspace:*",
     "@haedda/domain": "workspace:*",
