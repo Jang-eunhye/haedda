@@ -6,6 +6,7 @@ import { createTodoRepository } from './repositories/todo-repository';
 
 export type { StorageAdapter } from './types';
 export { createWebStorage } from './web';
+export { createNativeStorage, type AsyncStorageLike } from './native';
 export { createTodoRepository, type TodoRepository } from './repositories/todo-repository';
 export { createRewardRepository, type RewardRepository } from './repositories/reward-repository';
 export { createStickersRepository, type StickersRepository } from './repositories/stickers-repository';

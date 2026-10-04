@@ -4,7 +4,8 @@
   "private": true,
   "exports": {
     ".": "./src/index.ts",
-    "./web": "./src/web.ts"
+    "./web": "./src/web.ts",
+    "./native": "./src/native.ts"
   },
   "dependencies": {
     "@haedda/constants": "workspace:*",
