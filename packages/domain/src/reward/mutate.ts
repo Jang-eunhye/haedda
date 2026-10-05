@@ -1,6 +1,7 @@
 import type { Reward } from '@haedda/types';
+import { generateId } from '@haedda/utils';
 
-export function createReward(data: Omit<Reward, 'id'>, id: string = crypto.randomUUID()): Reward {
+export function createReward(data: Omit<Reward, 'id'>, id: string = generateId()): Reward {
   return { ...data, id };
 }
 

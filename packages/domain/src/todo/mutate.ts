@@ -1,6 +1,7 @@
 import type { Todo, TodoInput } from '@haedda/types';
+import { generateId } from '@haedda/utils';
 
-export function createTodo(data: TodoInput, id: string = crypto.randomUUID()): Todo {
+export function createTodo(data: TodoInput, id: string = generateId()): Todo {
   const { memo, deadline, categoryId, ...rest } = data;
   return {
     ...rest,

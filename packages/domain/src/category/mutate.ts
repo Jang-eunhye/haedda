@@ -1,6 +1,6 @@
 import type { CategoryColor, TodoCategory } from '@haedda/types';
 import { CATEGORY_LABEL_MAX_LENGTH } from '@haedda/constants';
-import { normalizeCategoryColor } from '@haedda/utils';
+import { generateId, normalizeCategoryColor } from '@haedda/utils';
 
 export interface CategoryInput {
   label: string;
@@ -29,7 +29,7 @@ export function parseCategoriesFromUnknown(parsed: unknown): TodoCategory[] {
 
 export function createCategory(
   data: CategoryInput,
-  id: string = crypto.randomUUID()
+  id: string = generateId()
 ): TodoCategory | null {
   const label = normalizeCategoryLabel(data.label);
   if (!label) return null;

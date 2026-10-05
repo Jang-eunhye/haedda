@@ -1,11 +1,12 @@
 import type { CategoryColor, TodoCategory } from '@haedda/types';
 import { CATEGORY_COLORS } from '@haedda/constants';
+import { generateId } from './id';
 
 export function createDefaultCategories(): TodoCategory[] {
   return [
-    { id: crypto.randomUUID(), label: '업무', color: 'red' },
-    { id: crypto.randomUUID(), label: '일정', color: 'blue' },
-    { id: crypto.randomUUID(), label: '일상', color: 'yellow' },
+    { id: generateId(), label: '업무', color: 'red' },
+    { id: generateId(), label: '일정', color: 'blue' },
+    { id: generateId(), label: '일상', color: 'yellow' },
   ];
 }
 
