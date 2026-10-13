@@ -18,9 +18,8 @@ export default function RootLayout() {
   return (
     <AppProviders>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack>
+        {/* 모든 화면이 자체 헤더를 그린다 */}
+        <Stack screenOptions={{ headerShown: false }} />
       </ThemeProvider>
     </AppProviders>
   );

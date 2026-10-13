@@ -11,9 +11,15 @@ interface Props {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
   totalStickers: number;
+  onSettingsPress: () => void;
 }
 
-export default function AppHeader({ activeTab, onTabChange, totalStickers }: Props) {
+export default function AppHeader({
+  activeTab,
+  onTabChange,
+  totalStickers,
+  onSettingsPress,
+}: Props) {
   const rewardActive = activeTab === 'reward';
 
   return (
@@ -32,30 +38,41 @@ export default function AppHeader({ activeTab, onTabChange, totalStickers }: Pro
         />
       </Pressable>
 
-      <Pressable
-        onPress={() => onTabChange(rewardActive ? 'todo' : 'reward')}
-        accessibilityRole="button"
-        accessibilityLabel={
-          rewardActive ? '할일로 돌아가기' : `보상, 스티커 ${totalStickers}개`
-        }
-        accessibilityState={{ selected: rewardActive }}
-        style={({ pressed }) => [
-          styles.reward,
-          rewardActive && styles.rewardActive,
-          pressed && styles.pressed,
-        ]}
-      >
-        <Icon
-          name="store"
-          size={20}
-          color={rewardActive ? colors.foreground : colors.muted}
-        />
-        <View style={styles.divider} />
-        <View style={styles.count}>
-          <StickerStar size="sm" />
-          <Text style={styles.countLabel}>{totalStickers}</Text>
-        </View>
-      </Pressable>
+      <View style={styles.actions}>
+        <Pressable
+          onPress={() => onTabChange(rewardActive ? 'todo' : 'reward')}
+          accessibilityRole="button"
+          accessibilityLabel={
+            rewardActive ? '할일로 돌아가기' : `보상, 스티커 ${totalStickers}개`
+          }
+          accessibilityState={{ selected: rewardActive }}
+          style={({ pressed }) => [
+            styles.reward,
+            rewardActive && styles.rewardActive,
+            pressed && styles.pressed,
+          ]}
+        >
+          <Icon
+            name="store"
+            size={20}
+            color={rewardActive ? colors.foreground : colors.muted}
+          />
+          <View style={styles.divider} />
+          <View style={styles.count}>
+            <StickerStar size="sm" />
+            <Text style={styles.countLabel}>{totalStickers}</Text>
+          </View>
+        </Pressable>
+
+        <Pressable
+          onPress={onSettingsPress}
+          accessibilityRole="button"
+          accessibilityLabel="설정"
+          style={({ pressed }) => [styles.settings, pressed && styles.settingsPressed]}
+        >
+          <Icon name="settings" size={20} color={colors.muted} />
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -77,6 +94,11 @@ const styles = StyleSheet.create({
   },
   pressed: {
     transform: [{ scale: 0.97 }],
+  },
+  actions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   reward: {
     flexDirection: 'row',
@@ -110,5 +132,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontVariant: ['tabular-nums'],
     color: colors.foreground,
+  },
+  settings: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  settingsPressed: {
+    backgroundColor: colors.background,
   },
 });

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCategories, useTodos } from '@haedda/hooks';
 import type { TabType } from '@haedda/types';
@@ -11,6 +12,7 @@ import { colors } from '@/src/theme/colors';
 
 export default function MainScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>('todo');
   const {
     todos,
@@ -35,6 +37,7 @@ export default function MainScreen() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         totalStickers={totalStickers}
+        onSettingsPress={() => router.push('/settings')}
       />
 
       {!ready ? (

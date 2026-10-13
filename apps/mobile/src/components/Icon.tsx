@@ -5,6 +5,7 @@ type SymbolName = Exclude<SymbolViewProps['name'], string>;
 
 const ICONS = {
   add: { ios: 'plus', android: 'add', web: 'add' },
+  back: { ios: 'arrow.left', android: 'arrow_back', web: 'arrow_back' },
   calendar: { ios: 'calendar', android: 'calendar_today', web: 'calendar_today' },
   check: { ios: 'checkmark', android: 'check', web: 'check' },
   chevronDown: {
@@ -17,9 +18,11 @@ const ICONS = {
   chevronUp: { ios: 'chevron.up', android: 'keyboard_arrow_up', web: 'keyboard_arrow_up' },
   close: { ios: 'xmark', android: 'close', web: 'close' },
   delete: { ios: 'trash', android: 'delete', web: 'delete' },
+  drag: { ios: 'line.3.horizontal', android: 'drag_indicator', web: 'drag_indicator' },
   edit: { ios: 'pencil', android: 'edit', web: 'edit' },
   remove: { ios: 'minus', android: 'remove', web: 'remove' },
   repeat: { ios: 'arrow.triangle.2.circlepath', android: 'autorenew', web: 'autorenew' },
+  settings: { ios: 'gearshape', android: 'settings', web: 'settings' },
   store: { ios: 'storefront', android: 'storefront', web: 'storefront' },
   warning: {
     ios: 'exclamationmark.triangle',
