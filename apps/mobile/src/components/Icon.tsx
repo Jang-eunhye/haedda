@@ -18,6 +18,7 @@ const ICONS = {
   close: { ios: 'xmark', android: 'close', web: 'close' },
   delete: { ios: 'trash', android: 'delete', web: 'delete' },
   edit: { ios: 'pencil', android: 'edit', web: 'edit' },
+  remove: { ios: 'minus', android: 'remove', web: 'remove' },
   repeat: { ios: 'arrow.triangle.2.circlepath', android: 'autorenew', web: 'autorenew' },
   store: { ios: 'storefront', android: 'storefront', web: 'storefront' },
   warning: {
