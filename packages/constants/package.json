@@ -1,0 +1,14 @@
+{
+  "name": "@haedda/constants",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@haedda/types": "workspace:*"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@haedda/storage",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./web": "./src/web.ts",
+    "./native": "./src/native.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@haedda/constants": "workspace:*",
+    "@haedda/domain": "workspace:*",
+    "@haedda/types": "workspace:*",
+    "@haedda/utils": "workspace:*"
+  }
+}
