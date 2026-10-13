@@ -32,12 +32,12 @@ function getDeadlineStatus(
   deadline: string | undefined,
   isRecurring: boolean,
 ): string {
-  if (!deadline) return "?? ??";
+  if (!deadline) return "기한 없음";
   if (!isRecurring && isDeadlineExpired(deadline)) {
     return formatDeadlineDDay(deadline);
   }
-  if (isDeadlineToday(deadline)) return "????";
-  if (isDeadlineTomorrow(deadline)) return "????";
+  if (isDeadlineToday(deadline)) return "오늘까지";
+  if (isDeadlineTomorrow(deadline)) return "내일까지";
   return formatDeadlineDDay(deadline);
 }
 
@@ -104,17 +104,17 @@ export default function TodoDetailModal({
           <button
             type="button"
             onClick={onClose}
-            aria-label="??"
+            aria-label="닫기"
             className="absolute left-5 sm:left-6 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-lg text-muted hover:text-foreground hover:bg-background transition-colors active:scale-95"
           >
             <MdClose size={20} aria-hidden />
           </button>
-          <span className="text-sm font-semibold text-muted">?? ??</span>
+          <span className="text-sm font-semibold text-muted">할일 상세</span>
           <div className="absolute right-5 sm:right-6 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
             <button
               type="button"
               onClick={onEdit}
-              aria-label="??"
+              aria-label="수정"
               className="w-9 h-9 flex items-center justify-center rounded-lg text-muted hover:text-foreground hover:bg-background transition-colors active:scale-95"
             >
               <MdOutlineEdit size={18} aria-hidden />
@@ -122,7 +122,7 @@ export default function TodoDetailModal({
             <button
               type="button"
               onClick={onDelete}
-              aria-label="??"
+              aria-label="삭제"
               className="w-9 h-9 flex items-center justify-center rounded-lg text-muted hover:text-danger hover:bg-background transition-colors active:scale-95"
             >
               <MdDeleteOutline size={18} aria-hidden />
@@ -142,7 +142,7 @@ export default function TodoDetailModal({
               />
               {isOneTimeExpired && (
                 <p className="mt-2 text-xs text-muted text-center">
-                  ??? ?? ???? ?? ? ???
+                  기한이 지나 스티커를 받을 수 없어요
                 </p>
               )}
             </div>
@@ -167,7 +167,7 @@ export default function TodoDetailModal({
               <p className="text-2xl font-bold text-success tabular-nums">
                 {streak}
               </p>
-              <p className="text-xs text-muted mt-0.5">?? ??</p>
+              <p className="text-xs text-muted mt-0.5">연속 완료</p>
             </div>
           )}
 
@@ -176,12 +176,12 @@ export default function TodoDetailModal({
               <p className="text-2xl font-bold text-danger tabular-nums">
                 {missedCount}
               </p>
-              <p className="text-xs text-muted mt-0.5">???</p>
+              <p className="text-xs text-muted mt-0.5">미완료</p>
             </div>
           )}
 
           <div className="mt-4 rounded-2xl bg-background border border-border divide-y divide-border">
-            <InfoRow label="????">
+            <InfoRow label="카테고리">
               {category ? (
                 <span
                   className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold border ${CATEGORY_CHIP_CLASS[category.color].selected}`}
@@ -189,19 +189,19 @@ export default function TodoDetailModal({
                   {category.label}
                 </span>
               ) : (
-                <span className="text-muted">???</span>
+                <span className="text-muted">미분류</span>
               )}
             </InfoRow>
-            <InfoRow label="???">
+            <InfoRow label="마감일">
               {formatDeadlineDisplay(todo.deadline)}
             </InfoRow>
-            <InfoRow label="?? ??">
+            <InfoRow label="남은 기한">
               <span className={isOneTimeExpired ? "text-danger" : ""}>
                 {deadlineStatus}
               </span>
             </InfoRow>
             {isRecurring && todo.recurrence && (
-              <InfoRow label="??">
+              <InfoRow label="반복">
                 {formatRecurrenceLabel(todo.recurrence)}
               </InfoRow>
             )}
@@ -209,7 +209,7 @@ export default function TodoDetailModal({
 
           {isRecurring && (
             <p className="mt-3 text-xs text-muted text-center">
-              ???? ?? ??? ?? ????
+              완료하면 다음 주기로 자동 넘어가요
             </p>
           )}
 
@@ -218,7 +218,7 @@ export default function TodoDetailModal({
             onClick={onComplete}
             className="w-full mt-5 py-3.5 rounded-xl text-sm font-semibold bg-foreground text-white hover:bg-foreground/90 active:scale-[0.98] transition-all duration-150"
           >
-            ????
+            완료하기
           </button>
         </div>
       </div>
