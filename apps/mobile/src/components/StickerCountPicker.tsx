@@ -42,13 +42,17 @@ export default function StickerCountPicker({
     setEditing(true);
   };
 
-  const commitEdit = () => {
-    const parsed = parseInt(draft, 10);
+  // 입력 중에 저장 버튼을 누르면 입력칸의 blur가 오지 않으므로, 입력할 때마다 값을 올려보낸다
+  const changeDraft = (text: string) => {
+    const digits = text.replace(/\D/g, '');
+    setDraft(digits);
+    const parsed = parseInt(digits, 10);
     if (!Number.isNaN(parsed)) {
       onChange(clamp(parsed));
     }
-    setEditing(false);
   };
+
+  const finishEdit = () => setEditing(false);
 
   return (
     <View style={[styles.container, style]}>
@@ -61,9 +65,9 @@ export default function StickerCountPicker({
             selectTextOnFocus
             keyboardType="number-pad"
             value={draft}
-            onChangeText={text => setDraft(text.replace(/\D/g, ''))}
-            onBlur={commitEdit}
-            onSubmitEditing={commitEdit}
+            onChangeText={changeDraft}
+            onBlur={finishEdit}
+            onSubmitEditing={finishEdit}
             accessibilityLabel={inputAriaLabel}
             style={[styles.count, styles.input]}
           />
