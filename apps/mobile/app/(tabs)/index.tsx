@@ -1,3 +1,3 @@
-import TodoListScreen from '@/src/screens/TodoListScreen';
+import MainScreen from '@/src/screens/MainScreen';
 
-export default TodoListScreen;
+export default MainScreen;

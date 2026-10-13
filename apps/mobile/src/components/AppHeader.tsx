@@ -1,4 +1,5 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import type { TabType } from '@haedda/types';
 import { colors } from '@/src/theme/colors';
 import Icon from './Icon';
 import StickerStar from './StickerStar';
@@ -7,31 +8,54 @@ const LOGO_HEIGHT = 42;
 const LOGO_ASPECT = 512 / 384;
 
 interface Props {
+  activeTab: TabType;
+  onTabChange: (tab: TabType) => void;
   totalStickers: number;
 }
 
-export default function AppHeader({ totalStickers }: Props) {
+export default function AppHeader({ activeTab, onTabChange, totalStickers }: Props) {
+  const rewardActive = activeTab === 'reward';
+
   return (
     <View style={styles.header}>
-      <Image
-        source={require('@/assets/images/haedda-logo.png')}
-        style={styles.logo}
-        resizeMode="contain"
-        accessibilityRole="header"
-        accessibilityLabel="해따"
-      />
-      <View
-        style={styles.stickers}
-        accessible
-        accessibilityLabel={`스티커 ${totalStickers}개`}
+      <Pressable
+        onPress={() => onTabChange('todo')}
+        accessibilityRole="button"
+        accessibilityLabel="할일"
+        accessibilityState={{ selected: activeTab === 'todo' }}
+        style={({ pressed }) => pressed && styles.pressed}
       >
-        <Icon name="store" size={20} color={colors.muted} />
+        <Image
+          source={require('@/assets/images/haedda-logo.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </Pressable>
+
+      <Pressable
+        onPress={() => onTabChange(rewardActive ? 'todo' : 'reward')}
+        accessibilityRole="button"
+        accessibilityLabel={
+          rewardActive ? '할일로 돌아가기' : `보상, 스티커 ${totalStickers}개`
+        }
+        accessibilityState={{ selected: rewardActive }}
+        style={({ pressed }) => [
+          styles.reward,
+          rewardActive && styles.rewardActive,
+          pressed && styles.pressed,
+        ]}
+      >
+        <Icon
+          name="store"
+          size={20}
+          color={rewardActive ? colors.foreground : colors.muted}
+        />
         <View style={styles.divider} />
         <View style={styles.count}>
           <StickerStar size="sm" />
           <Text style={styles.countLabel}>{totalStickers}</Text>
         </View>
-      </View>
+      </Pressable>
     </View>
   );
 }
@@ -51,7 +75,10 @@ const styles = StyleSheet.create({
     height: LOGO_HEIGHT,
     width: Math.round(LOGO_HEIGHT * LOGO_ASPECT),
   },
-  stickers: {
+  pressed: {
+    transform: [{ scale: 0.97 }],
+  },
+  reward: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
@@ -62,6 +89,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.accentMuted,
     backgroundColor: colors.accentSoft,
+  },
+  rewardActive: {
+    borderColor: 'rgba(245, 158, 11, 0.4)',
+    backgroundColor: colors.accentMuted,
   },
   divider: {
     width: 1,

@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { FlatList, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useCategories, useTodos } from '@haedda/hooks';
-import type { Todo, TodoCompleteResult } from '@haedda/types';
+import type { Todo, TodoCategory, TodoCompleteResult, TodoInput } from '@haedda/types';
 import {
   isMissedTodo,
   matchesCategoryFilter,
@@ -11,20 +9,19 @@ import {
   sortMissedTodos,
   type TodoFilter,
 } from '@haedda/utils';
-import AppHeader from '@/src/components/AppHeader';
-import CategoryFilterChips from '@/src/components/CategoryFilterChips';
-import ConfirmTodoModal from '@/src/components/ConfirmTodoModal';
-import DeleteConfirmModal from '@/src/components/DeleteConfirmModal';
-import EmptyState from '@/src/components/EmptyState';
-import Fab from '@/src/components/Fab';
-import FilterChips from '@/src/components/FilterChips';
-import FilterExcludeOption from '@/src/components/FilterExcludeOption';
-import MissedTodosBanner from '@/src/components/MissedTodosBanner';
-import SortSelect from '@/src/components/SortSelect';
-import TodoCard from '@/src/components/TodoCard';
-import TodoCompleteResultModal from '@/src/components/TodoCompleteResultModal';
-import TodoDetailModal from '@/src/components/TodoDetailModal';
-import TodoFormModal from '@/src/components/TodoFormModal';
+import CategoryFilterChips from './CategoryFilterChips';
+import ConfirmTodoModal from './ConfirmTodoModal';
+import DeleteConfirmModal from './DeleteConfirmModal';
+import EmptyState from './EmptyState';
+import Fab from './Fab';
+import FilterChips from './FilterChips';
+import FilterExcludeOption from './FilterExcludeOption';
+import MissedTodosBanner from './MissedTodosBanner';
+import SortSelect from './SortSelect';
+import TodoCard from './TodoCard';
+import TodoCompleteResultModal from './TodoCompleteResultModal';
+import TodoDetailModal from './TodoDetailModal';
+import TodoFormModal from './TodoFormModal';
 import { colors } from '@/src/theme/colors';
 
 const APP_TAGLINE = '할일을 완료하고 스티커를 모아보세요';
@@ -46,11 +43,24 @@ const TODO_SORT_OPTIONS = [
   { value: 'sticker-desc' as const, label: '스티커 많은 순' },
 ];
 
-export default function TodoListScreen() {
+interface Props {
+  todos: Todo[];
+  categories: TodoCategory[];
+  onAddTodo: (todo: TodoInput) => void;
+  onUpdateTodo: (id: string, data: TodoInput) => void;
+  onDeleteTodo: (id: string) => void;
+  onCompleteTodo: (id: string) => TodoCompleteResult | null;
+}
+
+export default function TodoTab({
+  todos,
+  categories,
+  onAddTodo,
+  onUpdateTodo,
+  onDeleteTodo,
+  onCompleteTodo,
+}: Props) {
   const insets = useSafeAreaInsets();
-  const { todos, ready, totalStickers, addTodo, updateTodo, deleteTodo, completeTodo } =
-    useTodos();
-  const { categories } = useCategories();
 
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [detailTarget, setDetailTarget] = useState<Todo | null>(null);
@@ -105,7 +115,7 @@ export default function TodoListScreen() {
   const handleConfirmComplete = () => {
     if (!confirmTarget) return;
     const hadStickers = confirmTarget.stickerCount > 0;
-    const result = completeTodo(confirmTarget.id);
+    const result = onCompleteTodo(confirmTarget.id);
     setConfirmTarget(null);
     if (result && hadStickers) setCompleteResult(result);
   };
@@ -116,7 +126,7 @@ export default function TodoListScreen() {
       content={deleteTarget.content}
       onCancel={() => setDeleteTarget(null)}
       onConfirm={() => {
-        deleteTodo(deleteTarget.id);
+        onDeleteTodo(deleteTarget.id);
         setDeleteTarget(null);
         setDetailTarget(null);
         setEditTarget(null);
@@ -125,119 +135,108 @@ export default function TodoListScreen() {
   );
 
   return (
-    <View style={[styles.screen, { paddingTop: insets.top }]}>
-      <StatusBar style="dark" />
-      <AppHeader totalStickers={totalStickers} />
-
-      {!ready ? (
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.muted} />
-        </View>
+    <View style={styles.tab}>
+      {todos.length === 0 ? (
+        <EmptyState
+          icon="🎯"
+          tagline={APP_TAGLINE}
+          title="아직 할일이 없어요"
+          description="오른쪽 아래 + 버튼으로 첫 할일을 추가해 보세요"
+        />
       ) : (
-        <View style={styles.main}>
-          {todos.length === 0 ? (
-            <EmptyState
-              icon="🎯"
-              tagline={APP_TAGLINE}
-              title="아직 할일이 없어요"
-              description="오른쪽 아래 + 버튼으로 첫 할일을 추가해 보세요"
+        <>
+          {missedTodoCount > 0 && (
+            <MissedTodosBanner
+              count={missedTodoCount}
+              expanded={missedExpanded}
+              onToggle={() => setMissedExpanded(v => !v)}
+              todos={missedTodos}
+              categories={categories}
+              onComplete={handleCompleteClick}
+              onOpen={setDetailTarget}
             />
-          ) : (
+          )}
+          {!missedExpanded && (
             <>
-              {missedTodoCount > 0 && (
-                <MissedTodosBanner
-                  count={missedTodoCount}
-                  expanded={missedExpanded}
-                  onToggle={() => setMissedExpanded(v => !v)}
-                  todos={missedTodos}
-                  categories={categories}
-                  onComplete={handleCompleteClick}
-                  onOpen={setDetailTarget}
+              <View style={styles.filters}>
+                <FilterChips
+                  value={filter}
+                  onChange={setFilter}
+                  options={TODO_FILTER_OPTIONS}
+                  ariaLabel="할일 필터"
                 />
-              )}
-              {!missedExpanded && (
-                <>
-                  <View style={styles.filters}>
-                    <FilterChips
-                      value={filter}
-                      onChange={setFilter}
-                      options={TODO_FILTER_OPTIONS}
-                      ariaLabel="할일 필터"
-                    />
-                    <CategoryFilterChips
-                      value={categoryFilter}
-                      onChange={setCategoryFilter}
-                      categories={categories}
-                    />
-                    <View style={styles.listOptions}>
-                      {filter === 'week' && (
-                        <>
-                          <FilterExcludeOption
-                            label="오늘 목록 제외"
-                            checked={excludeTodayFromWeek}
-                            onChange={setExcludeTodayFromWeek}
-                          />
-                          <View style={styles.optionDivider} />
-                        </>
-                      )}
-                      {filter === 'month' && (
-                        <>
-                          <FilterExcludeOption
-                            label="이번주 목록 제외"
-                            checked={excludeWeekFromMonth}
-                            onChange={setExcludeWeekFromMonth}
-                          />
-                          <View style={styles.optionDivider} />
-                        </>
-                      )}
-                      <SortSelect
-                        value={sort}
-                        onChange={setSort}
-                        options={TODO_SORT_OPTIONS}
-                        ariaLabel="할일 목록 정렬"
+                <CategoryFilterChips
+                  value={categoryFilter}
+                  onChange={setCategoryFilter}
+                  categories={categories}
+                />
+                <View style={styles.listOptions}>
+                  {filter === 'week' && (
+                    <>
+                      <FilterExcludeOption
+                        label="오늘 목록 제외"
+                        checked={excludeTodayFromWeek}
+                        onChange={setExcludeTodayFromWeek}
                       />
-                    </View>
-                  </View>
-                  <FlatList
-                    data={sortedTodos}
-                    keyExtractor={todo => todo.id}
-                    style={styles.list}
-                    contentContainerStyle={[
-                      styles.listContent,
-                      { paddingBottom: 96 + insets.bottom },
-                    ]}
-                    ListEmptyComponent={
-                      <EmptyState
-                        icon="🔍"
-                        tagline={APP_TAGLINE}
-                        title="해당하는 할일이 없어요"
-                        description="다른 필터를 선택해 보세요"
+                      <View style={styles.optionDivider} />
+                    </>
+                  )}
+                  {filter === 'month' && (
+                    <>
+                      <FilterExcludeOption
+                        label="이번주 목록 제외"
+                        checked={excludeWeekFromMonth}
+                        onChange={setExcludeWeekFromMonth}
                       />
-                    }
-                    renderItem={({ item }) => (
-                      <TodoCard
-                        todo={item}
-                        categories={categories}
-                        onComplete={handleCompleteClick}
-                        onOpen={setDetailTarget}
-                      />
-                    )}
+                      <View style={styles.optionDivider} />
+                    </>
+                  )}
+                  <SortSelect
+                    value={sort}
+                    onChange={setSort}
+                    options={TODO_SORT_OPTIONS}
+                    ariaLabel="할일 목록 정렬"
                   />
-                </>
-              )}
+                </View>
+              </View>
+              <FlatList
+                data={sortedTodos}
+                keyExtractor={todo => todo.id}
+                style={styles.list}
+                contentContainerStyle={[
+                  styles.listContent,
+                  { paddingBottom: 96 + insets.bottom },
+                ]}
+                ListEmptyComponent={
+                  <EmptyState
+                    icon="🔍"
+                    tagline={APP_TAGLINE}
+                    title="해당하는 할일이 없어요"
+                    description="다른 필터를 선택해 보세요"
+                  />
+                }
+                renderItem={({ item }) => (
+                  <TodoCard
+                    todo={item}
+                    categories={categories}
+                    onComplete={handleCompleteClick}
+                    onOpen={setDetailTarget}
+                  />
+                )}
+              />
             </>
           )}
-        </View>
+        </>
       )}
 
-      {ready && <Fab onPress={() => setIsAddOpen(true)} label="할일 추가" />}
+      <Fab onPress={() => setIsAddOpen(true)} label="할일 추가" />
 
       {isAddOpen && (
         <TodoFormModal
           categories={categories}
           onClose={() => setIsAddOpen(false)}
           onSave={data => {
-            addTodo(data);
+            onAddTodo(data);
             setIsAddOpen(false);
           }}
         />
@@ -267,7 +266,7 @@ export default function TodoListScreen() {
           categories={categories}
           onClose={() => setEditTarget(null)}
           onSave={data => {
-            updateTodo(editTarget.id, data);
+            onUpdateTodo(editTarget.id, data);
             setEditTarget(null);
           }}
         />
@@ -296,16 +295,7 @@ export default function TodoListScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.surface,
-  },
-  centered: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  main: {
+  tab: {
     flex: 1,
     paddingTop: 16,
     paddingHorizontal: 16,
