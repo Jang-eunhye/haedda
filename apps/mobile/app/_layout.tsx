@@ -1,5 +1,4 @@
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
-import { useColorScheme } from 'react-native';
+import { DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 
 import AppProviders from '@/src/providers/AppProviders';
 
@@ -13,11 +12,10 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <AppProviders>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      {/* 앱 색상은 라이트 모드 기준이라 시스템 다크 모드와 상관없이 라이트 테마를 쓴다 */}
+      <ThemeProvider value={DefaultTheme}>
         {/* 모든 화면이 자체 헤더를 그린다 */}
         <Stack screenOptions={{ headerShown: false }} />
       </ThemeProvider>
