@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { Todo, TodoCategory, TodoCompleteResult, TodoInput } from '@haedda/types';
 import {
@@ -22,6 +22,8 @@ import TodoCard from './TodoCard';
 import TodoCompleteResultModal from './TodoCompleteResultModal';
 import TodoDetailModal from './TodoDetailModal';
 import TodoFormModal from './TodoFormModal';
+import TodoSearchView from './TodoSearchView';
+import Icon from './Icon';
 import { colors } from '@/src/theme/colors';
 import { afterModalClose } from '@/src/utils/afterModalClose';
 
@@ -75,6 +77,7 @@ export default function TodoTab({
   const [excludeTodayFromWeek, setExcludeTodayFromWeek] = useState(true);
   const [excludeWeekFromMonth, setExcludeWeekFromMonth] = useState(true);
   const [missedExpanded, setMissedExpanded] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const filterOptions = useMemo(
     () => ({ excludeTodayFromWeek, excludeWeekFromMonth }),
@@ -144,6 +147,14 @@ export default function TodoTab({
           title="아직 할일이 없어요"
           description="오른쪽 아래 + 버튼으로 첫 할일을 추가해 보세요"
         />
+      ) : searchOpen ? (
+        <TodoSearchView
+          todos={todos}
+          categories={categories}
+          onComplete={handleCompleteClick}
+          onOpen={setDetailTarget}
+          onClose={() => setSearchOpen(false)}
+        />
       ) : (
         <>
           {missedTodoCount > 0 && (
@@ -172,6 +183,16 @@ export default function TodoTab({
                   categories={categories}
                 />
                 <View style={styles.listOptions}>
+                  <Pressable
+                    onPress={() => setSearchOpen(true)}
+                    accessibilityRole="button"
+                    accessibilityLabel="할일 검색"
+                    hitSlop={8}
+                    style={styles.searchButton}
+                  >
+                    <Icon name="search" size={16} color={colors.muted} />
+                    <Text style={styles.searchLabel}>검색</Text>
+                  </Pressable>
                   {filter === 'week' && (
                     <>
                       <FilterExcludeOption
@@ -312,6 +333,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-end',
     gap: 12,
+  },
+  searchButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    marginRight: 'auto',
+  },
+  searchLabel: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: colors.muted,
   },
   optionDivider: {
     width: 1,
