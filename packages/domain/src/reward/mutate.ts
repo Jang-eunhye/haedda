@@ -1,6 +1,19 @@
 import type { Reward } from '@haedda/types';
 import { generateId } from '@haedda/utils';
 
+/** 저장소나 백업에서 읽은 값 중 올바른 보상만 남긴다 */
+export function parseRewardsFromUnknown(parsed: unknown): Reward[] {
+  if (!Array.isArray(parsed)) return [];
+  return parsed.filter(
+    (item): item is Reward =>
+      !!item &&
+      typeof item === 'object' &&
+      typeof (item as Reward).id === 'string' &&
+      typeof (item as Reward).content === 'string' &&
+      typeof (item as Reward).stickerCost === 'number'
+  );
+}
+
 export function createReward(data: Omit<Reward, 'id'>, id: string = generateId()): Reward {
   return { ...data, id };
 }
