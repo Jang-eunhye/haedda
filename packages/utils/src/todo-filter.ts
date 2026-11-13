@@ -1,4 +1,4 @@
-import type { Todo } from '@haedda/types';
+import type { Todo, TodoCategory } from '@haedda/types';
 import {
   getTodayISO,
   getWeekRangeISO,
@@ -87,4 +87,29 @@ export function getFilterContext(ref: Date = new Date()) {
     today: getTodayISO(),
     week: getWeekRangeISO(ref),
   };
+}
+
+/** 검색어를 띄어쓰기로 나눈 단어 목록 (소문자) */
+function toSearchTerms(query: string): string[] {
+  return query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+}
+
+/** 할일 내용·메모·카테고리 이름에 검색어의 모든 단어가 들어 있으면 true */
+export function matchesSearchQuery(
+  todo: Todo,
+  query: string,
+  categories: TodoCategory[] = []
+): boolean {
+  const terms = toSearchTerms(query);
+  if (terms.length === 0) return false;
+  const categoryLabel = categories.find(c => c.id === todo.categoryId)?.label ?? '';
+  const haystack = [todo.content, todo.memo ?? '', categoryLabel].join('\n').toLowerCase();
+  return terms.every(term => haystack.includes(term));
+}
+
+/** 필터와 상관없이 전체 할일에서 찾고, 마감일이 가까운 순(기한 없음은 끝)으로 정렬한다 */
+export function searchTodos(todos: Todo[], query: string, categories: TodoCategory[] = []): Todo[] {
+  return todos
+    .filter(todo => matchesSearchQuery(todo, query, categories))
+    .sort((a, b) => (a.deadline ?? '9999-12-31').localeCompare(b.deadline ?? '9999-12-31'));
 }

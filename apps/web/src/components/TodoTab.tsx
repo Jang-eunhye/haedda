@@ -15,6 +15,8 @@ import FilterChips from './FilterChips';
 import CategoryFilterChips from './CategoryFilterChips';
 import FilterExcludeOption from './FilterExcludeOption';
 import MissedTodosBanner from './MissedTodosBanner';
+import TodoSearchView from './TodoSearchView';
+import { MdSearch } from 'react-icons/md';
 import { isMissedTodo, matchesCategoryFilter, matchesTodoFilter, sortMissedTodos, TodoFilter } from '@haedda/utils';
 import { TodoCategory } from '../utils/categories';
 
@@ -66,6 +68,7 @@ export default function TodoTab({
   const [excludeTodayFromWeek, setExcludeTodayFromWeek] = useState(true);
   const [excludeWeekFromMonth, setExcludeWeekFromMonth] = useState(true);
   const [missedExpanded, setMissedExpanded] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const filterOptions = useMemo(
     () => ({ excludeTodayFromWeek, excludeWeekFromMonth }),
@@ -124,6 +127,14 @@ export default function TodoTab({
           title="아직 할일이 없어요"
           description="오른쪽 아래 + 버튼으로 첫 할일을 추가해 보세요"
         />
+      ) : searchOpen ? (
+        <TodoSearchView
+          todos={todos}
+          categories={categories}
+          onComplete={handleCompleteClick}
+          onOpen={setDetailTarget}
+          onClose={() => setSearchOpen(false)}
+        />
       ) : (
         <>
           {missedTodoCount > 0 && (
@@ -152,6 +163,14 @@ export default function TodoTab({
                   categories={categories}
                 />
                 <div className="flex items-center justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setSearchOpen(true)}
+                    className="mr-auto flex items-center gap-0.5 text-xs text-muted hover:text-foreground transition-colors"
+                  >
+                    <MdSearch size={16} aria-hidden />
+                    검색
+                  </button>
                   {filter === 'week' && (
                     <>
                       <FilterExcludeOption

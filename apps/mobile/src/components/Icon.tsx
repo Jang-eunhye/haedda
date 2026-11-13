@@ -22,6 +22,7 @@ const ICONS = {
   edit: { ios: 'pencil', android: 'edit', web: 'edit' },
   remove: { ios: 'minus', android: 'remove', web: 'remove' },
   repeat: { ios: 'arrow.triangle.2.circlepath', android: 'autorenew', web: 'autorenew' },
+  search: { ios: 'magnifyingglass', android: 'search', web: 'search' },
   settings: { ios: 'gearshape', android: 'settings', web: 'settings' },
   store: { ios: 'storefront', android: 'storefront', web: 'storefront' },
   warning: {
