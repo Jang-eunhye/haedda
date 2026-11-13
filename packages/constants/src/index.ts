@@ -16,3 +16,5 @@ export {
 
 export type { DeadlinePreset } from './deadline-presets';
 export { DEADLINE_PRESET_OPTIONS } from './deadline-presets';
+
+export { WEB_BASE_URL, PRIVACY_POLICY_URL } from './links';

@@ -23,6 +23,7 @@ import TodoCompleteResultModal from './TodoCompleteResultModal';
 import TodoDetailModal from './TodoDetailModal';
 import TodoFormModal from './TodoFormModal';
 import { colors } from '@/src/theme/colors';
+import { afterModalClose } from '@/src/utils/afterModalClose';
 
 const APP_TAGLINE = '할일을 완료하고 스티커를 모아보세요';
 
@@ -117,7 +118,7 @@ export default function TodoTab({
     const hadStickers = confirmTarget.stickerCount > 0;
     const result = onCompleteTodo(confirmTarget.id);
     setConfirmTarget(null);
-    if (result && hadStickers) setCompleteResult(result);
+    if (result && hadStickers) afterModalClose(() => setCompleteResult(result));
   };
 
   const deleteConfirmModal = deleteTarget && (
@@ -248,13 +249,15 @@ export default function TodoTab({
           categories={categories}
           onClose={() => setDetailTarget(null)}
           onEdit={() => {
-            setEditTarget(detailTarget);
+            const target = detailTarget;
             setDetailTarget(null);
+            afterModalClose(() => setEditTarget(target));
           }}
           onDelete={() => setDeleteTarget(detailTarget)}
           onComplete={() => {
-            setConfirmTarget(detailTarget);
+            const target = detailTarget;
             setDetailTarget(null);
+            afterModalClose(() => setConfirmTarget(target));
           }}
           overlay={deleteConfirmModal}
         />
