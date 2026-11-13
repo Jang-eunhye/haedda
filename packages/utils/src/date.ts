@@ -67,22 +67,14 @@ export function formatDeadlineCountdown(deadline?: string): string | null {
 
 export function formatDeadlineLabel(deadline: string): string {
   const [y, m, d] = normalizeDeadline(deadline).split('-').map(Number);
-  const date = new Date(y, m - 1, d);
-  return date.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  // toLocaleDateString은 기기·JS 엔진(앱의 Hermes)마다 결과가 다를 수 있어 직접 만든다
+  return `${y}년 ${m}월 ${d}일`;
 }
 
 /** 카드용: 년도 생략 (6월 18일) */
 export function formatDeadlineShortLabel(deadline: string): string {
-  const [y, m, d] = normalizeDeadline(deadline).split('-').map(Number);
-  const date = new Date(y, m - 1, d);
-  return date.toLocaleDateString('ko-KR', {
-    month: 'long',
-    day: 'numeric',
-  });
+  const [, m, d] = normalizeDeadline(deadline).split('-').map(Number);
+  return `${m}월 ${d}일`;
 }
 
 /** 카드용: 기한 없음 null / label + D-day */
