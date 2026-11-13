@@ -70,18 +70,16 @@ function useTodosState() {
     setTodos(prev => [...prev, createTodo(data)]);
   };
 
+  // 결과를 바로 돌려줘야 해서 setState 콜백 밖에서 계산한다.
+  // (콜백은 나중에 실행될 수 있어 결과가 null로 나가거나, 개발 모드에서 두 번 실행돼 스티커가 두 배로 쌓일 수 있다)
   const completeTodo = (id: string): TodoCompleteResult | null => {
     userMutatedRef.current = true;
-    let result: TodoCompleteResult | null = null;
-    setTodos(prev => {
-      const outcome = completeTodoInList(prev, id);
-      result = outcome.result;
-      if (outcome.stickersEarned > 0) {
-        setTotalStickers(s => s + outcome.stickersEarned);
-      }
-      return outcome.todos;
-    });
-    return result;
+    const outcome = completeTodoInList(todos, id);
+    setTodos(outcome.todos);
+    if (outcome.stickersEarned > 0) {
+      setTotalStickers(s => s + outcome.stickersEarned);
+    }
+    return outcome.result;
   };
 
   const addReward = (data: Omit<Reward, 'id'>) => {
@@ -89,13 +87,9 @@ function useTodosState() {
   };
 
   const claimReward = (id: string): boolean => {
-    let claimed = false;
-    setTotalStickers(current => {
-      const outcome = claimRewardDomain(rewards, current, id);
-      claimed = outcome.success;
-      return outcome.nextTotalStickers;
-    });
-    return claimed;
+    const outcome = claimRewardDomain(rewards, totalStickers, id);
+    if (outcome.success) setTotalStickers(outcome.nextTotalStickers);
+    return outcome.success;
   };
 
   const updateTodo = (id: string, data: TodoInput) => {
