@@ -14,6 +14,7 @@ export {
   updateRewardInList,
   deleteRewardFromList,
   claimReward,
+  parseRewardsFromUnknown,
   type ClaimRewardOutcome,
 } from './reward/mutate';
 
@@ -26,3 +27,14 @@ export {
   updateCategoryInList,
   deleteCategoryFromList,
 } from './category/mutate';
+
+export {
+  BACKUP_FORMAT,
+  BACKUP_VERSION,
+  type BackupData,
+  type BackupFile,
+  type ParseBackupResult,
+  createBackup,
+  serializeBackup,
+  parseBackup,
+} from './backup';

@@ -1,20 +1,12 @@
 import { REWARDS_STORAGE_KEY } from '@haedda/constants';
 import type { Reward } from '@haedda/types';
+import { parseRewardsFromUnknown } from '@haedda/domain';
 import type { StorageAdapter } from '../types';
 
 function parseRewards(raw: string | null): Reward[] {
   if (!raw) return [];
   try {
-    const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (item): item is Reward =>
-        !!item &&
-        typeof item === 'object' &&
-        typeof (item as Reward).id === 'string' &&
-        typeof (item as Reward).content === 'string' &&
-        typeof (item as Reward).stickerCost === 'number'
-    );
+    return parseRewardsFromUnknown(JSON.parse(raw));
   } catch {
     return [];
   }

@@ -27,3 +27,5 @@ export function createRepositories(storage: StorageAdapter): AppRepositories {
     categories: createCategoryRepository(storage),
   };
 }
+
+export { restoreBackup } from './backup';

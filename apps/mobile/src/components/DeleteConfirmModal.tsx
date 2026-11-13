@@ -8,9 +8,17 @@ interface Props {
   content: string;
   onCancel: () => void;
   onConfirm: () => void;
+  /** 확인 버튼 문구 (기본: 삭제) */
+  confirmLabel?: string;
 }
 
-export default function DeleteConfirmModal({ title, content, onCancel, onConfirm }: Props) {
+export default function DeleteConfirmModal({
+  title,
+  content,
+  onCancel,
+  onConfirm,
+  confirmLabel = '삭제',
+}: Props) {
   return (
     <BottomSheet onClose={onCancel}>
       <View style={styles.heading}>
@@ -20,7 +28,7 @@ export default function DeleteConfirmModal({ title, content, onCancel, onConfirm
 
       <View style={styles.actions}>
         <SheetButton label="취소" variant="secondary" onPress={onCancel} style={styles.action} />
-        <SheetButton label="삭제" onPress={onConfirm} style={styles.action} />
+        <SheetButton label={confirmLabel} onPress={onConfirm} style={styles.action} />
       </View>
     </BottomSheet>
   );

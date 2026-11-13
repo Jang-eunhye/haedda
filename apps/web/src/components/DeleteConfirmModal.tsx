@@ -8,9 +8,17 @@ interface Props {
   content: string;
   onCancel: () => void;
   onConfirm: () => void;
+  /** 확인 버튼 문구 (기본: 삭제) */
+  confirmLabel?: string;
 }
 
-export default function DeleteConfirmModal({ title, content, onCancel, onConfirm }: Props) {
+export default function DeleteConfirmModal({
+  title,
+  content,
+  onCancel,
+  onConfirm,
+  confirmLabel = '삭제',
+}: Props) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -51,7 +59,7 @@ export default function DeleteConfirmModal({ title, content, onCancel, onConfirm
             onClick={onConfirm}
             className="flex-1 py-3 rounded-xl bg-foreground text-white text-sm font-semibold hover:bg-foreground/90 transition-all active:scale-[0.98]"
           >
-            삭제
+            {confirmLabel}
           </button>
         </div>
       </div>

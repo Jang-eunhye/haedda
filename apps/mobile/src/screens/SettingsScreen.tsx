@@ -21,6 +21,14 @@ export default function SettingsScreen() {
           <Icon name="chevronRight" size={20} color={colors.muted} />
         </Pressable>
         <Pressable
+          onPress={() => router.push('/settings/backup')}
+          accessibilityRole="link"
+          style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}
+        >
+          <Text style={styles.label}>데이터 백업</Text>
+          <Icon name="chevronRight" size={20} color={colors.muted} />
+        </Pressable>
+        <Pressable
           onPress={() => openBrowserAsync(PRIVACY_POLICY_URL)}
           accessibilityRole="link"
           style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}
