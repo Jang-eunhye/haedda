@@ -8,7 +8,9 @@ import type { TabType } from '@haedda/types';
 import AppHeader from '@/src/components/AppHeader';
 import RewardTab from '@/src/components/RewardTab';
 import TodoTab from '@/src/components/TodoTab';
+import { useReminders } from '@/src/reminders/ReminderProvider';
 import { colors } from '@/src/theme/colors';
+import { afterModalClose } from '@/src/utils/afterModalClose';
 
 export default function MainScreen() {
   const insets = useSafeAreaInsets();
@@ -29,6 +31,13 @@ export default function MainScreen() {
     deleteReward,
   } = useTodos();
   const { categories } = useCategories();
+  const { askPermissionOnce } = useReminders();
+
+  // 첫 할일을 추가하면 알림 권한을 한 번 물어본다 (추가 모달이 닫힌 뒤)
+  const handleAddTodo: typeof addTodo = data => {
+    addTodo(data);
+    afterModalClose(askPermissionOnce);
+  };
 
   return (
     <View style={[styles.screen, { paddingTop: insets.top }]}>
@@ -48,7 +57,7 @@ export default function MainScreen() {
         <TodoTab
           todos={todos}
           categories={categories}
-          onAddTodo={addTodo}
+          onAddTodo={handleAddTodo}
           onUpdateTodo={updateTodo}
           onDeleteTodo={deleteTodo}
           onCompleteTodo={completeTodo}
