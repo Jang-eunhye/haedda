@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AppState } from 'react-native';
 import { AppDataProvider } from '@haedda/hooks';
 import { getTodayISO } from '@haedda/utils';
+import { ReminderProvider } from '@/src/reminders/ReminderProvider';
 import { appStorage } from '@/src/storage';
 
 /**
@@ -30,7 +31,7 @@ export default function AppProviders({ children }: { children: React.ReactNode }
   return (
     // key가 바뀌면 저장소에서 다시 불러온다 (화면은 첫 화면으로 돌아간다)
     <AppDataProvider key={dayKey} storage={appStorage}>
-      {children}
+      <ReminderProvider>{children}</ReminderProvider>
     </AppDataProvider>
   );
 }

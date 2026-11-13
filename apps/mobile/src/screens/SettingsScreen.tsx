@@ -21,6 +21,14 @@ export default function SettingsScreen() {
           <Icon name="chevronRight" size={20} color={colors.muted} />
         </Pressable>
         <Pressable
+          onPress={() => router.push('/settings/reminders')}
+          accessibilityRole="link"
+          style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}
+        >
+          <Text style={styles.label}>알림</Text>
+          <Icon name="chevronRight" size={20} color={colors.muted} />
+        </Pressable>
+        <Pressable
           onPress={() => openBrowserAsync(PRIVACY_POLICY_URL)}
           accessibilityRole="link"
           style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}
