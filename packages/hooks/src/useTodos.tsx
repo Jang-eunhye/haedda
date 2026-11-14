@@ -1,12 +1,14 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { Todo, Reward, TodoInput, TodoCompleteResult } from '@haedda/types';
+import type { HistoryEntry, Todo, Reward, TodoInput, TodoCompleteResult } from '@haedda/types';
 import {
   claimReward as claimRewardDomain,
   clearCategoryFromTodos,
   completeTodoInList,
+  createHistoryEntry,
   createReward,
+  prependHistory,
   createTodo,
   deleteRewardFromList,
   deleteTodoFromList,
@@ -20,6 +22,7 @@ function useTodosState() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [totalStickers, setTotalStickers] = useState<number>(0);
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [ready, setReady] = useState(false);
   const userMutatedRef = useRef(false);
 
@@ -33,14 +36,16 @@ function useTodosState() {
         if (cancelled) return;
 
         setTodos(loaded);
-        const [loadedRewards, loadedStickers] = await Promise.all([
+        const [loadedRewards, loadedStickers, loadedHistory] = await Promise.all([
           appStorage.rewards.loadRewards(),
           appStorage.stickers.loadTotalStickers(),
+          appStorage.history.loadHistory(),
         ]);
         if (cancelled) return;
 
         setRewards(loadedRewards);
         setTotalStickers(loadedStickers);
+        setHistory(loadedHistory);
       } catch {}
       if (!cancelled) setReady(true);
     })();
@@ -65,6 +70,18 @@ function useTodosState() {
     void appStorage.stickers.saveTotalStickers(totalStickers);
   }, [totalStickers, ready, appStorage]);
 
+  // 기록은 바뀐 적이 있을 때만 저장한다 (불러오기 직후 그대로 다시 쓰지 않도록)
+  const historyChangedRef = useRef(false);
+  useEffect(() => {
+    if (!ready || !historyChangedRef.current) return;
+    void appStorage.history.saveHistory(history);
+  }, [history, ready, appStorage]);
+
+  const recordHistory = (entry: HistoryEntry) => {
+    historyChangedRef.current = true;
+    setHistory(prev => prependHistory(prev, entry));
+  };
+
   const addTodo = (data: TodoInput) => {
     userMutatedRef.current = true;
     setTodos(prev => [...prev, createTodo(data)]);
@@ -74,10 +91,21 @@ function useTodosState() {
   // (콜백은 나중에 실행될 수 있어 결과가 null로 나가거나, 개발 모드에서 두 번 실행돼 스티커가 두 배로 쌓일 수 있다)
   const completeTodo = (id: string): TodoCompleteResult | null => {
     userMutatedRef.current = true;
+    const target = todos.find(t => t.id === id);
     const outcome = completeTodoInList(todos, id);
     setTodos(outcome.todos);
     if (outcome.stickersEarned > 0) {
       setTotalStickers(s => s + outcome.stickersEarned);
+    }
+    if (target && outcome.result) {
+      recordHistory(
+        createHistoryEntry({
+          type: 'todo',
+          content: target.content,
+          stickers: outcome.stickersEarned,
+          categoryId: target.categoryId,
+        })
+      );
     }
     return outcome.result;
   };
@@ -88,7 +116,15 @@ function useTodosState() {
 
   const claimReward = (id: string): boolean => {
     const outcome = claimRewardDomain(rewards, totalStickers, id);
-    if (outcome.success) setTotalStickers(outcome.nextTotalStickers);
+    if (outcome.success) {
+      setTotalStickers(outcome.nextTotalStickers);
+      const reward = rewards.find(r => r.id === id);
+      if (reward) {
+        recordHistory(
+          createHistoryEntry({ type: 'reward', content: reward.content, stickers: -reward.stickerCost })
+        );
+      }
+    }
     return outcome.success;
   };
 
@@ -119,6 +155,7 @@ function useTodosState() {
     todos,
     rewards,
     totalStickers,
+    history,
     ready,
     addTodo,
     completeTodo,

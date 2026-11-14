@@ -4,6 +4,8 @@ export {
   REWARDS_STORAGE_KEY,
   STICKERS_STORAGE_KEY,
   CATEGORIES_STORAGE_KEY,
+  HISTORY_STORAGE_KEY,
+  HISTORY_MAX_ENTRIES,
 } from './storage-keys';
 
 export { WEEKDAY_LABELS } from './weekdays';

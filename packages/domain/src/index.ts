@@ -26,3 +26,16 @@ export {
   updateCategoryInList,
   deleteCategoryFromList,
 } from './category/mutate';
+
+export {
+  createHistoryEntry,
+  prependHistory,
+  parseHistoryFromUnknown,
+  historyEntryDay,
+  summarizeHistory,
+  groupHistoryByDay,
+  formatHistoryDayLabel,
+  formatHistoryTime,
+  type HistorySummary,
+  type HistoryDayGroup,
+} from './history';
