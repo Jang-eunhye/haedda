@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { Reward } from '@haedda/types';
 import { colors } from '@/src/theme/colors';
@@ -7,6 +8,7 @@ import ClaimRewardModal from './ClaimRewardModal';
 import DeleteConfirmModal from './DeleteConfirmModal';
 import EmptyState from './EmptyState';
 import Fab from './Fab';
+import Icon from './Icon';
 import RewardCard from './RewardCard';
 import RewardFormModal from './RewardFormModal';
 
@@ -29,6 +31,7 @@ export default function RewardTab({
   onDeleteReward,
   onClaimReward,
 }: Props) {
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<Reward | null>(null);
@@ -65,9 +68,20 @@ export default function RewardTab({
         />
       ) : (
         <>
-          <Text style={styles.title} accessibilityRole="header">
-            보상<Text style={styles.count}>({rewards.length})</Text>
-          </Text>
+          <View style={styles.titleRow}>
+            <Text style={styles.title} accessibilityRole="header">
+              보상<Text style={styles.count}>({rewards.length})</Text>
+            </Text>
+            <Pressable
+              onPress={() => router.push('/history')}
+              accessibilityRole="link"
+              hitSlop={8}
+              style={styles.historyLink}
+            >
+              <Text style={styles.historyLabel}>스티커 기록</Text>
+              <Icon name="chevronRight" size={16} color={colors.muted} />
+            </Pressable>
+          </View>
           <FlatList
             data={rewards}
             keyExtractor={reward => reward.id}
@@ -131,12 +145,28 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingHorizontal: 16,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginBottom: 12,
+  },
   title: {
     fontSize: 16,
     lineHeight: 24,
     fontWeight: '700',
     color: colors.foreground,
-    marginBottom: 12,
+  },
+  historyLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  historyLabel: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: colors.muted,
   },
   count: {
     fontSize: 14,

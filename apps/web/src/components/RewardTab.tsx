@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+import { MdChevronRight } from 'react-icons/md';
 import { useState } from 'react';
 import { Reward } from '@haedda/types';
 import RewardCard from './RewardCard';
@@ -50,11 +52,18 @@ export default function RewardTab({
         />
       ) : (
         <>
-          <div className="shrink-0 mb-3">
+          <div className="shrink-0 mb-3 flex items-center justify-between gap-3">
             <h2 className="text-base font-bold text-foreground tracking-tight">
               보상
               <span className="text-sm font-semibold text-muted tabular-nums">({rewards.length})</span>
             </h2>
+            <Link
+              href="/history"
+              className="flex items-center gap-0.5 text-xs text-muted hover:text-foreground transition-colors"
+            >
+              스티커 기록
+              <MdChevronRight size={16} aria-hidden />
+            </Link>
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto pb-20">
             <div className="space-y-3">
