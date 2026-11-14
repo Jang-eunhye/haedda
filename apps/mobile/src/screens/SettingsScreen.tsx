@@ -21,6 +21,14 @@ export default function SettingsScreen() {
           <Icon name="chevronRight" size={20} color={colors.muted} />
         </Pressable>
         <Pressable
+          onPress={() => router.push('/history')}
+          accessibilityRole="link"
+          style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}
+        >
+          <Text style={styles.label}>스티커 기록</Text>
+          <Icon name="chevronRight" size={20} color={colors.muted} />
+        </Pressable>
+        <Pressable
           onPress={() => openBrowserAsync(PRIVACY_POLICY_URL)}
           accessibilityRole="link"
           style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}
