@@ -1,0 +1,17 @@
+name: test
+
+on:
+  pull_request:
+  push:
+    branches: [main, app/android]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # 테스트는 새 패키지 없이 Node 내장 러너로 돌아서 설치 단계가 필요 없다
+      - run: npm test --silent

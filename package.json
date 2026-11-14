@@ -9,7 +9,8 @@
     "build": "turbo run build",
     "start": "turbo run start",
     "lint": "turbo run lint",
-    "typecheck": "turbo run typecheck"
+    "typecheck": "turbo run typecheck",
+    "test": "TZ=Asia/Seoul node --experimental-strip-types --no-warnings --import ./scripts/register-ts-test-loader.mjs --test \"tests/**/*.test.ts\""
   },
   "devDependencies": {
     "turbo": "^2.5.4",
