@@ -20,6 +20,15 @@ export default function SettingsPage() {
           </li>
           <li>
             <Link
+              href="/history"
+              className="flex items-center gap-3 px-4 sm:px-6 py-3.5 text-foreground hover:bg-background/60 active:bg-background transition-colors"
+            >
+              <span className="flex-1 text-sm font-medium">스티커 기록</span>
+              <MdChevronRight size={20} className="text-muted shrink-0" aria-hidden />
+            </Link>
+          </li>
+          <li>
+            <Link
               href="/privacy"
               className="flex items-center gap-3 px-4 sm:px-6 py-3.5 text-foreground hover:bg-background/60 active:bg-background transition-colors"
             >
