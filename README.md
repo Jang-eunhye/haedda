@@ -30,7 +30,15 @@ pnpm install
 pnpm dev:web      # 웹 개발 서버 (http://localhost:3000)
 pnpm dev:mobile   # Expo 개발 서버 (Expo Go 앱으로 QR 스캔)
 pnpm typecheck    # 전체 타입 검사
+pnpm test         # 핵심 로직 테스트 (Node 22 내장 테스트 러너, 설치 없이도 실행 가능)
 ```
+
+## 테스트
+
+`tests/` 아래에 날짜·반복·필터·할일 완료·보상 로직 테스트가 있어요. 새 패키지 없이 Node 내장 테스트 러너(`node --test`)와
+`scripts/ts-test-loader.mjs`(워크스페이스 경로와 확장자 없는 import를 풀어주는 로더)로 TS 소스를 바로 실행해요.
+날짜는 `tests/helpers.ts`의 `freezeTime()`으로 2026년 11월 14일(토)에 고정하고, 시간대는 Asia/Seoul로 맞춰요.
+PR을 올리면 GitHub Actions에서 자동으로 돌아요.
 
 ## 앱 빌드 (EAS)
 
