@@ -15,8 +15,21 @@ import FilterChips from './FilterChips';
 import CategoryFilterChips from './CategoryFilterChips';
 import FilterExcludeOption from './FilterExcludeOption';
 import MissedTodosBanner from './MissedTodosBanner';
+import TodoCalendarView from './TodoCalendarView';
+import ViewModeToggle, { type TodoViewMode } from './ViewModeToggle';
+import { useTodos } from '@haedda/hooks';
 import { isMissedTodo, matchesCategoryFilter, matchesTodoFilter, sortMissedTodos, TodoFilter } from '@haedda/utils';
 import { TodoCategory } from '../utils/categories';
+
+const VIEW_MODE_STORAGE_KEY = 'haedda:todo-view-mode';
+
+function loadViewMode(): TodoViewMode {
+  try {
+    return window.localStorage.getItem(VIEW_MODE_STORAGE_KEY) === 'calendar' ? 'calendar' : 'list';
+  } catch {
+    return 'list';
+  }
+}
 
 const APP_TAGLINE = '할일을 완료하고 스티커를 모아보세요';
 
@@ -66,6 +79,21 @@ export default function TodoTab({
   const [excludeTodayFromWeek, setExcludeTodayFromWeek] = useState(true);
   const [excludeWeekFromMonth, setExcludeWeekFromMonth] = useState(true);
   const [missedExpanded, setMissedExpanded] = useState(false);
+  const [viewMode, setViewMode] = useState<TodoViewMode>('list');
+  const { history } = useTodos();
+
+  useEffect(() => {
+    setViewMode(loadViewMode());
+  }, []);
+
+  const changeViewMode = (mode: TodoViewMode) => {
+    setViewMode(mode);
+    try {
+      window.localStorage.setItem(VIEW_MODE_STORAGE_KEY, mode);
+    } catch {
+      // 저장이 안 돼도 이번 화면에서는 바뀐 보기 방식을 쓴다
+    }
+  };
 
   const filterOptions = useMemo(
     () => ({ excludeTodayFromWeek, excludeWeekFromMonth }),
@@ -137,7 +165,18 @@ export default function TodoTab({
               onOpen={setDetailTarget}
             />
           )}
-          {!missedExpanded && (
+          {!missedExpanded && viewMode === 'calendar' && (
+            <TodoCalendarView
+              todos={todos}
+              history={history}
+              categories={categories}
+              viewMode={viewMode}
+              onViewModeChange={changeViewMode}
+              onComplete={handleCompleteClick}
+              onOpen={setDetailTarget}
+            />
+          )}
+          {!missedExpanded && viewMode === 'list' && (
             <>
               <div className="shrink-0 mb-3 space-y-2">
                 <FilterChips
@@ -152,6 +191,9 @@ export default function TodoTab({
                   categories={categories}
                 />
                 <div className="flex items-center justify-end gap-3">
+                  <div className="mr-auto">
+                    <ViewModeToggle value={viewMode} onChange={changeViewMode} />
+                  </div>
                   {filter === 'week' && (
                     <>
                       <FilterExcludeOption

@@ -39,3 +39,12 @@ export {
   type HistorySummary,
   type HistoryDayGroup,
 } from './history';
+
+export {
+  buildMonthGrid,
+  groupTodosByDeadline,
+  groupCompletionsByDay,
+  shiftMonth,
+  formatCalendarDayTitle,
+  type CalendarCell,
+} from './calendar';
